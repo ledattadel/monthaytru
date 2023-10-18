@@ -7,6 +7,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import { editProductAPI, getAllBrand, getAllAccessoryTypeAPI } from 'src/components/services';
+import { useRef } from 'react';
 
 export default function ProductEditDialog(props) {
   const { openDialog, setOpenDialog, getAllProduct, setContentToast, setSeverity, setOpenToast, product } = props;
@@ -18,26 +19,33 @@ export default function ProductEditDialog(props) {
   const [isError, setIsError] = React.useState(false);
   const [listBrand, setListBrand] = React.useState([]);
 
+  const brandRef = useRef(product?.brand?.BrandName)
   React.useEffect(() => {
-    console.log(product.brand);
+    fetchAllBrand();
+    // getAllProductType();
+  }, []);
+  React.useEffect(() => {
     setName(product?.ProductName);
     setPrice(product?.Price);
     setQuantity(product?.Unit);
     setBrand(product?.brand?.BrandName);
     setDescription(product?.ProductDescription);
-  }, [product, product.brand.BrandName]);
+  }, [product]);
 
   const editProduct = async (data, productId) => {
     try {
       const res = await editProductAPI(data, productId);
+      let errorMessage = res.message ||  'Sửa sản phẩm thất bại'
+      let successMessage =  res.message || 'Sửa sản phẩm thành công'
+     
       if (res.status === 200) {
-        setContentToast(res?.data);
+        setContentToast(successMessage);
         setSeverity('success');
         setOpenToast(true);
         setOpenDialog(false);
         getAllProduct();
       } else {
-        setContentToast('Sửa sản phẩm thất bại');
+        setContentToast(errorMessage);
         setOpenToast(true);
         setSeverity('error');
       }
@@ -53,7 +61,6 @@ export default function ProductEditDialog(props) {
     try {
       const res = await getAllBrand();
       setListBrand(res?.data);
-      // console.log("res:::",res);
     } catch (error) {
       console.log(error);
     }
@@ -69,10 +76,7 @@ export default function ProductEditDialog(props) {
     }
   };
 
-  React.useEffect(() => {
-    fetchAllBrand();
-    // getAllProductType();
-  }, []);
+  
 
   const handleClose = () => {
     setOpenDialog(false);
@@ -93,6 +97,21 @@ export default function ProductEditDialog(props) {
 
     //   editProduct(data, product?.id);
     // }
+
+
+
+
+    if (!quantity || !name || !price || !brand  ) {
+      console.log(quantity,name,price,brand);
+      setIsError(true);
+    } else {
+      setIsError(false);
+
+      
+      const data = { ProductName: name, ProductDescription : description, BrandName: brand, Unit:quantity, Price: price }
+
+      editProduct(data, product?.ProductID);
+    }
   };
 
   return (
@@ -151,9 +170,9 @@ export default function ProductEditDialog(props) {
               disablePortal
               id="brand"
               options={listBrand}
-              getOptionLabel={(option) => option?.BrandName}
+              getOptionLabel={(option) => option?.BrandName || brand}
               sx={{ width: 500, mr: 2 }}
-              value={brand}
+              value={brand ? brand : brandRef.current}
               onChange={(e, newValue) => {
                 
                 setBrand(newValue?.BrandName);

@@ -93,13 +93,16 @@ export default function Brand() {
   const deleteAPI = async (id) => {
     try {
       const res = await deleteBrandAPI(id);
+      let errorMessage = res.message ||  'Xoá Hãng thất bại'
+      let successMessage =  res.message || 'Xoá Hãng thành công'
+     
       if (res.status === 200) {
-        setContentToast(res?.data);
+        setContentToast(successMessage);
         setSeverity('success');
         setOpenToast(true);
         getAllBrand();
       } else {
-        setContentToast(res?.data);
+        setContentToast(errorMessage);
         setSeverity('error');
         setOpenToast(true);
       }
@@ -111,7 +114,7 @@ export default function Brand() {
   const getAllBrand = async () => {
     try {
       const res = await getAllBrandAPI();
-      // setListProduct(res?.data);
+      setListProduct(res?.data);
     } catch (error) {
       console.log(error);
     }

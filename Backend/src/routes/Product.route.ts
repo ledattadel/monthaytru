@@ -10,7 +10,7 @@ router.get('/:id',ProductService.getById);
 
 router.post('/', ProductService.create);
 
-router.put('/:id', ProductService.update);
+router.patch('/:id', ProductService.update);
 
 router.delete('/:id', ProductService.delete);
 

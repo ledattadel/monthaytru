@@ -33,6 +33,10 @@ export const Vi = {
   costPrice: 'Gía gốc ',
   nameBrand: 'Tên hãng',
   nameSupplier: 'Tên nhà cung cấp',
+   
+  phoneNumberSupplier: 'Số điện thoại nhà cung cấp',
+
+  addressSupplier: 'Địa chỉ nhà cung cấp',
   priceService: 'Giá dịch vụ',
   nameService: 'Tên dịch vụ',
   plateNumber: 'Biển số xe',

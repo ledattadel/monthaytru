@@ -4,14 +4,27 @@ import { authenticateJwt, checkAdminRole, checkTechnicianRole, checkManageRole, 
 
 const router = Router();
 
-router.get('/',authenticateJwt,checkManageAndAdminRole, ServiceService.getAll);
+// router.get('/',authenticateJwt,checkManageAndAdminRole, ServiceService.getAll);
 
-router.get('/:id',authenticateJwt,checkManageAndAdminRole, ServiceService.getById);
+// router.get('/:id',authenticateJwt,checkManageAndAdminRole, ServiceService.getById);
 
-router.post('/',authenticateJwt,checkManageAndAdminRole, ServiceService.create);
+// router.post('/',authenticateJwt,checkManageAndAdminRole, ServiceService.create);
 
-router.put('/:id',authenticateJwt,checkManageAndAdminRole, ServiceService.update);
+// router.put('/:id',authenticateJwt,checkManageAndAdminRole, ServiceService.update);
 
-router.delete('/:id',authenticateJwt,checkManageAndAdminRole, ServiceService.delete);
+// router.delete('/:id',authenticateJwt,checkManageAndAdminRole, ServiceService.delete);
+
+
+
+
+router.get('/', ServiceService.getAll);
+
+router.get('/:id', ServiceService.getById);
+
+router.post('/', ServiceService.create);
+
+router.patch('/:id', ServiceService.update);
+
+router.delete('/:id', ServiceService.delete);
 
 export default router;

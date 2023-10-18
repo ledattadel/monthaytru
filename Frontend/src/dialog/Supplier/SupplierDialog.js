@@ -18,30 +18,28 @@ import { Vi } from 'src/_mock/Vi';
 export default function SupplierDialog(props) {
   const { openDialog, setOpenDialog, getAllProduct, setContentToast, setSeverity, setOpenToast } = props;
   const [name, setName] = React.useState();
-  // const [quantity, setQuantity] = React.useState();
-  // const [price, setPrice] = React.useState();
-  // const [manufacturer, setManufacturer] = React.useState();
-  // const [accessoryType, setAccessoryType] = React.useState();
-  // const [description, setDescription] = React.useState();
+  const [phoneNumber, setPhoneNumber] = React.useState();
+  const [address, setAddress] = React.useState();
   const [isError, setIsError] = React.useState(false);
-  // const [listManufacturer, setListManufacturer] = React.useState([]);
-  // const [listAccessoryType, setListAccessoryType] = React.useState([]);
   const [selectedFile, setSelectedFile] = React.useState();
   const [imageUrl, setImageUrl] = React.useState();
 
   const addNewProduct = async (data) => {
     try {
       const res = await addNewSupplierAPI(data);
-      if (res.status === 200) {
+      let errorMessage = res.message ||  'Thêm nhà cung cấp thất bại'
+      let successMessage =  res.message || 'Thêm nhà cung cấp thành công'
+     
+      if (res.status === 201) {
         setName(null);
 
-        setContentToast(res?.data);
+        setContentToast(successMessage);
         setSeverity('success');
         setOpenToast(true);
         setOpenDialog(false);
         getAllProduct();
       } else {
-        setContentToast('Thêm nhà cung cấp thất bại');
+        setContentToast(errorMessage);
         setOpenToast(true);
         setSeverity('error');
       }
@@ -63,62 +61,21 @@ export default function SupplierDialog(props) {
       setIsError(true);
     } else {
       setIsError(false);
-      //const data = {
-      //  name,
-      //  quantity,
-      //  price,
-      //  manufacturer,
-      //  accessoryType,
-      //  productType: 2,
-      //	image: selectedFile,
-      //  description: [
-      //    {
-      //      type: 'Content',
-      //      description: description || '',
-      //    },
-      //  ],
-      //};
-      const bodyFormData = new FormData();
-      bodyFormData.append('name', name);
-      // bodyFormData.append('quantity', quantity);
-      // bodyFormData.append('price', price);
-      // bodyFormData.append('manufacturer', manufacturer);
-      // bodyFormData.append('accessoryType', accessoryType);
-      // bodyFormData.append('productType', 2);
-      // bodyFormData.append('image', selectedFile);
-      // bodyFormData.append('description', description);
-
-      // CALL API add new product
       const data = {
         name: name,
+        phoneNumber: phoneNumber,
+        address: address
       };
       addNewProduct(data);
     }
   };
 
-  const handleUploadImage = (e) => {
-    let file = e.target.files[0];
-    const reader = new FileReader();
-
-    reader.addEventListener(
-      'load',
-      () => {
-        setImageUrl(reader.result);
-      },
-      false
-    );
-
-    if (file) {
-      reader.readAsDataURL(file);
-      setSelectedFile(file);
-    }
-  };
 
   return (
     <div>
       <Dialog open={openDialog} onClose={handleClose}>
         <DialogTitle>{Vi.addNewSupplier}</DialogTitle>
-        <DialogContent sx={{ height: 150, width: 500 }}>
+        <DialogContent sx={{ height: 300, width: 500 }}>
           <TextField
             margin="dense"
             id="name"
@@ -130,12 +87,29 @@ export default function SupplierDialog(props) {
             onChange={(e) => setName(e.target.value)}
             required
           />
+          <TextField
+            margin="dense"
+            id="phone"
+            label={Vi.phoneNumberSupplier}
+            type="number"
+            fullWidth
+            variant="outlined"
+            sx={{ mt: 2 }}
+            onChange={(e) => setPhoneNumber(e.target.value)}
+            required
+          />
+          <TextField
+            margin="dense"
+            id="address"
+            label={Vi.addressSupplier}
+            type="text"
+            fullWidth
+            variant="outlined"
+            sx={{ mt: 2 }}
+            onChange={(e) => setAddress(e.target.value)}
+            required
+          />
 
-          {/* <Button variant="contained" component="label" sx={{ mt: 2, mb: 2 }}>
-            Upload Image
-            <input hidden accept="image/*" type="file" onChange={handleUploadImage} />
-          </Button>
-          {imageUrl && <img src={imageUrl} alt="ProductImage" />}
           <p
             style={{
               margin: '10px',
@@ -146,7 +120,7 @@ export default function SupplierDialog(props) {
             }}
           >
             Please enter full information
-          </p> */}
+          </p> 
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Huỷ</Button>

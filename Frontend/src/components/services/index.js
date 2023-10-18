@@ -189,9 +189,9 @@ export const addNewBrandAPI = async (body) => {
   }
 };
 
-export const editBrandAPI = async (body) => {
+export const editBrandAPI = async (body, id) => {
   try {
-    const response = await axios.patch(API_UPDATE_BRAND, body, {
+    const response = await axios.patch(`${API_UPDATE_BRAND}/${id}`, body, {
       headers: { authorization: `Bearer ${token}` },
     });
     return response;
@@ -233,9 +233,9 @@ export const addNewSupplierAPI = async (body) => {
   }
 };
 
-export const editSupplierAPI = async (body) => {
+export const editSupplierAPI = async (body, id) => {
   try {
-    const response = await axios.patch(API_UPDATE_SUPPLIER, body, {
+    const response = await axios.patch(`${API_UPDATE_SUPPLIER}/${id}`, body, {
       headers: { authorization: `Bearer ${token}` },
     });
     return response;

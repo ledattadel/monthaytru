@@ -4,19 +4,51 @@ import { authenticateJwt, checkAdminRole, checkTechnicianRole, checkManageRole, 
 
 const router = Router();
 
+// // GET all suppliers
+// router.get('/',authenticateJwt,checkManageAndAdminRole, SupplierService.getAll);
+
+// // GET a supplier by ID
+// router.get('/:id',authenticateJwt,checkManageAndAdminRole, SupplierService.getById);
+
+// // CREATE a new supplier
+// router.post('/',authenticateJwt,checkManageAndAdminRole, SupplierService.create);
+
+// // UPDATE a supplier by ID
+// router.put('/:id',authenticateJwt,checkManageAndAdminRole, SupplierService.update);
+
+// // DELETE a supplier by ID
+// router.delete('/:id',authenticateJwt,checkManageAndAdminRole, SupplierService.delete);
+
+
+
+
+
 // GET all suppliers
-router.get('/',authenticateJwt,checkManageAndAdminRole, SupplierService.getAll);
+
+router.get('/', SupplierService.getAll);
+
+
 
 // GET a supplier by ID
-router.get('/:id',authenticateJwt,checkManageAndAdminRole, SupplierService.getById);
+
+router.get('/:id', SupplierService.getById);
+
+
 
 // CREATE a new supplier
-router.post('/',authenticateJwt,checkManageAndAdminRole, SupplierService.create);
+
+router.post('/',SupplierService.create);
+
+
 
 // UPDATE a supplier by ID
-router.put('/:id',authenticateJwt,checkManageAndAdminRole, SupplierService.update);
+
+router.patch('/:id', SupplierService.update);
+
+
 
 // DELETE a supplier by ID
-router.delete('/:id',authenticateJwt,checkManageAndAdminRole, SupplierService.delete);
+
+router.delete('/:id', SupplierService.delete);
 
 export default router;

@@ -7,37 +7,35 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import { editProductAPI, editSupplierAPI } from 'src/components/services';
+import { Vi } from 'src/_mock/Vi';
 
 export default function SupplierEditDialog(props) {
   const { openDialog, setOpenDialog, getAllProduct, setContentToast, setSeverity, setOpenToast, product } = props;
   const [name, setName] = useState();
-  // const [quantity, setQuantity] = useState();
-  // const [price, setPrice] = useState();
-  // const [manufacturer, setManufacturer] = useState();
-  // const [accessoryType, setAccessoryType] = useState();
+  const [phoneNumber, setPhoneNumber] = React.useState();
+  const [address, setAddress] = React.useState();
   const [isError, setIsError] = useState(false);
-  // const [listManufacturer, setListManufacturer] = useState();
-  // const [listAccessoryType, setListAccessoryType] = useState();
 
   React.useEffect(() => {
     setName(product?.name);
-    // setPrice(product?.price);
-    // setQuantity(product?.quantity);
-    // setManufacturer(product?.manufacturer);
-    // setAccessoryType(product?.accessoryType);
+    setPhoneNumber(product?.phoneNumber);
+    setAddress(product?.address)
   }, [product]);
 
   const editProduct = async (data, productId) => {
     try {
       const res = await editSupplierAPI(data, productId);
+      let errorMessage = res.message ||  'Cập nhật nhà cung cấp thất bại'
+      let successMessage =  res.message || 'Cập nhật nhà cung cấp thành công'
+     
       if (res.status === 200) {
-        setContentToast(res?.data);
+        setContentToast(successMessage);
         setSeverity('success');
         setOpenToast(true);
         setOpenDialog(false);
         getAllProduct();
       } else {
-        setContentToast('Sửa sản phẩm thất bại');
+        setContentToast(errorMessage);
         setOpenToast(true);
         setSeverity('error');
       }
@@ -58,10 +56,12 @@ export default function SupplierEditDialog(props) {
     } else {
       setIsError(false);
       const data = {
-        BrandName: name,
+        name: name,
+        phoneNumber: phoneNumber,
+        address: address
       };
 
-      editProduct(data, product?.id);
+      editProduct(data, product?.SupplierID);
     }
   };
 
@@ -69,11 +69,11 @@ export default function SupplierEditDialog(props) {
     <div>
       <Dialog open={openDialog} onClose={handleClose}>
         <DialogTitle>Chỉnh sửa nhà cung cấp</DialogTitle>
-        <DialogContent sx={{ height: 150, width: 500 }}>
+        <DialogContent sx={{ height: 300, width: 500 }}>
           <TextField
             margin="dense"
             id="name"
-            label="Tên nhà cung cấp"
+            label={Vi.nameSupplier}
             type="text"
             fullWidth
             variant="outlined"
@@ -82,34 +82,30 @@ export default function SupplierEditDialog(props) {
             onChange={(e) => setName(e.target.value)}
             required
           />
-          {/* <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              mt: 3,
-            }}
-          >
-            <TextField
-              autoFocus
-              id="quantity"
-              label="Quantity"
-              type="number"
-              size="medium"
-              value={quantity}
-              sx={{ width: 500, mr: 2 }}
-              onChange={(e) => setQuantity(e.target.value)}
-              required
-            />
-            <TextField
-              id="price"
-              label="Price"
-              type="Number"
-              fullWidth
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              required
-            />
-          </Box>
+           <TextField
+            margin="dense"
+            id="phone"
+            label={Vi.phoneNumberSupplier}
+            type="number"
+            fullWidth
+            variant="outlined"
+            sx={{ mt: 2 }}
+            onChange={(e) => setPhoneNumber(e.target.value)}
+            required
+            value={phoneNumber}
+          />
+          <TextField
+            margin="dense"
+            id="address"
+            label={Vi.addressSupplier}
+            type="text"
+            fullWidth
+            variant="outlined"
+            sx={{ mt: 2 }}
+            onChange={(e) => setAddress(e.target.value)}
+            required
+            value={address}
+          />
           <p
             style={{
               margin: '10px',
@@ -120,7 +116,7 @@ export default function SupplierEditDialog(props) {
             }}
           >
             Please enter full information
-          </p> */}
+          </p> 
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Huỷ</Button>

@@ -6,7 +6,7 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import { editProductAPI } from 'src/components/services';
+import { editBrandAPI } from 'src/components/services';
 
 export default function BrandEditDialog(props) {
   const { openDialog, setOpenDialog, getAllProduct, setContentToast, setSeverity, setOpenToast, product } = props;
@@ -29,15 +29,18 @@ export default function BrandEditDialog(props) {
 
   const editProduct = async (data, productId) => {
     try {
-      const res = await editProductAPI(data, productId);
+      const res = await editBrandAPI(data, productId);
+      let errorMessage = res.message ||  'Cập nhật Hãng thất bại'
+      let successMessage =  res.message || 'Cập nhật Hãng thành công'
+     
       if (res.status === 200) {
-        setContentToast(res?.data);
+        setContentToast(successMessage);
         setSeverity('success');
         setOpenToast(true);
         setOpenDialog(false);
         getAllProduct();
       } else {
-        setContentToast('Sửa sản phẩm thất bại');
+        setContentToast(errorMessage);
         setOpenToast(true);
         setSeverity('error');
       }
@@ -61,7 +64,7 @@ export default function BrandEditDialog(props) {
         BrandName: name,
       };
 
-      editProduct(data, product?.id);
+      editProduct(data, product?.BrandID);
     }
   };
 

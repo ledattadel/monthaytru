@@ -22,7 +22,7 @@ router.get('/:id',BrandService.getById);
 
 router.post('/', BrandService.create);
 
-router.put('/:id', BrandService.update);
+router.patch('/:id', BrandService.update);
 
 router.delete('/:id', BrandService.delete);
 export default router;

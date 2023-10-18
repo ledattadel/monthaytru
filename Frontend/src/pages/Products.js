@@ -92,13 +92,16 @@ export default function User() {
   const deleteAPI = async (id) => {
     try {
       const res = await deleteProductAPI(id);
+      let errorMessage = res.message ||  'Xoá sản phẩm thất bại'
+      let successMessage =  res.message || 'Xoá sản phẩm thành công'
+     
       if (res.status === 200) {
-        setContentToast(res?.data);
+        setContentToast(successMessage);
         setSeverity('success');
         setOpenToast(true);
         getAllProduct();
       } else {
-        setContentToast(res?.data);
+        setContentToast(successMessage);
         setSeverity('error');
         setOpenToast(true);
       }
