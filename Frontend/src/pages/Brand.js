@@ -64,7 +64,7 @@ function applySortFilter(array, comparator, query) {
     return a[1] - b[1];
   });
   if (query) {
-    return filter(array, (_user) => _user.name.toLowerCase().indexOf(query.toLowerCase()) !== -1);
+    return filter(array, (_user) => _user.BrandName.toLowerCase().indexOf(query.toLowerCase()) !== -1);
   }
   return stabilizedThis?.map((el) => el[0]);
 }
@@ -93,9 +93,9 @@ export default function Brand() {
   const deleteAPI = async (id) => {
     try {
       const res = await deleteBrandAPI(id);
-      let errorMessage = res.message ||  'Xoá Hãng thất bại'
-      let successMessage =  res.message || 'Xoá Hãng thành công'
-     
+      let errorMessage = res.message || 'Xoá Hãng thất bại';
+      let successMessage = res.message || 'Xoá Hãng thành công';
+
       if (res.status === 200) {
         setContentToast(successMessage);
         setSeverity('success');

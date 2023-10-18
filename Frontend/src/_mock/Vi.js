@@ -16,7 +16,7 @@ export const Vi = {
   inforQuote: 'Thông tin phiếu báo gía',
   inforImportProduct: 'Thông tin phiếu nhập',
   addNewCustomer: 'Tạo khách hàng mới',
-  
+
   addNewStaff: 'Tạo nhân viên mới',
 
   addNewProduct: 'Tạo sản phẩm mới',
@@ -33,7 +33,7 @@ export const Vi = {
   costPrice: 'Gía gốc ',
   nameBrand: 'Tên hãng',
   nameSupplier: 'Tên nhà cung cấp',
-   
+
   phoneNumberSupplier: 'Số điện thoại nhà cung cấp',
 
   addressSupplier: 'Địa chỉ nhà cung cấp',
@@ -43,7 +43,7 @@ export const Vi = {
   createAt: 'Tạo lúc',
   descriptionReceipt: 'Mô tả đơn nhận',
   price: 'Giá',
-  costPrice: 'Giá gốc',
+  costPrice: 'Giá Nhập',
   status: 'Trạng thái',
   detail: 'Chi tiết',
   receiptId: 'Mã tiếp nhận',
@@ -51,7 +51,8 @@ export const Vi = {
   createName: 'Người tạo',
   vehicleInformation: 'Thông tin xe',
   quoteId: 'Mã phiếu báo gía',
-  addProductService: 'Thêm sản phẩm / dịch vụ vào phiếu báo giá',
+  importProductId: 'Mã phiếu nhập',
+  addProductService: 'Thêm sản phẩm vào phiếu nhập',
   //xe
   brandVehicle: 'Hãng xe',
   vehicleNumber: 'Biển số xe',
@@ -76,5 +77,7 @@ export const Vi = {
   address: 'Địa chỉ',
   role: 'Vai trò',
   userName: 'Tên tài khoản',
+  autoRenderId: 'Hệ thống tự tạo',
+  staffWork: 'Nhân viên sửa chửa',
   // Please enter full information: 'Nha'
 };

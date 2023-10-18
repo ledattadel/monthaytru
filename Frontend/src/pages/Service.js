@@ -28,7 +28,7 @@ import Iconify from '../components/Iconify';
 import SearchNotFound from '../components/SearchNotFound';
 import { UserListHead, UserListToolbar, UserMoreMenu } from '../sections/@dashboard/user';
 // mock
-import { deleteProductAPI, getAllServicesAPI } from '../components/services/index';
+import { deleteProductAPI, deleteServiceAPI, getAllServiceAPI, getAllServicesAPI } from '../components/services/index';
 import { Vi } from 'src/_mock/Vi';
 
 // ----------------------------------------------------------------------
@@ -67,9 +67,10 @@ function applySortFilter(array, comparator, query) {
     return a[1] - b[1];
   });
   if (query) {
-    return filter(array, (_user) => _user.name.toLowerCase().indexOf(query.toLowerCase()) !== -1);
+    return filter(array, (_user) => _user.ServiceName.toLowerCase().indexOf(query.toLowerCase()) !== -1);
   }
   return stabilizedThis?.map((el) => el[0]);
+  // return array;
 }
 
 export default function Service() {
@@ -104,9 +105,9 @@ export default function Service() {
 
   const getAllService = async () => {
     try {
-      const res = await getAllServicesAPI();
+      const res = await getAllServiceAPI();
       const temp = res?.data;
-      // setListService(temp);
+      setListService(temp);
     } catch (error) {
       console.log(error);
     }
@@ -114,20 +115,25 @@ export default function Service() {
 
   const deleteAPI = async (id) => {
     try {
-      const res = await deleteProductAPI(id);
+      const res = await deleteServiceAPI(id);
+      let errorMessage = res.message || 'Xoá dịch vụ thất bại';
+      let successMessage = res.message || 'Xoá dịch vụ thành công';
       if (res.status === 200) {
         console.log('res', res);
-        setContentToast(res?.data);
+        setContentToast(errorMessage);
         setSeverity('success');
         setOpenToast(true);
         getAllService();
       } else {
-        setContentToast(res?.data);
+        setContentToast(errorMessage);
         setSeverity('error');
         setOpenToast(true);
       }
     } catch (error) {
       console.log(error);
+      setContentToast('Xoá dịch vụ thất bại');
+      setSeverity('error');
+      setOpenToast(true);
     }
   };
 
@@ -143,7 +149,7 @@ export default function Service() {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = listService.map((n) => n.name);
+      const newSelecteds = listService.map((n) => n.ServiceName);
       setSelected(newSelecteds);
       return;
     }

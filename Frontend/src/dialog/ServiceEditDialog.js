@@ -6,7 +6,7 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import { editProductAPI, getAllServiceTypeAPI } from '../components/services/index';
+import { editProductAPI, editServiceAPI, getAllServiceTypeAPI } from '../components/services/index';
 
 export default function ServiceEditDialog(props) {
   const { openDialog, setOpenDialog, getAllService, setContentToast, setSeverity, setOpenToast, service } = props;
@@ -25,16 +25,17 @@ export default function ServiceEditDialog(props) {
 
   const editService = async (data, productId) => {
     try {
-      const res = await editProductAPI(data, productId);
-      console.log(res);
+      const res = await editServiceAPI(productId, data);
+      let errorMessage = res.message || 'Cập nhật dịch vụ thất bại';
+      let successMessage = res.message || 'Cập nhật dịch vụ thành công';
       if (res.status === 200) {
-        setContentToast(res?.data);
+        setContentToast(errorMessage);
         setSeverity('success');
         setOpenToast(true);
         setOpenDialog(false);
         getAllService();
       } else {
-        setContentToast('Sửa dịch vụ thất bại');
+        setContentToast(successMessage);
         setOpenToast(true);
         setSeverity('error');
       }
@@ -50,7 +51,7 @@ export default function ServiceEditDialog(props) {
   };
 
   const handleEditUser = () => {
-    if (!name || !price || !serviceType) {
+    if (!name || !price || !description) {
       setIsError(true);
     } else {
       setIsError(false);
@@ -60,7 +61,7 @@ export default function ServiceEditDialog(props) {
         Description: description,
       };
 
-      editService(data, service?.id);
+      editService(data, service?.ServiceID);
     }
   };
 

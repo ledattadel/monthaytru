@@ -23,7 +23,7 @@ import {
 
 // components
 import formatMoneyWithDot from '../utils/formatMoney';
-import { changeRoleFromEnToVi, changeRoleFromViToEn} from '../utils/formatLanguage'
+import { changeRoleFromEnToVi, changeRoleFromViToEn } from '../utils/formatLanguage';
 import Page from '../components/Page';
 import Scrollbar from '../components/Scrollbar';
 import SearchNotFound from '../components/SearchNotFound';
@@ -88,7 +88,7 @@ function applySortFilter(array, comparator, query) {
     return a[1] - b[1];
   });
   if (query) {
-    return filter(array, (item) => item?.user?.name.toLowerCase().indexOf(query.toLowerCase()) !== -1);
+    return filter(array, (item) => item?.name.toLowerCase().indexOf(query.toLowerCase()) !== -1);
   }
   return stabilizedThis?.map((el) => el[0]);
 }
@@ -188,7 +188,6 @@ export default function Staff() {
   const handleAddProduct = () => {
     setOpenDialog(true);
   };
-
 
   return (
     <Page title="User">
@@ -322,7 +321,7 @@ function Row({
 
   const { user, purchaseCount } = row || {};
 
-  const { id, name, phoneNumber, email, address, username , Role} = row;
+  const { id, name, phoneNumber, email, address, username, Role } = row;
   const isItemSelected = selected.indexOf(phoneNumber) !== -1;
 
   const getCartByUserId = async (id) => {

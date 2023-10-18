@@ -4,13 +4,13 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import TextField from '@mui/material/TextField';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 
+import Autocomplete from '@mui/material/Autocomplete';
 import moment from 'moment';
-import { addCarDesAPI } from 'src/components/services';
+import { addCarDesAPI, getAllStaffAPI } from 'src/components/services';
 import AppToast from 'src/myTool/AppToast';
 import { Vi } from 'src/_mock/Vi';
-import Autocomplete from '@mui/material/Autocomplete';
 
 const ENUM_PRODUCT_TYPE = [
   {
@@ -60,6 +60,12 @@ const mockDataService = [
   },
 ];
 
+const data = [
+  {
+    name: '',
+  },
+];
+
 function formatDate(str) {
   const date = str.split('T');
   const day = date[0].split('-');
@@ -82,14 +88,19 @@ export default function CreateQuote(props) {
 
   const [listServcies, setListServices] = useState([]);
   const [serviceChoose, setServiceChoose] = useState();
+  const [staffChoose, setStaffChoose] = useState({
+    staffName: '',
+  });
+  const [listStaff, setListStaff] = useState([]);
   const [type, setType] = useState(ENUM_PRODUCT_TYPE?.[0]?.name);
-
+  const refAutoStaff = useRef();
   const [listProduct, setListProduct] = useState([]);
   const [productChoose, setProductChoose] = useState();
   const [listBrand, setListBrand] = useState([]);
   const [brandChoose, setBrandChoose] = useState();
   const [listSupplier, setSupplier] = useState([]);
   const [supplierChoose, setSupplierChoose] = useState();
+  const [isClear, setIsClear] = useState(true);
   ///
   const [createAt, setCreateAt] = useState();
 
@@ -138,8 +149,16 @@ export default function CreateQuote(props) {
     }
   };
 
+  const getAllStaff = async () => {
+    try {
+      const res = await getAllStaffAPI();
+      setListStaff(res?.data);
+    } catch (error) {}
+  };
+
   React.useEffect(() => {
     setCreateAt(moment().format('DD-MM-yyyy'));
+    getAllStaff();
   }, []);
 
   const handleClose = () => {
@@ -153,13 +172,10 @@ export default function CreateQuote(props) {
   };
 
   const handleAddProduct = () => {
-    if ((cartId && !productAdd.length && !additionPrice) || !cartId) {
-      setIsError(true);
-    } else {
-      setIsError(false);
-      setErrorMsg('');
-      addProduct();
-    }
+    // setStaffChoose({ staffName: '' });
+    // );
+    // console.log('pon console', refAutoStaff?.current()?.clear());
+    setIsClear(true);
   };
 
   const handleDataVehicle = (field, value) => {
@@ -544,6 +560,31 @@ export default function CreateQuote(props) {
                 />
               )}
             />
+            {type === ENUM_PRODUCT_TYPE?.[0]?.name ? (
+              <Autocomplete
+                disablePortal
+                id="staff"
+                options={listStaff}
+                getOptionLabel={(option) => option?.name}
+                sx={{ width: 200, mr: 2 }}
+                onChange={(e, newValue) => {
+                  setStaffChoose(newValue);
+                  setIsClear(false);
+                }}
+                key={staffChoose?.name}
+                ref={refAutoStaff}
+                // clearOnEscape=true
+                // value={staffChoose}
+                size="small"
+                // defaultValue={ENUM_PRODUCT_TYPE?.[0]}
+                // value={staffChoose}
+                value={isClear ? null : staffChoose}
+                blurOnSelect={true}
+                // value={isClear ? data?.[0] : ''}
+                renderInput={(params) => <TextField {...params} label={Vi.staffWork} />}
+              />
+            ) : null}
+
             {type === ENUM_PRODUCT_TYPE?.[1]?.name ? (
               <Autocomplete
                 disablePortal

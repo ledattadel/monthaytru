@@ -69,9 +69,7 @@
 // export const API_GET_SALE_DESCRIPTION = `${BASE_URL}/sale-description/get-sale-description-by-id`;
 // export const API_CREATE_SALE_DESCRIPTION = `${BASE_URL}/sale-description/create`;
 
-
-
-const BASE_URL = 'http://localhost:8888/api';
+const BASE_URL = 'http://192.168.2.51:8888/api';
 // https://bf4a-27-78-35-127.ngrok-free.app/api/staff/sign-in
 // Sign in
 export const SIGN_IN_ADMIN = `${BASE_URL}/staff/sign-in`;
@@ -94,6 +92,7 @@ export const API_GET_ALL_STAFF = `${BASE_URL}/staff`;
 export const API_ADD_NEW_STAFF = `${BASE_URL}/staff`;
 export const API_UPDATE_STAFF = `${BASE_URL}/staff`;
 export const API_DELETE_STAFF = `${BASE_URL}/staff`;
+export const API_GET_LIST_TECHNICAL = `${BASE_URL}/staff/get-all-technicians`;
 //brand
 export const API_GET_ALL_BRAND = `${BASE_URL}/brand`;
 export const API_ADD_NEW_BRAND = `${BASE_URL}/brand`;
@@ -105,6 +104,13 @@ export const API_GET_ALL_SUPPLIER = `${BASE_URL}/supplier`;
 export const API_ADD_NEW_SUPPLIER = `${BASE_URL}/supplier`;
 export const API_UPDATE_SUPPLIER = `${BASE_URL}/supplier`;
 export const API_DELETE_SUPPLIER = `${BASE_URL}/supplier`;
+//services
+export const API_GET_ALL_SERVICE = `${BASE_URL}/service`;
+//import product
+export const API_CREATE_PURCHASE = `${BASE_URL}/purchase`;
+// export const API_ADD_NEW_SUPPLIER = `${BASE_URL}/service`;
+// export const API_UPDATE_SUPPLIER = `${BASE_URL}/service`;
+// export const API_DELETE_SUPPLIER = `${BASE_URL}/service`;
 // export const API_GET_SUPPLIER_INFORMATION = `${BASE_URL}/supplier/get-user-info`;
 
 export const API_GET_ALL_CART = `${BASE_URL}/cart/get-all`;

@@ -69,7 +69,7 @@ function applySortFilter(array, comparator, query) {
     return a[1] - b[1];
   });
   if (query) {
-    return filter(array, (_user) => _user.name.toLowerCase().indexOf(query.toLowerCase()) !== -1);
+    return filter(array, (_user) => _user.ProductName.toLowerCase().indexOf(query.toLowerCase()) !== -1);
   }
   return stabilizedThis?.map((el) => el[0]);
 }
@@ -92,9 +92,9 @@ export default function User() {
   const deleteAPI = async (id) => {
     try {
       const res = await deleteProductAPI(id);
-      let errorMessage = res.message ||  'Xoá sản phẩm thất bại'
-      let successMessage =  res.message || 'Xoá sản phẩm thành công'
-     
+      let errorMessage = res.message || 'Xoá sản phẩm thất bại';
+      let successMessage = res.message || 'Xoá sản phẩm thành công';
+
       if (res.status === 200) {
         setContentToast(successMessage);
         setSeverity('success');
@@ -197,7 +197,6 @@ export default function User() {
 
                 <TableBody>
                   {filteredUsers?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                  
                     const { ProductID, ProductDescription, ProductName, Unit, Price, brand } = row;
 
                     const isItemSelected = selected.indexOf(ProductName) !== -1;

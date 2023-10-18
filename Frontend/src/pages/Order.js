@@ -1,59 +1,57 @@
-import { filter } from 'lodash';
-import { useState, useEffect } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import { filter } from 'lodash';
+import { useEffect, useState } from 'react';
+import { Link as RouterLink } from 'react-router-dom';
 
 // material
 import {
-  Card,
-  Table,
-  Stack,
-  Button,
-  TableRow,
-  TableBody,
-  Collapse,
-  TableCell,
-  Container,
-  Typography,
-  TableContainer,
-  TablePagination,
-  Select,
-  FormControl,
-  MenuItem,
-  IconButton,
   Box,
+  Button,
+  Card,
+  Collapse,
+  Container,
+  FormControl,
+  IconButton,
+  MenuItem,
+  Select,
+  Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
   TableHead,
+  TablePagination,
+  TableRow,
+  Typography,
 } from '@mui/material';
 // components
-import formatMoneyWithDot from '../utils/formatMoney';
-import AppToast from '../myTool/AppToast';
-import Page from '../components/Page';
-import OrderDialog from '../dialog/OrderDialog';
-import DatePickerDialog from '../dialog/DatePickerDialog';
-import Scrollbar from '../components/Scrollbar';
 import Iconify from '../components/Iconify';
-import { UserListHead, UserListToolbar, UserBillMoreMenu } from '../sections/@dashboard/user';
+import Page from '../components/Page';
+import Scrollbar from '../components/Scrollbar';
+import DatePickerDialog from '../dialog/DatePickerDialog';
+import AppToast from '../myTool/AppToast';
+import { UserBillMoreMenu, UserListHead, UserListToolbar } from '../sections/@dashboard/user';
+import formatMoneyWithDot from '../utils/formatMoney';
 // import OrderEditDialog from '../dialog/OrderEditDialog';
 
 import KeyboardArrowUpIcon from '@mui/icons-material/ArrowDownward';
 import KeyboardArrowDownIcon from '@mui/icons-material/ArrowUpward';
 
+import CreateQuote from 'src/dialog/Receipt/CreateQuote';
+import { Vi } from 'src/_mock/Vi';
 import {
-  getAllCartAPI,
-  getAllStatusAPI,
-  updateStatusAPI,
   createBillAPI,
   deleteCartByIdAPI,
+  getAllCartAPI,
+  getAllStatusAPI,
   getCartDescriptionAPI,
   getUserInfoAPI,
+  updateStatusAPI,
 } from '../components/services/index';
-import { Vi } from 'src/_mock/Vi';
-import CreateReceipt from 'src/dialog/Receipt/CreateReceipt';
-import CreateQuote from 'src/dialog/Receipt/CreateQuote';
 
 // ----------------------------------------------------------------------
 
@@ -237,6 +235,7 @@ export default function Receipt() {
       </Container>
       {/* <CreateReceipt openDialog={openDialog} setOpenDialog={setOpenDialog} listCart={listCart} /> */}
       <CreateQuote openDialog={openDialog} setOpenDialog={setOpenDialog} listCart={listCart} />
+      {/* <AssignStaff openDialog={openDialog} setOpenDialog={setOpenDialog} listCart={listCart} /> */}
     </Page>
   );
 }

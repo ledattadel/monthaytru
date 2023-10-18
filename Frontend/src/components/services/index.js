@@ -45,6 +45,9 @@ import {
   API_ADD_NEW_STAFF,
   API_UPDATE_STAFF,
   API_DELETE_STAFF,
+  API_GET_ALL_SERVICE,
+  API_GET_LIST_TECHNICAL,
+  API_CREATE_PURCHASE,
 } from './configs';
 const token = JSON.parse(localStorage.getItem('adminInfo'));
 
@@ -67,9 +70,9 @@ export const getAllUserMainAPI = async () => {
     return error?.response?.data || error;
   }
 };
-export const getInfoAdminAPI = async () => {
+export const getInfoAdminAPI = async (username) => {
   try {
-    const response = await axios.get(GET_USER_INFO, {
+    const response = await axios.get(`${GET_USER_INFO}/${username}`, {
       headers: { authorization: `Bearer ${token}` },
     });
     return response;
@@ -111,7 +114,6 @@ export const editUserAPI = async (id, body) => {
   }
 };
 
-
 export const deleteUserAPI = async (id) => {
   try {
     const response = await axios.delete(`${API_DELETE_USER}/${id}`, {
@@ -122,8 +124,63 @@ export const deleteUserAPI = async (id) => {
     return error?.response?.data || error;
   }
 };
+/// SERVICE
+export const getAllServiceAPI = async () => {
+  try {
+    const response = await axios.get(API_GET_ALL_SERVICE, {
+      headers: { authorization: `Bearer ${token}` },
+    });
+    return response;
+  } catch (error) {
+    return error?.response?.data || error;
+  }
+};
+
+export const addNewServiceAPI = async (body) => {
+  try {
+    const response = await axios.post(API_GET_ALL_SERVICE, body, {
+      headers: { authorization: `Bearer ${token}` },
+    });
+    return response;
+  } catch (error) {
+    return error?.response?.data || error;
+  }
+};
+
+export const editServiceAPI = async (id, body) => {
+  console.log('pon console ', id);
+  try {
+    const response = await axios.patch(API_GET_ALL_SERVICE + `/${id}`, body, {
+      headers: { authorization: `Bearer ${token}` },
+    });
+    return response;
+  } catch (error) {
+    return error?.response?.data || error;
+  }
+};
+
+export const deleteServiceAPI = async (id) => {
+  try {
+    const response = await axios.delete(`${API_GET_ALL_SERVICE}/${id}`, {
+      headers: { authorization: `Bearer ${token}` },
+    });
+    return response;
+  } catch (error) {
+    return error?.response?.data || error;
+  }
+};
 /// STAFF
 export const getAllStaffAPI = async () => {
+  try {
+    const response = await axios.get(API_GET_LIST_TECHNICAL, {
+      headers: { authorization: `Bearer ${token}` },
+    });
+    return response;
+  } catch (error) {
+    return error?.response?.data || error;
+  }
+};
+export const getAllStaffTechnicalAPI = async () => {
   try {
     const response = await axios.get(API_GET_ALL_STAFF, {
       headers: { authorization: `Bearer ${token}` },
@@ -145,9 +202,9 @@ export const addNewStaffAPI = async (body) => {
   }
 };
 
-export const editStaffAPI = async (id,body) => {
+export const editStaffAPI = async (id, body) => {
   try {
-    const response = await axios.patch( `${API_UPDATE_STAFF}/${id}`, body, {
+    const response = await axios.patch(`${API_UPDATE_STAFF}/${id}`, body, {
       headers: { authorization: `Bearer ${token}` },
     });
     return response;
@@ -254,7 +311,17 @@ export const deleteSupplierAPI = async (id) => {
     return error?.response?.data || error;
   }
 };
-///
+/// import product
+export const addNewImportProductAPI = async (body) => {
+  try {
+    const response = await axios.post(API_CREATE_PURCHASE, body, {
+      headers: { authorization: `Bearer ${token}` },
+    });
+    return response;
+  } catch (error) {
+    return error?.response?.data || error;
+  }
+};
 
 export const getAllCartAPI = async () => {
   try {
@@ -406,7 +473,6 @@ export const getAllBrand = async () => {
     return error?.response?.data || error;
   }
 };
-
 
 export const getAllProductTypeAPI = async () => {
   try {

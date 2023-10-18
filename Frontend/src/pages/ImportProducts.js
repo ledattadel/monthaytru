@@ -38,7 +38,7 @@ import ImportProductEditDialog from 'src/dialog/ImportProduct/ImportProductEditD
 const TABLE_HEAD = [
   { id: 'accessoryId', label: 'ID', alignRight: false },
   // { id: 'image', label: 'Image', alignRight: false },
-  { id: 'name', label: Vi.nameProduct, alignRight: false },
+  { id: 'name', label: Vi.createName, alignRight: false },
   // { id: 'quantity', label: 'Quantity', alignRight: false },
   { id: 'price', label: Vi.priceProduct, alignRight: false },
   // { id: 'manufacturer', label: 'Manufacturer', alignRight: false },

@@ -1,39 +1,38 @@
-import * as React from 'react';
-import { Button, Box } from '@mui/material';
-import TextField from '@mui/material/TextField';
+import { Box, Button } from '@mui/material';
 import Dialog from '@mui/material/Dialog';
-import Autocomplete from '@mui/material/Autocomplete';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import { getAllServiceTypeAPI, addNewProductAPI } from '../components/services/index';
+import TextField from '@mui/material/TextField';
+import * as React from 'react';
+import { addNewServiceAPI } from '../components/services/index';
 
 export default function ServiceDialog(props) {
   const { openDialog, setOpenDialog, getAllService, setContentToast, setSeverity, setOpenToast } = props;
   const [name, setName] = React.useState();
   const [price, setPrice] = React.useState();
-  const [serviceType, setServiceType] = React.useState();
   const [description, setDescription] = React.useState();
   const [isError, setIsError] = React.useState(false);
-  const [listServiceType, setListServiceType] = React.useState();
-  const [selectedFile, setSelectedFile] = React.useState();
-  const [imageUrl, setImageUrl] = React.useState();
 
   const addNewService = async (data) => {
     try {
-      const res = await addNewProductAPI(data);
-      if (res.status === 200) {
+      const res = await addNewServiceAPI(data);
+
+      let errorMessage = res.message || 'Thêm dịch vụ thất bại';
+      let successMessage = res.message || 'Thêm dịch vụ thành công';
+
+      if (res.status === 201) {
         setName(null);
         setPrice(null);
-        setServiceType(null);
+
         setDescription(null);
-        setContentToast(res?.data);
+        setContentToast(successMessage);
         setSeverity('success');
         setOpenToast(true);
         setOpenDialog(false);
         getAllService();
       } else {
-        setContentToast('Thêm dịch vụ thất bại');
+        setContentToast(errorMessage);
         setOpenToast(true);
         setSeverity('error');
       }
@@ -44,29 +43,16 @@ export default function ServiceDialog(props) {
     }
   };
 
-  const getAllServiceType = async () => {
-    try {
-      const res = await getAllServiceTypeAPI();
-      setListServiceType(res?.data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  React.useEffect(() => {
-    getAllServiceType();
-  }, []);
-
   const handleClose = () => {
     setOpenDialog(false);
     setName(null);
     setPrice(null);
-    setServiceType(null);
+
     setDescription(null);
   };
 
   const handleAddUser = () => {
-    if (!name || !price || !serviceType || !selectedFile || !description) {
+    if (!name || !price || !description) {
       setIsError(true);
     } else {
       setIsError(false);
@@ -83,46 +69,33 @@ export default function ServiceDialog(props) {
       //    },
       //  ],
       //};
-      const bodyFormData = new FormData();
-      bodyFormData.append('name', name);
-      bodyFormData.append('quantity', 99999);
-      bodyFormData.append('price', price);
-      bodyFormData.append('serviceType', serviceType?.id);
-      bodyFormData.append('productType', 1);
-      bodyFormData.append('image', selectedFile);
-      bodyFormData.append('description', description);
-
-      addNewService(bodyFormData);
-    }
-  };
-
-  const handleUploadImage = (e) => {
-    let file = e.target.files[0];
-    const reader = new FileReader();
-
-    reader.addEventListener(
-      'load',
-      () => {
-        setImageUrl(reader.result);
-      },
-      false
-    );
-
-    if (file) {
-      reader.readAsDataURL(file);
-      setSelectedFile(file);
+      // const bodyFormData = new FormData();
+      // bodyFormData.append('name', name);
+      // bodyFormData.append('quantity', 99999);
+      // bodyFormData.append('price', price);
+      // bodyFormData.append('serviceType', serviceType?.id);
+      // bodyFormData.append('productType', 1);
+      // bodyFormData.append('image', selectedFile);
+      // bodyFormData.append('description', description);
+      const data = {
+        ServiceName: name,
+        Description: description,
+        Price: price,
+        // brand:
+      };
+      addNewService(data);
     }
   };
 
   return (
     <div>
       <Dialog open={openDialog} onClose={handleClose}>
-        <DialogTitle>Tạo mới sản phẩm</DialogTitle>
+        <DialogTitle>Tạo mới dịch vụ</DialogTitle>
         <DialogContent sx={{ height: 500 }}>
           <TextField
             margin="dense"
             id="name"
-            label="Tên sản phẩm"
+            label="Tên dịch vụ"
             type="text"
             fullWidth
             variant="outlined"
@@ -170,13 +143,13 @@ export default function ServiceDialog(props) {
               display: isError ? 'flex' : 'none',
             }}
           >
-            Please enter full information
+            Vui lòng nhập đủ thông tin
           </p>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
+          <Button onClick={handleClose}>Huỷ</Button>
           <Button onClick={handleAddUser} type="submit">
-            Add Service
+            Tạo dịch vụ
           </Button>
         </DialogActions>
       </Dialog>

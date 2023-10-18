@@ -1,29 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { Button, Box, Typography } from '@mui/material';
-import TextField from '@mui/material/TextField';
-import Autocomplete from '@mui/material/Autocomplete';
+import { Box, Button, Typography } from '@mui/material';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
+import TextField from '@mui/material/TextField';
+import React, { useState } from 'react';
 
-import { Vi } from 'src/_mock/Vi';
-import AppToast from 'src/myTool/AppToast';
-import formatMoneyWithDot from 'src/utils/formatMoney';
-import {
-  getAllServicesAPI,
-  addCarDesAPI,
-  getAllProductAndServiceAPI,
-  getCartDescriptionAPI,
-} from 'src/components/services';
 import moment from 'moment';
+import { addCarDesAPI } from 'src/components/services';
+import AppToast from 'src/myTool/AppToast';
+import { Vi } from 'src/_mock/Vi';
 
 const ENUM_PRODUCT_TYPE = {
   PHU_KIEN: 'Phụ kiện',

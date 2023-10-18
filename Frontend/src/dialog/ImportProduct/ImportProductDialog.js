@@ -6,152 +6,224 @@ import DialogTitle from '@mui/material/DialogTitle';
 import TextField from '@mui/material/TextField';
 import React, { useState } from 'react';
 
-import moment from 'moment';
-import { addCarDesAPI } from 'src/components/services';
-import AppToast from 'src/myTool/AppToast';
-import { Vi } from 'src/_mock/Vi';
 import Autocomplete from '@mui/material/Autocomplete';
+import moment from 'moment';
+import {
+  addNewImportProductAPI,
+  addNewProductAPI,
+  getAllBrandAPI,
+  getAllProductAPI,
+  getAllSupplierAPI,
+} from 'src/components/services';
+import AppToast from 'src/myTool/AppToast';
 import formatMoneyWithDot from 'src/utils/formatMoney';
-
-const ENUM_PRODUCT_TYPE = [
-  {
-    lable: 'Dịch vụ',
-    name: 'Dịch vụ',
-  },
-  {
-    lable: 'Sản phẩm',
-    name: 'Sản phẩm',
-  },
-];
-
-const mockData = [
-  {
-    id: 1,
-    name: 'lốp xe',
-    brand: 'suzuki',
-    costPrice: '1000000',
-    quantity: 4,
-    totalPrice: '4000000',
-  },
-  {
-    id: 2,
-    name: 'kính xe',
-    brand: 'suzuki',
-    costPrice: '4000000',
-    quantity: 2,
-    totalPrice: '8000000',
-  },
-];
-
-function formatDate(str) {
-  const date = str.split('T');
-  const day = date[0].split('-');
-  return `${day[2]}/${day[1]}/${day[0]}`;
-}
+import { Vi } from 'src/_mock/Vi';
 
 export default function ImportProductDialog(props) {
-  const { openDialog, setOpenDialog, listCart } = props;
+  const { openDialog, setOpenDialog } = props;
 
-  const [additionPrice, setAdditionPrice] = useState(0);
-  const [productAdd, setProductAdd] = useState([]);
   const [openToastHere, setOpenToastHere] = useState(false);
   const [contentToastHere, setContentToastHere] = useState('');
   const [severityHere, setSeverityHere] = useState('');
   const [isError, setIsError] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
-  const [cartId, setCartId] = useState(0);
 
   /// services/product
 
-  const [listServcies, setListServices] = useState([]);
-  const [serviceChoose, setServiceChoose] = useState();
-  const [type, setType] = useState(ENUM_PRODUCT_TYPE?.[0]?.name);
-
   const [listProduct, setListProduct] = useState([]);
-  const [productChoose, setProductChoose] = useState();
   const [listBrand, setListBrand] = useState([]);
-  const [brandChoose, setBrandChoose] = useState();
-  const [listSupplier, setSupplier] = useState([]);
+  const [listSupplier, setListSupplier] = useState([]);
   const [supplierChoose, setSupplierChoose] = useState();
+  const InfoAdmin = JSON.parse(localStorage.getItem('profileAdmin'));
+  const [isAddProduct, setIsAddProduct] = useState(false);
   ///
   const [createAt, setCreateAt] = useState();
 
-  const [inforCustomer, setInforCustomer] = useState({
-    name: '',
-    phoneNumber: '',
-    email: '',
-  });
+  //
+  const [name, setName] = React.useState();
+  const [price, setPrice] = React.useState();
+  const [brand, setBrand] = React.useState();
+  const [description, setDescription] = React.useState();
 
-  const [inforVehicle, setInforVehicle] = useState({
-    numberPlate: '',
-    type: '',
-    color: '',
-    engineNumber: '',
-    chassisNumber: '',
-    brand: '',
+  const [inforProduct, setInfoProduct] = useState({
+    quantity: '',
+    purchasePrice: '',
   });
+  const [listProductAdd, setListProductAdd] = useState([]);
 
   ///
-  const addProduct = async () => {
-    const data = {
-      idCartDes: cartId,
-      productAdd,
-      ...(additionPrice ? { additionPrice } : null),
-    };
 
+  const getAllSupplier = async () => {
     try {
-      const res = await addCarDesAPI(data);
-      if (res.status === 200) {
-        setContentToastHere(res?.data);
-        setSeverityHere('success');
-        setProductAdd([]);
-
-        setAdditionPrice(0);
-        setOpenToastHere(true);
-        setOpenDialog(false);
-      } else {
-        setContentToastHere('Thêm sản phẩm add thất bại');
-        setOpenToastHere(true);
-        setSeverityHere('error');
+      const res = await getAllSupplierAPI();
+      //
+      if (res) {
+        setListSupplier(res?.data);
       }
     } catch (error) {
-      setContentToastHere('Thêm sản phẩm add thất bại');
-      setOpenToastHere(true);
-      setSeverityHere('error');
+      console.log(error);
+    }
+  };
+  const getAllProduct = async () => {
+    try {
+      const res = await getAllProductAPI();
+      setListProduct(res?.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const fetchAllBrand = async () => {
+    try {
+      const res = await getAllBrandAPI();
+      setListBrand(res?.data);
+      // console.log("res:::",res);
+    } catch (error) {
+      console.log(error);
     }
   };
 
   React.useEffect(() => {
-    setCreateAt(moment().format('DD-MM-yyyy'));
+    setCreateAt(moment().format('DD-MM-yyyy hh:mm'));
+    getAllSupplier();
+    getAllProduct();
+    fetchAllBrand();
   }, []);
 
-  const handleClose = () => {
-    setCartId(null);
-    setProductAdd([]);
+  const totalPayment = React.useMemo(() => {
+    const totalMoney = listProductAdd.reduce((a, b) => a * 1 + b?.purchasePrice * b?.quantity, 0);
+    // listProductAdd?.forEach((e)=>{
+    //   const total =
+    // })
+    return totalMoney;
+  }, [listProductAdd]);
 
+  const handleClose = () => {
+    setListProductAdd([]);
     setIsError(false);
     setErrorMsg('');
-    setAdditionPrice(0);
+
     setOpenDialog(false);
   };
 
-  const handleAddProduct = () => {
-    if ((cartId && !productAdd.length && !additionPrice) || !cartId) {
-      setIsError(true);
+  const addNewProduct = async (data) => {
+    try {
+      const res = await addNewProductAPI(data);
+      let errorMessage = res.message || 'Thêm sản phẩm thất bại';
+      let successMessage = res.message || 'Thêm sản phẩm thành công';
+      if (res.status === 201) {
+        setName(null);
+        setPrice(null);
+        setBrand(null);
+        setDescription(null);
+        setContentToastHere(successMessage);
+        setSeverityHere('success');
+        setOpenToastHere(true);
+        // setOpenDialog(false);
+        getAllProduct();
+        setIsAddProduct(false);
+      } else {
+        setContentToastHere(errorMessage);
+        setOpenToastHere(true);
+        setSeverityHere('error');
+      }
+    } catch (error) {
+      console.log(error);
+      setContentToastHere('Thêm product thất bại');
+      setOpenToastHere(true);
+      setSeverityHere('error');
+    }
+  };
+  const handleAddNewProduct = () => {
+    if (!name || !price || !brand) {
+      setContentToastHere('Vui lòng nhập đủ thông tin sản phẩm');
+      setSeverityHere('error');
+      setOpenToastHere(true);
     } else {
-      setIsError(false);
-      setErrorMsg('');
-      addProduct();
+      const data = {
+        ProductName: name,
+        ProductDescription: description,
+        BrandName: brand,
+        Price: price,
+      };
+
+      addNewProduct(data);
     }
   };
 
-  const handleDataVehicle = (field, value) => {
-    const tempDate = { ...inforVehicle, field: value };
-    setInforVehicle(tempDate);
+  const handleAddProduct = () => {
+    const flat = listProductAdd?.filter((e) => e?.ProductID === inforProduct?.ProductID);
+    if (!inforProduct?.ProductID || inforProduct?.purchasePrice === '' || !inforProduct?.quantity === '') {
+    } else if (flat?.length > 0) {
+      setErrorMsg('Phiếu nhập đã có sản phẩm này rồi');
+      setInfoProduct({
+        purchasePrice: '',
+        quantity: '',
+      });
+    } else {
+      const product = [...listProductAdd];
+      product.push(inforProduct);
+      setListProductAdd(product);
+      setInfoProduct({
+        ...inforProduct,
+        purchasePrice: '',
+        quantity: '',
+      });
+    }
   };
-  const handleDataCustomer = (field, value) => {
-    const tempDate = { ...inforCustomer, field: value };
-    setInforCustomer(tempDate);
+
+  const addNewImportProduct = async (data) => {
+    try {
+      const res = await addNewImportProductAPI(data);
+    } catch (error) {}
+  };
+
+  const handleNext = () => {
+    if (!supplierChoose?.SupplierID) {
+      setContentToastHere('Vui lòng chọn nhà cung cấp');
+      setSeverityHere('error');
+      setOpenToastHere(true);
+    } else if (listProductAdd?.length === 0) {
+      setContentToastHere('Danh sách sản phẩm không tồn tại');
+      setSeverityHere('error');
+      setOpenToastHere(true);
+    } else {
+      const newList = [];
+      listProductAdd?.forEach((e) => {
+        const tempProduct = {
+          productID: e?.ProductID,
+          supplierId: supplierChoose?.SupplierID,
+          purchasePrice: e?.purchasePrice,
+          SellingPrice: e?.Price,
+          quantity: e?.quantity,
+        };
+        newList?.push(tempProduct);
+      });
+      const data = {
+        userId: InfoAdmin?.userId,
+        // supplierId: supplierChoose?.SupplierID,
+        createAt: moment()?.format('DD-MM-yyyy hh:mm'),
+        listProduct: [...newList],
+      };
+      addNewImportProduct(data);
+      console.log('pon console', data);
+    }
+  };
+
+  const removeProduct = (ProductID) => {
+    const listTemp = [...listProductAdd];
+    const listNewProduct = listTemp?.filter((e) => e?.ProductID !== ProductID);
+
+    setListProductAdd(listNewProduct);
+  };
+
+  const handleDataProduct = (field, value) => {
+    if (field === 'product') {
+      const tempDate = { ...inforProduct, ...value };
+      setInfoProduct(tempDate);
+    } else {
+      const tempDate = { ...inforProduct, [field]: value };
+      setInfoProduct(tempDate);
+    }
   };
 
   const renderItemProduct = (item, index) => {
@@ -171,19 +243,21 @@ export default function ImportProductDialog(props) {
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
           <Box style={{ display: 'flex', width: 106, justifyContent: 'space-between' }}>
-            <Typography style={{ width: 100, textAlign: 'center' }}>{item?.id}</Typography>
+            <Typography style={{ width: 100, textAlign: 'center' }}>{item?.ProductID}</Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
           <Box style={{ display: 'flex', padding: 4, width: 168, justifyContent: 'space-between' }}>
-            <Typography style={{ width: 130, textAlign: 'center' }}>{item?.name}</Typography>
+            <Typography style={{ width: 130, textAlign: 'center' }}>{item?.ProductName}</Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
           <Box style={{ display: 'flex', padding: 4, width: 146, justifyContent: 'space-between' }}>
-            <Typography style={{ width: 100, textAlign: 'center' }}>{item?.brand}</Typography>
+            <Typography style={{ width: 100, textAlign: 'center' }}>{item?.brand?.BrandName}</Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
           <Box style={{ display: 'flex', padding: 4, width: 140, justifyContent: 'space-between' }}>
-            <Typography style={{ width: 100, textAlign: 'center' }}>{formatMoneyWithDot(item.costPrice)}</Typography>
+            <Typography style={{ width: 100, textAlign: 'center' }}>
+              {formatMoneyWithDot(item?.purchasePrice)}
+            </Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
           <Box style={{ display: 'flex', padding: 4, width: 100, justifyContent: 'space-between' }}>
@@ -191,11 +265,15 @@ export default function ImportProductDialog(props) {
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
           <Box style={{ display: 'flex', padding: 4, width: 156, justifyContent: 'space-between' }}>
-            <Typography style={{ width: 140, textAlign: 'center' }}>{formatMoneyWithDot(item.totalPrice)}</Typography>
+            <Typography style={{ width: 140, textAlign: 'center' }}>
+              {formatMoneyWithDot(item.purchasePrice * item?.quantity || 0)}
+            </Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
           <Button style={{ display: 'flex', padding: 4, width: 40, justifyContent: 'space-between' }}>
-            <Typography style={{ width: 100, textAlign: 'center' }}>X</Typography>
+            <Typography onClick={() => removeProduct(item?.ProductID)} style={{ width: 100, textAlign: 'center' }}>
+              X
+            </Typography>
             {/* <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} /> */}
           </Button>
 
@@ -262,7 +340,7 @@ export default function ImportProductDialog(props) {
   };
 
   return (
-    <div style={{ width: '1500px' }}>
+    <div style={{ width: '1800px' }}>
       <Dialog open={openDialog} onClose={handleClose} maxWidth={'1500px'}>
         <DialogTitle>{Vi.addNewImportProduct}</DialogTitle>
         <DialogContent sx={{ height: 650, width: 1000 }}>
@@ -270,12 +348,13 @@ export default function ImportProductDialog(props) {
             <Typography style={{ fontSize: 14, marginTop: 8, marginBottom: 12 }}>{Vi.inforImportProduct}</Typography>
             <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
               <TextField
-                id="quoteId"
-                label={Vi.quoteId}
+                id="importProductId"
+                label={Vi.importProductId}
                 sx={{ mr: 2 }}
                 InputLabelProps={{
                   shrink: true,
                 }}
+                placeholder={Vi.autoRenderId}
                 disabled={true}
                 //   value={price}
                 //   onChange={(e) => setPrice(e.target.value)}
@@ -306,24 +385,12 @@ export default function ImportProductDialog(props) {
                   shrink: true,
                 }}
                 disabled={true}
-                value={'Pôn'}
+                value={InfoAdmin?.name}
                 size="small"
                 //   onChange={(e) => handleDataCustomer(e.target.value)}
                 required
               />
-              {/* <TextField
-                id="receiptId"
-                label={Vi.supplier}
-                sx={{ mr: 2 }}
-                InputLabelProps={{
-                  shrink: true,
-                }}
-                // disabled={true}
-                //   value={price}
-                //   onChange={(e) => setPrice(e.target.value)}
-                size="small"
-                required
-              /> */}
+
               <Autocomplete
                 disablePortal
                 id="supplier"
@@ -331,7 +398,7 @@ export default function ImportProductDialog(props) {
                 getOptionLabel={(option) => option?.name}
                 sx={{ width: 200, mr: 2 }}
                 onChange={(e, newValue) => {
-                  setSupplierChoose(newValue?.id);
+                  setSupplierChoose(newValue);
                 }}
                 size="small"
                 // defaultValue={ENUM_PRODUCT_TYPE?.[0]}
@@ -342,110 +409,156 @@ export default function ImportProductDialog(props) {
 
           <Typography style={{ fontSize: 14, marginTop: 24, marginBottom: 12 }}>{Vi.addProductService}</Typography>
           <Box style={{ display: 'flex' }}>
-            {/* <Autocomplete
-              disablePortal
-              //   id="manufacturer"
-              options={ENUM_PRODUCT_TYPE}
-              getOptionLabel={(option) => option?.name}
-              sx={{ width: 200, mr: 2 }}
-              onChange={(e, newValue) => {
-                setType(newValue?.name);
-              }}
-              size="small"
-              defaultValue={ENUM_PRODUCT_TYPE?.[0]}
-              renderInput={(params) => <TextField {...params} />}
-            /> */}
             <Autocomplete
               disablePortal
               id="nameService"
-              options={type === ENUM_PRODUCT_TYPE?.[0]?.name ? listServcies : listProduct}
-              getOptionLabel={(option) => option?.name}
-              sx={{ width: 200, mr: 2 }}
+              options={listProduct}
+              getOptionLabel={(option) => `${option?.ProductName} - ${option?.brand?.BrandName}`}
+              sx={{ width: 350, mr: 2 }}
               onChange={(e, newValue) => {
-                type === ENUM_PRODUCT_TYPE?.[0]?.name ? setServiceChoose(newValue?.id) : setProductChoose(newValue?.id);
-              }}
-              size="small"
-              defaultValue={ENUM_PRODUCT_TYPE?.[0]}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label={type === ENUM_PRODUCT_TYPE?.[0]?.name ? Vi.nameService : Vi.nameProduct}
-                />
-              )}
-            />
-
-            <Autocomplete
-              disablePortal
-              id="brand"
-              options={listBrand}
-              getOptionLabel={(option) => option?.name}
-              sx={{ width: 200, mr: 2 }}
-              onChange={(e, newValue) => {
-                setBrandChoose(newValue?.id);
+                setErrorMsg('');
+                handleDataProduct('product', newValue);
               }}
               size="small"
               // defaultValue={ENUM_PRODUCT_TYPE?.[0]}
-              renderInput={(params) => <TextField {...params} label={Vi.brand} />}
+              renderInput={(params) => <TextField {...params} label={Vi.nameProduct} />}
             />
 
             <TextField
               id="quantity"
               label={Vi.quantity}
-              //   type="Number"
               sx={{ mr: 2 }}
               InputLabelProps={{
                 shrink: true,
               }}
-              //   disabled={true}
-              //   value={createAt}
-              //   ={createAt}
-              //   onChange={(e) => setCreateAt(e.target.value)}
               required
-              value={inforVehicle?.vehicleNumber}
+              value={inforProduct?.quantity}
               size="small"
-              style={{ width: 100 }}
-              onChange={(e) => handleDataVehicle('vehicleNumber', e.target.value)}
+              style={{ width: 150 }}
+              onChange={(e) => handleDataProduct('quantity', e.target.value)}
             />
             <TextField
-              id="costPrice"
-              label={Vi.costPrice}
-              //   type="Number"
+              id="purchasePrice"
+              label={Vi.purchasePrice}
               sx={{ mr: 2 }}
               InputLabelProps={{
                 shrink: true,
               }}
-              //   disabled={true}
-              //   value={createAt}
-              //   ={createAt}
-              //   onChange={(e) => setCreateAt(e.target.value)}
               required
-              value={inforVehicle?.vehicleNumber}
+              value={inforProduct?.purchasePrice || ''}
               size="small"
-              style={{ width: 100 }}
-              onChange={(e) => handleDataVehicle('vehicleNumber', e.target.value)}
+              style={{ width: 180 }}
+              onChange={(e) => handleDataProduct('purchasePrice', e.target.value)}
             />
 
-            <Button variant="outlined" onClick={handleAddProduct} size="small" type="submit">
+            <Button variant="outlined" sx={{ mr: 2 }} onClick={handleAddProduct} size="small" type="submit">
               {Vi.add}
             </Button>
+            <Button variant="outlined" onClick={() => setIsAddProduct(true)} size="small" type="submit">
+              {Vi.addNewProduct}
+            </Button>
           </Box>
+          {errorMsg ? <Typography style={{ color: 'red', marginTop: 12 }}>{errorMsg}</Typography> : null}
+          {isAddProduct ? (
+            <Box style={{ height: 350, marginTop: 30 }}>
+              <Box>Tạo mới sản phẩm</Box>
+              <Box>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    mt: 2,
+                  }}
+                >
+                  <TextField
+                    margin="dense"
+                    id="name"
+                    label="Tên sản phẩm"
+                    type="text"
+                    // fullWidth
+                    variant="outlined"
+                    // sx={{ mt: 2 }}
+                    sx={{ width: 500, mr: 2 }}
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                  />
+                  <TextField
+                    id="price"
+                    label="Giá"
+                    type="Number"
+                    sx={{ width: 500, mr: 2 }}
+                    // fullWidth
+                    onChange={(e) => setPrice(e.target.value)}
+                    required
+                  />
+                </Box>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    // alignItems: 'center',
+                    mt: 2,
+                  }}
+                >
+                  <Autocomplete
+                    disablePortal
+                    id="brand"
+                    options={listBrand}
+                    getOptionLabel={(option) => option?.BrandName}
+                    sx={{ width: 500, mr: 2 }}
+                    onChange={(e, newValue) => {
+                      setBrand(newValue?.BrandName);
+                    }}
+                    renderInput={(params) => <TextField {...params} label="brand" />}
+                  />
+                  <TextField
+                    margin="dense"
+                    id="description"
+                    label="Description"
+                    minRows={4}
+                    multiline
+                    fullWidth
+                    variant="outlined"
+                    // sx={{ mt: 4 }}
+                    sx={{ width: 500, mr: 2 }}
+                    onChange={(e) => setDescription(e.target.value)}
+                    required
+                  />
+                </Box>
+
+                <p
+                  style={{
+                    margin: '10px',
+                    color: 'red',
+                    fontWeight: 'Bold',
+                    justifyContent: 'flex-end',
+                    display: isError ? 'flex' : 'none',
+                  }}
+                >
+                  Nhập đủ thông tin sản phẩm
+                </p>
+              </Box>
+              <DialogActions>
+                <Button onClick={() => setIsAddProduct(false)}>Huỷ</Button>
+                <Button onClick={handleAddNewProduct} type="submit">
+                  Tạo sản phẩm
+                </Button>
+              </DialogActions>
+            </Box>
+          ) : null}
           <Box mt={2}>
             <Typography style={{ fontSize: 18, marginBottom: 12, fontWeight: 600 }}> {Vi.product}:</Typography>
           </Box>
           {renderTitleProduct()}
-          {mockData?.map((e, index) => renderItemProduct(e, index))}
+          {listProductAdd?.map((e, index) => renderItemProduct(e, index))}
+
+          <Box style={{ display: 'flex', justifyContent: 'space-between', width: 330, marginLeft: 620 }}>
+            <Typography textAlign={'right'} style={{ fontSize: 18, marginTop: 12 }}>
+              Tổng tiền :{' '}
+            </Typography>
+            <Typography style={{ fontSize: 18, marginTop: 12 }}>{formatMoneyWithDot(totalPayment || 0)}</Typography>
+          </Box>
         </DialogContent>
-        {/* <p
-          style={{
-            margin: '10px',
-            color: 'red',
-            fontWeight: 'Bold',
-            justifyContent: 'flex-end',
-            display: isError ? 'flex' : 'none',
-          }}
-        >
-          Please enter full information {errorMsg}
-        </p> */}
+
         <DialogActions>
           <Button variant="outlined" onClick={handleClose}>
             {Vi.Cancel}
@@ -456,11 +569,12 @@ export default function ImportProductDialog(props) {
           <Button variant="outlined" onClick={handleAddProduct} type="submit">
             {Vi.reset}
           </Button>
-          <Button variant="outlined" onClick={handleAddProduct} type="submit">
+          <Button variant="outlined" onClick={handleNext} type="submit">
             {Vi.next}
           </Button>
         </DialogActions>
       </Dialog>
+
       <AppToast
         content={contentToastHere}
         type={0}

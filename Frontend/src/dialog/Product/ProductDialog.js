@@ -244,9 +244,6 @@
 //   );
 // }
 
-
-
-
 import * as React from 'react';
 import { Button, Box } from '@mui/material';
 import TextField from '@mui/material/TextField';
@@ -270,8 +267,8 @@ export default function ProductDialog(props) {
   const addNewProduct = async (data) => {
     try {
       const res = await addNewProductAPI(data);
-      let errorMessage = res.message ||  'Thêm sản phẩm thất bại'
-      let successMessage =  res.message || 'Thêm sản phẩm thành công'
+      let errorMessage = res.message || 'Thêm sản phẩm thất bại';
+      let successMessage = res.message || 'Thêm sản phẩm thành công';
       if (res.status === 201) {
         setName(null);
         setQuantity(null);
@@ -332,19 +329,23 @@ export default function ProductDialog(props) {
   };
 
   const handleAddProduct = () => {
-    if (!quantity || !name || !price || !brand  ) {
-      console.log(quantity,name,price,brand);
+    if (!name || !price || !brand) {
+      console.log(quantity, name, price, brand);
       setIsError(true);
     } else {
       setIsError(false);
 
-      
-      const data = { ProductName: name, ProductDescription : description, BrandName: brand, Unit:quantity, Price: price }
+      const data = {
+        ProductName: name,
+        ProductDescription: description,
+        BrandName: brand,
+        Unit: quantity,
+        Price: price,
+      };
 
       addNewProduct(data);
     }
   };
-
 
   return (
     <div>
@@ -402,12 +403,10 @@ export default function ProductDialog(props) {
               getOptionLabel={(option) => option?.BrandName}
               sx={{ width: 500, mr: 2 }}
               onChange={(e, newValue) => {
-                
                 setBrand(newValue?.BrandName);
               }}
               renderInput={(params) => <TextField {...params} label="brand" />}
             />
-           
           </Box>
           <TextField
             margin="dense"
@@ -422,7 +421,6 @@ export default function ProductDialog(props) {
             required
           />
 
-      
           <p
             style={{
               margin: '10px',
