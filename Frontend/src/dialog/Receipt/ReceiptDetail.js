@@ -4,7 +4,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import TextField from '@mui/material/TextField';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import moment from 'moment';
 import { addCarDesAPI, addNewReceiptAPI, getUserByPhoneAPI, getVehicleByNumberAPI } from 'src/components/services';
@@ -22,8 +22,8 @@ function formatDate(str) {
   return `${day[2]}/${day[1]}/${day[0]}`;
 }
 
-export default function CreateReceipt(props) {
-  const { openDialog, setOpenDialog, listCart, getAllCart } = props;
+export default function ReceiptDetail(props) {
+  const { openDialog, setOpenDialog, receiptChoose, getAllCart, setOpenCreateQuoteDialog } = props;
 
   const [additionPrice, setAdditionPrice] = useState(0);
   const [productAdd, setProductAdd] = useState([]);
@@ -103,6 +103,15 @@ export default function CreateReceipt(props) {
     }
   };
 
+  useEffect(() => {
+    if (receiptChoose?.ReceiptID) {
+      handleDataCustomer('phoneNumber', receiptChoose?.customer?.phoneNumber);
+      handleDataVehicle('vehicleNumber', receiptChoose?.vehicle?.NumberPlate);
+      setVehicleCondition(receiptChoose?.VehicleStatus);
+      setNoteVehicle(receiptChoose?.Note);
+    }
+  }, [receiptChoose, openDialog]);
+
   const getVehicleByNumber = async (number) => {
     try {
       const res = await getVehicleByNumberAPI(number);
@@ -168,7 +177,7 @@ export default function CreateReceipt(props) {
     // } else {
     setIsError(false);
     setErrorMsg('');
-    addProduct();
+    // addProduct();
     // }
   };
 
@@ -181,10 +190,17 @@ export default function CreateReceipt(props) {
     setInforCustomer(tempDate);
   };
 
+  const openCreateQuoteDialog = () => {
+    setOpenDialog(false);
+    setTimeout(() => {
+      setOpenCreateQuoteDialog(true);
+    }, 200);
+  };
+
   return (
     <div style={{ width: '1500px' }}>
       <Dialog open={openDialog} onClose={handleClose} maxWidth={'1500px'}>
-        <DialogTitle>{Vi.addNewReceipt}</DialogTitle>
+        <DialogTitle>Chi tiết phiếu tiếp nhận</DialogTitle>
         <DialogContent sx={{ height: 650, width: 800 }}>
           <Box style={{ borderWidth: 1, borderColor: 'grey' }}>
             <Typography style={{ fontSize: 14, marginTop: 8, marginBottom: 12 }}>{Vi.receipt}</Typography>
@@ -243,7 +259,7 @@ export default function CreateReceipt(props) {
               InputLabelProps={{
                 shrink: true,
               }}
-              disabled={false}
+              disabled={true}
               value={inforCustomerApi?.phoneNumber ? inforCustomerApi?.phoneNumber : inforCustomer?.phoneNumber}
               onChange={(e) => handleDataCustomer('phoneNumber', e.target.value)}
               //   value={createAt}
@@ -277,7 +293,7 @@ export default function CreateReceipt(props) {
                 shrink: true,
               }}
               value={inforCustomerApi?.email ? inforCustomerApi?.email : inforCustomer?.email}
-              disabled={inforCustomerApi?.email ? true : false}
+              disabled={true}
               onChange={(e) => handleDataCustomer('email', e.target.value)}
               required
               size="small"
@@ -298,6 +314,7 @@ export default function CreateReceipt(props) {
               //   ={createAt}
               //   onChange={(e) => setCreateAt(e.target.value)}
               required
+              disabled={true}
               value={inforVehicle?.vehicleNumber}
               size="small"
               onChange={(e) => handleDataVehicle('vehicleNumber', e.target.value)}
@@ -396,6 +413,7 @@ export default function CreateReceipt(props) {
             multiline
             minRows={3}
             size="small"
+            disabled={true}
           />
           <TextField
             id="noteVehicle"
@@ -409,6 +427,7 @@ export default function CreateReceipt(props) {
             minRows={3}
             fullWidth
             height
+            disabled={true}
             // disabled={inforCustomer?.email ? true : false}
             value={noteVehicle}
             onChange={(e) => setNoteVehicle(e.target.value)}
@@ -429,8 +448,8 @@ export default function CreateReceipt(props) {
         </p>
         <DialogActions>
           <Button onClick={handleClose}>Huỷ</Button>
-          <Button onClick={handleAddProduct} type="submit">
-            Tạo phiếu tiếp nhận
+          <Button onClick={openCreateQuoteDialog} type="submit">
+            Tạo báo giá
           </Button>
         </DialogActions>
       </Dialog>

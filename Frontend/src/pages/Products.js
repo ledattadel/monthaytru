@@ -35,9 +35,9 @@ import { Vi } from 'src/_mock/Vi';
 
 const TABLE_HEAD = [
   { id: 'accessoryId', label: 'ID', alignRight: false },
-  { id: 'descriptione', label: 'Mô tả sản phẩm', alignRight: false },
+  // { id: 'descriptione', label: 'Mô tả sản phẩm', alignRight: false },
   { id: 'name', label: Vi.nameProduct, alignRight: false },
-  { id: 'quantity', label: 'Số lượng', alignRight: false },
+  // { id: 'quantity', label: 'Số lượng', alignRight: false },
   { id: 'price', label: 'Giá thành', alignRight: false },
   { id: 'brand', label: 'Thương hiệu', alignRight: false },
   // { id: 'accessoryType', label: 'Product Type', alignRight: false },
@@ -216,9 +216,9 @@ export default function User() {
 
                         <TableCell align="center" />
                         <TableCell align="center">{ProductID}</TableCell>
-                        <TableCell align="center">{ProductDescription}</TableCell>
+                        {/* <TableCell align="center">{ProductDescription}</TableCell> */}
                         <TableCell align="center">{ProductName}</TableCell>
-                        <TableCell align="center">{Unit}</TableCell>
+                        {/* <TableCell align="center">{Unit}</TableCell> */}
                         <TableCell align="center">{Price}</TableCell>
                         <TableCell align="center">{brand?.BrandName}</TableCell>
                         <TableCell align="right">

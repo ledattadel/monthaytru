@@ -4,10 +4,16 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import TextField from '@mui/material/TextField';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import moment from 'moment';
-import { addCarDesAPI, addNewReceiptAPI, getUserByPhoneAPI, getVehicleByNumberAPI } from 'src/components/services';
+import {
+  addCarDesAPI,
+  addNewReceiptAPI,
+  editReceiptlAPI,
+  getUserByPhoneAPI,
+  getVehicleByNumberAPI,
+} from 'src/components/services';
 import AppToast from 'src/myTool/AppToast';
 import { Vi } from 'src/_mock/Vi';
 
@@ -22,8 +28,8 @@ function formatDate(str) {
   return `${day[2]}/${day[1]}/${day[0]}`;
 }
 
-export default function CreateReceipt(props) {
-  const { openDialog, setOpenDialog, listCart, getAllCart } = props;
+export default function EditReceipt(props) {
+  const { openDialog, setOpenDialog, receiptChoose, getAllCart } = props;
 
   const [additionPrice, setAdditionPrice] = useState(0);
   const [productAdd, setProductAdd] = useState([]);
@@ -56,34 +62,41 @@ export default function CreateReceipt(props) {
   //
   const InfoAdmin = JSON.parse(localStorage.getItem('profileAdmin'));
   ///
-  const addProduct = async () => {
+  const addProduct = async (id) => {
     // const data = {
     //   idCartDes: cartId,
     //   productAdd,
     //   ...(additionPrice ? { additionPrice } : null),
     // };
 
+    // const data = {
+    //   timeCreate: moment().format('DD-MM-yyyy hh:mm'),
+    //   staffId: InfoAdmin?.userId,
+    //   customerPhoneNumber: inforCustomerApi?.phoneNumber ?? inforCustomer?.phoneNumber,
+    //   customerName: inforCustomerApi?.name ?? inforCustomer?.name,
+    //   email: inforCustomerApi?.email ?? inforCustomer?.email,
+    //   NumberPlateVehicle: inforVehicleApi.NumberPlate ?? inforVehicle?.vehicleNumber,
+    //   TypeVehicle: inforVehicleApi?.Type ?? inforVehicle?.vehicleType,
+    //   ColorVehicle: inforVehicleApi?.Color ?? inforVehicle?.vehicleColor,
+    //   EngineNumberVehicle: inforVehicleApi?.EngineNumber ?? inforVehicle?.engineNumber,
+    //   ChassisNumberVehicle: inforVehicleApi?.ChassisNumber ?? inforVehicle?.chassisNumber,
+    //   BrandNameVehicle: inforVehicleApi?.brand?.BrandID ?? inforVehicle?.brand,
+    //   VehicleStatus: vehicleCondition,
+    //   Note: noteVehicle,
+    // };
+
     const data = {
-      timeCreate: moment().format('DD-MM-yyyy hh:mm'),
-      staffId: InfoAdmin?.userId,
-      customerPhoneNumber: inforCustomerApi?.phoneNumber ?? inforCustomer?.phoneNumber,
-      customerName: inforCustomerApi?.name ?? inforCustomer?.name,
-      email: inforCustomerApi?.email ?? inforCustomer?.email,
-      NumberPlateVehicle: inforVehicleApi.NumberPlate ?? inforVehicle?.vehicleNumber,
-      TypeVehicle: inforVehicleApi?.Type ?? inforVehicle?.vehicleType,
-      ColorVehicle: inforVehicleApi?.Color ?? inforVehicle?.vehicleColor,
-      EngineNumberVehicle: inforVehicleApi?.EngineNumber ?? inforVehicle?.engineNumber,
-      ChassisNumberVehicle: inforVehicleApi?.ChassisNumber ?? inforVehicle?.chassisNumber,
-      BrandNameVehicle: inforVehicleApi?.brand?.BrandID ?? inforVehicle?.brand,
+      TimeUpdate: moment().format('DD-MM-yyyy hh:mm'),
+      Editor: InfoAdmin?.userId,
       VehicleStatus: vehicleCondition,
       Note: noteVehicle,
     };
 
     try {
-      const res = await addNewReceiptAPI(data);
-      let errorMessage = res.message || 'Tạo phiếu tiếp nhận thất bại';
-      let successMessage = res.message || 'Tạo phiếu tiếp nhận thành công';
-      if (res.status === 201) {
+      const res = await editReceiptlAPI(data, id);
+      let errorMessage = res.message || 'Sửa phiếu tiếp nhận thất bại';
+      let successMessage = res.message || 'Sửa phiếu tiếp nhận thành công';
+      if (res.status === 200) {
         setContentToastHere(successMessage);
         setSeverityHere('success');
         setProductAdd([]);
@@ -97,11 +110,21 @@ export default function CreateReceipt(props) {
         setSeverityHere('error');
       }
     } catch (error) {
-      setContentToastHere('Tạo phiếu tiếp nhận thất bại');
+      setContentToastHere('Sửa phiếu tiếp nhận thất bại');
       setOpenToastHere(true);
       setSeverityHere('error');
     }
   };
+
+  useEffect(() => {
+    console.log('pon console', receiptChoose);
+    if (receiptChoose?.ReceiptID) {
+      handleDataCustomer('phoneNumber', receiptChoose?.customer?.phoneNumber);
+      handleDataVehicle('vehicleNumber', receiptChoose?.vehicle?.NumberPlate);
+      setVehicleCondition(receiptChoose?.VehicleStatus);
+      setNoteVehicle(receiptChoose?.Note);
+    }
+  }, [receiptChoose, openDialog]);
 
   const getVehicleByNumber = async (number) => {
     try {
@@ -168,7 +191,7 @@ export default function CreateReceipt(props) {
     // } else {
     setIsError(false);
     setErrorMsg('');
-    addProduct();
+    addProduct(receiptChoose?.ReceiptID);
     // }
   };
 
@@ -184,7 +207,7 @@ export default function CreateReceipt(props) {
   return (
     <div style={{ width: '1500px' }}>
       <Dialog open={openDialog} onClose={handleClose} maxWidth={'1500px'}>
-        <DialogTitle>{Vi.addNewReceipt}</DialogTitle>
+        <DialogTitle>Chỉnh sửa phiếu tiếp nhận</DialogTitle>
         <DialogContent sx={{ height: 650, width: 800 }}>
           <Box style={{ borderWidth: 1, borderColor: 'grey' }}>
             <Typography style={{ fontSize: 14, marginTop: 8, marginBottom: 12 }}>{Vi.receipt}</Typography>
@@ -243,7 +266,7 @@ export default function CreateReceipt(props) {
               InputLabelProps={{
                 shrink: true,
               }}
-              disabled={false}
+              disabled={true}
               value={inforCustomerApi?.phoneNumber ? inforCustomerApi?.phoneNumber : inforCustomer?.phoneNumber}
               onChange={(e) => handleDataCustomer('phoneNumber', e.target.value)}
               //   value={createAt}
@@ -277,7 +300,7 @@ export default function CreateReceipt(props) {
                 shrink: true,
               }}
               value={inforCustomerApi?.email ? inforCustomerApi?.email : inforCustomer?.email}
-              disabled={inforCustomerApi?.email ? true : false}
+              disabled={true}
               onChange={(e) => handleDataCustomer('email', e.target.value)}
               required
               size="small"
@@ -298,6 +321,7 @@ export default function CreateReceipt(props) {
               //   ={createAt}
               //   onChange={(e) => setCreateAt(e.target.value)}
               required
+              disabled={true}
               value={inforVehicle?.vehicleNumber}
               size="small"
               onChange={(e) => handleDataVehicle('vehicleNumber', e.target.value)}
@@ -430,7 +454,7 @@ export default function CreateReceipt(props) {
         <DialogActions>
           <Button onClick={handleClose}>Huỷ</Button>
           <Button onClick={handleAddProduct} type="submit">
-            Tạo phiếu tiếp nhận
+            Sửa
           </Button>
         </DialogActions>
       </Dialog>

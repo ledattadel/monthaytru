@@ -30,9 +30,109 @@ export default function ImportProductDialog(props) {
 
   /// services/product
 
-  const [listProduct, setListProduct] = useState([]);
+  const [listProduct, setListProduct] = useState([
+    {
+      ProductID: 3,
+      ProductName: 'Test sản phẩm',
+      ProductDescription: 'sản phẩm test',
+      Price: '1000.00',
+      isActive: true,
+      BrandId: 2,
+      Unit: '15',
+      brand: {
+        BrandID: 2,
+        BrandName: 'Toyota',
+        isActive: true,
+      },
+    },
+    {
+      ProductID: 4,
+      ProductName: 'sản phẩm test\t',
+      ProductDescription: 'sản phẩm test\t',
+      Price: '100000.00',
+      isActive: true,
+      BrandId: 3,
+      Unit: null,
+      brand: {
+        BrandID: 3,
+        BrandName: 'Honda after edit',
+        isActive: true,
+      },
+    },
+    {
+      ProductID: 5,
+      ProductName: 'Test sản phẩm\t',
+      ProductDescription: 'Test sản phẩm\t',
+      Price: '1000000.00',
+      isActive: true,
+      BrandId: 1,
+      Unit: null,
+      brand: {
+        BrandID: 1,
+        BrandName: 'Edited',
+        isActive: true,
+      },
+    },
+    {
+      ProductID: 6,
+      ProductName: 'kính xe',
+      ProductDescription: 'kính xe nè',
+      Price: '1000000.00',
+      isActive: true,
+      BrandId: 2,
+      Unit: null,
+      brand: {
+        BrandID: 2,
+        BrandName: 'Toyota',
+        isActive: true,
+      },
+    },
+    {
+      ProductID: 7,
+      ProductName: 'kính xe o to',
+      ProductDescription: 'kính xe o to',
+      Price: '1000000.00',
+      isActive: true,
+      BrandId: 1,
+      Unit: null,
+      brand: {
+        BrandID: 1,
+        BrandName: 'Edited',
+        isActive: true,
+      },
+    },
+  ]);
   const [listBrand, setListBrand] = useState([]);
-  const [listSupplier, setListSupplier] = useState([]);
+  const [listSupplier, setListSupplier] = useState([
+    {
+      SupplierID: 2,
+      name: 'ông năm - Chợ bà chiểu 123',
+      phoneNumber: '0775992477',
+      address: 'chợ bà chiểu',
+      isActive: true,
+    },
+    {
+      SupplierID: 4,
+      name: 'ông năm - Chợ bà chiểu 3',
+      phoneNumber: '0775992477',
+      address: 'chợ bà chiểu',
+      isActive: true,
+    },
+    {
+      SupplierID: 5,
+      name: 'ông năm - Chợ bà chiểu 2',
+      phoneNumber: '0775992477',
+      address: 'chợ bà chiểu',
+      isActive: true,
+    },
+    {
+      SupplierID: 6,
+      name: 'ông năm - Chợ bà chiểu 12',
+      phoneNumber: '0775992477',
+      address: 'chợ bà chiểu',
+      isActive: true,
+    },
+  ]);
   const [supplierChoose, setSupplierChoose] = useState();
   const InfoAdmin = JSON.parse(localStorage.getItem('profileAdmin'));
   const [isAddProduct, setIsAddProduct] = useState(false);
@@ -67,7 +167,7 @@ export default function ImportProductDialog(props) {
   const getAllProduct = async () => {
     try {
       const res = await getAllProductAPI();
-      setListProduct(res?.data);
+      // setListProduct(res?.data);
     } catch (error) {
       console.log(error);
     }
@@ -174,6 +274,24 @@ export default function ImportProductDialog(props) {
   const addNewImportProduct = async (data) => {
     try {
       const res = await addNewImportProductAPI(data);
+      let errorMessage = res.message || 'Thêm phiếu nhập thất bại';
+      let successMessage = res.message || 'Thêm  phiếu nhập thành công';
+      if (res.status === 201) {
+        setName(null);
+        setPrice(null);
+        setBrand(null);
+        setDescription(null);
+        setContentToastHere(successMessage);
+        setSeverityHere('success');
+        setOpenToastHere(true);
+        setOpenDialog(false);
+        getAllProduct();
+        handleClose();
+      } else {
+        setContentToastHere(errorMessage);
+        setOpenToastHere(true);
+        setSeverityHere('error');
+      }
     } catch (error) {}
   };
 
@@ -193,7 +311,7 @@ export default function ImportProductDialog(props) {
           productID: e?.ProductID,
           supplierId: supplierChoose?.SupplierID,
           purchasePrice: e?.purchasePrice,
-          SellingPrice: e?.Price,
+          sellingPrice: e?.Price,
           quantity: e?.quantity,
         };
         newList?.push(tempProduct);
@@ -563,14 +681,9 @@ export default function ImportProductDialog(props) {
           <Button variant="outlined" onClick={handleClose}>
             {Vi.Cancel}
           </Button>
-          <Button variant="outlined" onClick={handleAddProduct} type="submit">
-            {Vi.save}
-          </Button>
-          <Button variant="outlined" onClick={handleAddProduct} type="submit">
-            {Vi.reset}
-          </Button>
+
           <Button variant="outlined" onClick={handleNext} type="submit">
-            {Vi.next}
+            Tạo phiếu nhập
           </Button>
         </DialogActions>
       </Dialog>

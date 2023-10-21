@@ -29,7 +29,6 @@ import { Vi } from 'src/_mock/Vi';
 import { getAllReceiptAPI, getAllStatusAPI, getUserInfoAPI } from '../components/services/index';
 import EditReceipt from 'src/dialog/Receipt/EditReceipt';
 import ReceiptDetail from 'src/dialog/Receipt/ReceiptDetail';
-import CreateQuote from 'src/dialog/Receipt/CreateQuote';
 
 // ----------------------------------------------------------------------
 
@@ -75,7 +74,7 @@ function applySortFilter(array, comparator, query) {
   return stabilizedThis?.map((el) => el[0]);
 }
 
-export default function Receipt() {
+export default function Quote() {
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('asc');
   const [selected, setSelected] = useState([]);
@@ -89,7 +88,6 @@ export default function Receipt() {
   const [openDialog, setOpenDialog] = useState(false);
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [openDetailDialog, setOpenDetailDialog] = useState(false);
-  const [openCreateQuoteDialog, setOpenCreateQuoteDialog] = useState(false);
   const [receiptChoose, setReceiptChoose] = useState({});
 
   const getEmployeeInfo = async () => {
@@ -244,15 +242,9 @@ export default function Receipt() {
         setOpenDialog={setOpenDetailDialog}
         getAllCart={getAllCart}
         receiptChoose={receiptChoose}
-        setOpenCreateQuoteDialog={setOpenCreateQuoteDialog}
       />
 
-      <CreateQuote
-        openDialog={openCreateQuoteDialog}
-        setOpenDialog={setOpenCreateQuoteDialog}
-        receiptChoose={receiptChoose}
-        listCart={listCart}
-      />
+      {/* <CreateQuote openDialog={openDialog} setOpenDialog={setOpenDialog} listCart={listCart} /> */}
       {/* <AssignStaff openDialog={openDialog} setOpenDialog={setOpenDialog} listCart={listCart} /> */}
     </Page>
   );

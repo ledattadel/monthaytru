@@ -48,6 +48,10 @@ import {
   API_GET_ALL_SERVICE,
   API_GET_LIST_TECHNICAL,
   API_CREATE_PURCHASE,
+  API_GET_ALL_PURCHASE,
+  API_GET_ALL_PRODUCT_DETAIL,
+  API_GET_ALL_RECEIPT,
+  API_GET_ALL_VEHICLE,
 } from './configs';
 const token = JSON.parse(localStorage.getItem('adminInfo'));
 
@@ -84,6 +88,26 @@ export const getInfoAdminAPI = async (username) => {
 export const getAllUserAPI = async () => {
   try {
     const response = await axios.get(API_GET_ALL_USER, {
+      headers: { authorization: `Bearer ${token}` },
+    });
+    return response;
+  } catch (error) {
+    return error?.response?.data || error;
+  }
+};
+export const getUserByPhoneAPI = async (phone) => {
+  try {
+    const response = await axios.get(`${API_GET_ALL_USER}/phone/${phone}`, {
+      headers: { authorization: `Bearer ${token}` },
+    });
+    return response;
+  } catch (error) {
+    return error?.response?.data || error;
+  }
+};
+export const getVehicleByNumberAPI = async (numberplate) => {
+  try {
+    const response = await axios.get(`${API_GET_ALL_VEHICLE}/numberplate/${numberplate}`, {
       headers: { authorization: `Bearer ${token}` },
     });
     return response;
@@ -148,7 +172,6 @@ export const addNewServiceAPI = async (body) => {
 };
 
 export const editServiceAPI = async (id, body) => {
-  console.log('pon console ', id);
   try {
     const response = await axios.patch(API_GET_ALL_SERVICE + `/${id}`, body, {
       headers: { authorization: `Bearer ${token}` },
@@ -311,6 +334,59 @@ export const deleteSupplierAPI = async (id) => {
     return error?.response?.data || error;
   }
 };
+
+///// detail product
+
+export const getAllProductDetailAPI = async () => {
+  try {
+    const response = await axios.get(API_GET_ALL_PRODUCT_DETAIL, {
+      headers: { authorization: `Bearer ${token}` },
+    });
+    return response;
+  } catch (error) {
+    return error?.response?.data || error;
+  }
+};
+
+export const editProductDetailAPI = async (body, productId) => {
+  try {
+    const response = await axios.patch(`${API_GET_ALL_PRODUCT_DETAIL}/${productId}`, body);
+    return response;
+  } catch (error) {
+    return error?.response?.data || error;
+  }
+};
+//// create receipt
+export const addNewReceiptAPI = async (body) => {
+  try {
+    const response = await axios.post(API_GET_ALL_RECEIPT, body, {
+      headers: { authorization: `Bearer ${token}` },
+    });
+    return response;
+  } catch (error) {
+    return error?.response?.data || error;
+  }
+};
+export const getAllReceiptAPI = async () => {
+  try {
+    const response = await axios.get(API_GET_ALL_RECEIPT, {
+      headers: { authorization: `Bearer ${token}` },
+    });
+    return response;
+  } catch (error) {
+    return error?.response?.data || error;
+  }
+};
+
+export const editReceiptlAPI = async (body, productId) => {
+  try {
+    const response = await axios.patch(`${API_GET_ALL_RECEIPT}/${productId}`, body);
+    return response;
+  } catch (error) {
+    return error?.response?.data || error;
+  }
+};
+
 /// import product
 export const addNewImportProductAPI = async (body) => {
   try {
@@ -325,7 +401,7 @@ export const addNewImportProductAPI = async (body) => {
 
 export const getAllCartAPI = async () => {
   try {
-    const response = await axios.get(API_GET_ALL_CART, {
+    const response = await axios.get(API_GET_ALL_PURCHASE, {
       headers: { authorization: `Bearer ${token}` },
     });
     return response;

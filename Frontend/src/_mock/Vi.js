@@ -9,6 +9,7 @@ export const Vi = {
   supplier: 'Nhà cung cấp',
   service: 'Dịch vụ',
   receipt: 'Phiếu tiếp nhận',
+  Quote: 'Phiếu báo giá',
   bill: 'Hoá đơn',
   addNewReceipt: 'Tạo phiếu tiếp nhận mới',
   addNewImportProduct: 'Tạo phiếu nhập mới',
@@ -79,5 +80,6 @@ export const Vi = {
   userName: 'Tên tài khoản',
   autoRenderId: 'Hệ thống tự tạo',
   staffWork: 'Nhân viên sửa chửa',
+  totalPriceImport: 'Tổng tiền',
   // Please enter full information: 'Nha'
 };

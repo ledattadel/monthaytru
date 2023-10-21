@@ -1,4 +1,5 @@
 import { format, formatDistanceToNow } from 'date-fns';
+import moment from 'moment';
 
 // ----------------------------------------------------------------------
 
@@ -19,3 +20,8 @@ export function fToNow(date) {
     addSuffix: true,
   });
 }
+
+export const formatCreate = (date) => {
+  // console.log('pon console date', date);
+  return moment(date).format('dd/MM/yyyy hh:mm');
+};

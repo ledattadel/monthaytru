@@ -77,7 +77,9 @@ function applySortFilter(array, comparator, query) {
     return a[1] - b[1];
   });
   if (query) {
-    return filter(array, (item) => item?.user?.name.toLowerCase().indexOf(query.toLowerCase()) !== -1);
+    return filter(array, (item) => {
+      return item?.name.toLowerCase().indexOf(query.toLowerCase()) !== -1;
+    });
   }
   return stabilizedThis?.map((el) => el[0]);
 }
@@ -282,7 +284,7 @@ function Row({
   setContentToast,
   setSeverity,
   setOpenToast,
-  getAllUser
+  getAllUser,
 }) {
   const [open, setOpen] = useState(false);
   const [listCart, setListCart] = useState([]);
@@ -315,7 +317,7 @@ function Row({
       setContentToast(res?.message);
       setSeverity('success');
       setOpenToast(true);
-      getAllUser()
+      getAllUser();
     } else {
       setContentToast(res?.message || 'Xoá user thất bại');
       setSeverity('error');

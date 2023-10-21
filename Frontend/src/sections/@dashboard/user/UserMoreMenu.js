@@ -41,11 +41,13 @@ export default function UserMoreMenu(props) {
   const handleEdit = () => {
     setCurrentEntity(entity);
     setOpenDialogEdit(true);
+    setIsOpen(false);
   };
 
   const handleDelete = (id) => {
     deleteAPI(id);
     handleClose();
+    setIsOpen(false);
   };
 
   return (

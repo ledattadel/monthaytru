@@ -53,9 +53,9 @@ export default function DashboardSidebar({ isOpenSidebar, onCloseSidebar }) {
   }, [pathname]);
 
   useEffect(() => {
-    const temp = JSON.parse(localStorage.getItem('adminInfo'));
+    const temp = JSON.parse(localStorage.getItem('profileAdmin'));
     if (temp) {
-      //  setAdminInfo(temp);
+      setAdminInfo(temp);
     } else {
       navigate('/login');
     }
@@ -78,7 +78,7 @@ export default function DashboardSidebar({ isOpenSidebar, onCloseSidebar }) {
             <Avatar src={account.photoURL} alt="photoURL" />
             <Box sx={{ ml: 2 }}>
               <Typography variant="subtitle2" sx={{ color: 'text.primary' }}>
-                {adminInfo.username}
+                {adminInfo.name}
               </Typography>
               <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                 {adminInfo.role}

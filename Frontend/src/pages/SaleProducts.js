@@ -26,11 +26,12 @@ import Iconify from '../components/Iconify';
 import SearchNotFound from '../components/SearchNotFound';
 import { UserListHead, UserListToolbar, UserMoreMenu } from '../sections/@dashboard/user';
 // mock
-import { deleteProductAPI, getAllProductAPI } from '../components/services/index';
+import { deleteProductAPI, getAllProductAPI, getAllProductDetailAPI } from '../components/services/index';
 import ProductDialog from 'src/dialog/Product/ProductDialog';
 import ProductEditDialog from 'src/dialog/Product/ProductEditDialog';
 import SaleProductEditDialog from 'src/dialog/SaleProduct/SaleProductEditDialog';
 import { Vi } from 'src/_mock/Vi';
+import ProductDetailEditDialog from 'src/dialog/productDetail/ProductDetailEditDialog';
 
 // ----------------------------------------------------------------------
 
@@ -38,7 +39,7 @@ const TABLE_HEAD = [
   { id: 'accessoryId', label: 'ID', alignRight: false },
   // { id: 'image', label: 'Image', alignRight: false },
   { id: 'name', label: Vi.nameProduct, alignRight: false },
-  // { id: 'quantity', label: 'Quantity', alignRight: false },
+  { id: 'quantity', label: Vi.quantity, alignRight: false },
   { id: 'price', label: Vi.priceProduct, alignRight: false },
   { id: 'importPrice', label: Vi.costPrice, alignRight: false },
   // { id: 'manufacturer', label: 'Manufacturer', alignRight: false },
@@ -72,7 +73,7 @@ function applySortFilter(array, comparator, query) {
     return a[1] - b[1];
   });
   if (query) {
-    return filter(array, (_user) => _user.name.toLowerCase().indexOf(query.toLowerCase()) !== -1);
+    return filter(array, (_user) => _user?.product?.ProductName.toLowerCase().indexOf(query.toLowerCase()) !== -1);
   }
   return stabilizedThis?.map((el) => el[0]);
 }
@@ -112,8 +113,8 @@ export default function SaleProducts() {
 
   const getAllProduct = async () => {
     try {
-      const res = await getAllProductAPI();
-      // setListProduct(res?.data);
+      const res = await getAllProductDetailAPI();
+      setListProduct(res?.data);
     } catch (error) {
       console.log(error);
     }
@@ -197,14 +198,15 @@ export default function SaleProducts() {
 
                 <TableBody>
                   {filteredUsers?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { id, image, name, quantity, price, supplier, accessoryType } = row;
+                    const { ProductDetailID, image, name, Quantity, PurchasePrice, SellingPrice, supplier, product } =
+                      row;
 
                     const isItemSelected = selected.indexOf(name) !== -1;
 
                     return (
                       <TableRow
                         hover
-                        key={id}
+                        key={ProductDetailID}
                         tabIndex={-1}
                         role="checkbox"
                         selected={isItemSelected}
@@ -215,30 +217,18 @@ export default function SaleProducts() {
                         </TableCell> */}
 
                         <TableCell align="center" />
-                        <TableCell align="center">{id}</TableCell>
-                        <TableCell align="center" style={{ display: 'flex', justifyContent: 'center' }}>
-                          {
-                            <img
-                              width="180px"
-                              height="100px"
-                              src={
-                                image
-                                  ? `http://localhost:5001/api/image/${image?.filename}`
-                                  : require('../assets/images/bg1.png')
-                              }
-                              alt="detailImage"
-                            />
-                          }
-                        </TableCell>
-                        <TableCell align="center">{name}</TableCell>
-                        {/* <TableCell align="center">{quantity}</TableCell> */}
-                        <TableCell align="center">{formatMoneyWithDot(price)}</TableCell>
+                        <TableCell align="center">{ProductDetailID}</TableCell>
+
+                        <TableCell align="center">{product?.ProductName}</TableCell>
+                        <TableCell align="center">{Quantity}</TableCell>
+                        <TableCell align="center">{formatMoneyWithDot(parseInt(SellingPrice))}</TableCell>
+                        <TableCell align="center">{formatMoneyWithDot(parseInt(PurchasePrice))}</TableCell>
                         {/* <TableCell align="center">{manufacturer?.name}</TableCell> */}
-                        <TableCell align="center">{accessoryType?.name}</TableCell>
+                        <TableCell align="center">{product?.brand?.BrandName}</TableCell>
                         <TableCell align="center">{supplier?.name}</TableCell>
                         <TableCell align="right">
                           <UserMoreMenu
-                            id={id}
+                            id={ProductDetailID}
                             name={name}
                             entity={row}
                             type={'sản phẩm'}
@@ -293,10 +283,10 @@ export default function SaleProducts() {
         setSeverity={setSeverity}
         setOpenToast={setOpenToast}
       /> */}
-      <SaleProductEditDialog
+      <ProductDetailEditDialog
         product={currentProduct}
-        openDialog={openDialog}
-        setOpenDialog={setOpenDialog}
+        openDialog={openDialogEdit}
+        setOpenDialog={setOpenDialogEdit}
         getAllProduct={getAllProduct}
         setContentToast={setContentToast}
         setSeverity={setSeverity}

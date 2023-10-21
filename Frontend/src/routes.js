@@ -19,6 +19,7 @@ import Supplier from './pages/Supplier';
 import SaleProducts from './pages/SaleProducts';
 import Staff from './pages/Staff';
 import ImportProducts from './pages/ImportProducts';
+import Quote from './pages/Quote';
 
 // ----------------------------------------------------------------------
 
@@ -38,6 +39,7 @@ export default function Router() {
         { path: 'service', element: <Service /> },
         { path: 'sale', element: <Sale /> },
         { path: 'order', element: <Blog /> },
+        { path: 'Quote', element: <Quote /> },
         { path: 'bill', element: <Bill /> },
         //{ path: 'addProduct', element: <AddProduct /> },
         //{ path: 'orderDetail/', element: <DetailOrder /> },

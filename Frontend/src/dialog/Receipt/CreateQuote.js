@@ -4,13 +4,20 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import TextField from '@mui/material/TextField';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import Autocomplete from '@mui/material/Autocomplete';
 import moment from 'moment';
-import { addCarDesAPI, getAllStaffAPI } from 'src/components/services';
+import {
+  addCarDesAPI,
+  getAllProductDetailAPI,
+  getAllServiceAPI,
+  getAllStaffAPI,
+  getVehicleByNumberAPI,
+} from 'src/components/services';
 import AppToast from 'src/myTool/AppToast';
 import { Vi } from 'src/_mock/Vi';
+import formatMoneyWithDot from 'src/utils/formatMoney';
 
 const ENUM_PRODUCT_TYPE = [
   {
@@ -73,7 +80,7 @@ function formatDate(str) {
 }
 
 export default function CreateQuote(props) {
-  const { openDialog, setOpenDialog, listCart } = props;
+  const { openDialog, setOpenDialog, receiptChoose } = props;
 
   const [additionPrice, setAdditionPrice] = useState(0);
   const [productAdd, setProductAdd] = useState([]);
@@ -87,7 +94,7 @@ export default function CreateQuote(props) {
   /// services/product
 
   const [listServcies, setListServices] = useState([]);
-  const [serviceChoose, setServiceChoose] = useState();
+
   const [staffChoose, setStaffChoose] = useState({
     staffName: '',
   });
@@ -95,11 +102,7 @@ export default function CreateQuote(props) {
   const [type, setType] = useState(ENUM_PRODUCT_TYPE?.[0]?.name);
   const refAutoStaff = useRef();
   const [listProduct, setListProduct] = useState([]);
-  const [productChoose, setProductChoose] = useState();
-  const [listBrand, setListBrand] = useState([]);
-  const [brandChoose, setBrandChoose] = useState();
-  const [listSupplier, setSupplier] = useState([]);
-  const [supplierChoose, setSupplierChoose] = useState();
+
   const [isClear, setIsClear] = useState(true);
   ///
   const [createAt, setCreateAt] = useState();
@@ -118,8 +121,69 @@ export default function CreateQuote(props) {
     chassisNumber: '',
     brand: '',
   });
+  const [inforVehicleApi, setInforVehicleApi] = useState();
 
-  ///
+  /// state list services / product
+
+  const [listServiceAdd, setListServiceAdd] = useState([]);
+  const [listProductAdd, setListProductAdd] = useState([]);
+
+  const [productChoose, setProductChoose] = useState({
+    quantity: 0,
+  });
+  const [serviceChoose, setServiceChoose] = useState({
+    staff: {},
+  });
+
+  //// useEffect
+
+  useEffect(() => {
+    getAllProduct();
+    getAllService();
+  }, []);
+  React.useEffect(() => {
+    setCreateAt(moment().format('DD-MM-yyyy hh:mm'));
+    getAllStaff();
+  }, []);
+  React.useEffect(() => {
+    // getAllUser();
+    getVehicleByNumber(inforVehicle?.vehicleNumber);
+  }, [inforVehicle?.vehicleNumber]);
+
+  useEffect(() => {
+    if (receiptChoose?.ReceiptID) {
+      handleDataCustomer('phoneNumber', receiptChoose?.customer?.phoneNumber);
+      handleDataCustomer('name', receiptChoose?.customer?.name);
+      handleDataVehicle('vehicleNumber', receiptChoose?.vehicle?.NumberPlate);
+    }
+  }, [receiptChoose, openDialog]);
+
+  const getVehicleByNumber = async (number) => {
+    try {
+      const res = await getVehicleByNumberAPI(number);
+      const temp = res?.data;
+      if (temp?.VehicleID) {
+        setInforVehicleApi(temp);
+      } else {
+        setInforVehicleApi({});
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  /// function
+
+  const getAllService = async () => {
+    try {
+      const res = await getAllServiceAPI();
+      const temp = res?.data;
+      setListServices(temp);
+      console.log('pon console temp', temp);
+    } catch (error) {
+      console.log(error);
+    }
+  };
   const addProduct = async () => {
     const data = {
       idCartDes: cartId,
@@ -156,34 +220,113 @@ export default function CreateQuote(props) {
     } catch (error) {}
   };
 
-  React.useEffect(() => {
-    setCreateAt(moment().format('DD-MM-yyyy'));
-    getAllStaff();
-  }, []);
+  const getAllProduct = async () => {
+    try {
+      const res = await getAllProductDetailAPI();
+      if (res?.data) {
+        setListProduct(res?.data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const handleClose = () => {
     setCartId(null);
     setProductAdd([]);
+    setListProductAdd([]);
+    setListServiceAdd([]);
 
     setIsError(false);
     setErrorMsg('');
     setAdditionPrice(0);
     setOpenDialog(false);
+    setType(ENUM_PRODUCT_TYPE?.[0]?.name);
   };
 
   const handleAddProduct = () => {
     // setStaffChoose({ staffName: '' });
     // );
     // console.log('pon console', refAutoStaff?.current()?.clear());
+  };
+  const handleAddProductToList = () => {
+    const flat = listProductAdd?.filter((e) => e?.ProductDetailID === productChoose?.ProductDetailID);
+    if (!productChoose?.quantity) {
+      setContentToastHere('số luợng phải lớn hơn 0');
+      setOpenToastHere(true);
+      setSeverityHere('error');
+    } else if (!productChoose?.ProductDetailID) {
+      setContentToastHere('vui lòng chọn sản phẩm ');
+      setOpenToastHere(true);
+      setSeverityHere('error');
+    } else if (flat?.length > 0) {
+      const tempData = listProductAdd?.filter((e) => e?.ProductDetailID !== productChoose?.ProductDetailID);
+      const data = { ...flat?.[0], quantity: flat?.[0]?.quantity * 1 + productChoose?.quantity * 1 };
+
+      const product = [...tempData, data]?.sort((a, b) => a.index - b.index);
+
+      setListProductAdd(product);
+      setIsClear(true);
+      setProductChoose({
+        quantity: 0,
+      });
+    } else {
+      const product = [...listProductAdd];
+      product.push({
+        ...productChoose,
+        index: listProductAdd?.length > 0 ? listProductAdd?.[listProductAdd?.length - 1]?.index + 1 : 1,
+      });
+      setListProductAdd(product);
+      setIsClear(true);
+      setProductChoose({
+        quantity: 0,
+      });
+    }
+  };
+
+  const handleAddServiceToList = () => {
+    const service = [...listServiceAdd];
+    service.push({
+      ...productChoose,
+    });
+    setListServiceAdd(service);
     setIsClear(true);
+    setServiceChoose({
+      staff: {},
+    });
+  };
+
+  const removeProductAdd = (ProductDetailID) => {
+    const listTemp = [...listProductAdd];
+    const listNewProduct = listTemp?.filter((e) => e?.ProductDetailID !== ProductDetailID);
+
+    setListProductAdd(listNewProduct);
+  };
+
+  const handleChooseProduct = (field, value) => {
+    const temp = { ...productChoose, [field]: value };
+    setProductChoose(temp);
+  };
+  const handleChooseNameProduct = (value) => {
+    const temp = { ...productChoose, ...value };
+    setProductChoose(temp);
+  };
+
+  const handleChooseServce = (value) => {
+    const temp = { ...productChoose, value };
+    setServiceChoose(temp);
+  };
+  const handleChooseStaffToServce = (value) => {
+    const temp = { ...productChoose, staff: value };
+    setServiceChoose(temp);
   };
 
   const handleDataVehicle = (field, value) => {
-    const tempDate = { ...inforVehicle, field: value };
+    const tempDate = { ...inforVehicle, [field]: value };
     setInforVehicle(tempDate);
   };
   const handleDataCustomer = (field, value) => {
-    const tempDate = { ...inforCustomer, field: value };
+    const tempDate = { ...inforCustomer, [field]: value };
     setInforCustomer(tempDate);
   };
 
@@ -204,19 +347,21 @@ export default function CreateQuote(props) {
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
           <Box style={{ display: 'flex', width: 106, justifyContent: 'space-between' }}>
-            <Typography style={{ width: 100, textAlign: 'center' }}>{item?.id}</Typography>
+            <Typography style={{ width: 100, textAlign: 'center' }}>{item?.ProductDetailID}</Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
           <Box style={{ display: 'flex', padding: 4, width: 168, justifyContent: 'space-between' }}>
-            <Typography style={{ width: 130, textAlign: 'center' }}>{item?.name}</Typography>
+            <Typography style={{ width: 130, textAlign: 'center' }}>{item?.product?.ProductName}</Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
           <Box style={{ display: 'flex', padding: 4, width: 146, justifyContent: 'space-between' }}>
-            <Typography style={{ width: 100, textAlign: 'center' }}>{item?.brand}</Typography>
+            <Typography style={{ width: 100, textAlign: 'center' }}>{item?.product?.brand?.BrandName}</Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
           <Box style={{ display: 'flex', padding: 4, width: 140, justifyContent: 'space-between' }}>
-            <Typography style={{ width: 100, textAlign: 'center' }}>{item.price}</Typography>
+            <Typography style={{ width: 100, textAlign: 'center' }}>
+              {formatMoneyWithDot(parseInt(item.SellingPrice || '0.0'))}
+            </Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
           <Box style={{ display: 'flex', padding: 4, width: 100, justifyContent: 'space-between' }}>
@@ -224,10 +369,15 @@ export default function CreateQuote(props) {
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
           <Box style={{ display: 'flex', padding: 4, width: 156, justifyContent: 'space-between' }}>
-            <Typography style={{ width: 140, textAlign: 'center' }}>{item.totalPrice}</Typography>
+            <Typography style={{ width: 140, textAlign: 'center' }}>
+              {formatMoneyWithDot(parseInt(item.SellingPrice || '0.0') * item.quantity)}
+            </Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
-          <Button style={{ display: 'flex', padding: 4, width: 40, justifyContent: 'space-between' }}>
+          <Button
+            onClick={() => removeProductAdd(item?.ProductDetailID)}
+            style={{ display: 'flex', padding: 4, width: 40, justifyContent: 'space-between' }}
+          >
             <Typography style={{ width: 100, textAlign: 'center' }}>X</Typography>
             {/* <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} /> */}
           </Button>
@@ -268,18 +418,18 @@ export default function CreateQuote(props) {
             <Typography style={{ width: 100, textAlign: 'center' }}>{item?.brand}</Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box> */}
-          <Box style={{ display: 'flex', padding: 4, width: 186, justifyContent: 'space-between' }}>
-            <Typography style={{ width: 156, textAlign: 'center' }}>{item.price}</Typography>
+          <Box style={{ display: 'flex', padding: 4, width: 248, justifyContent: 'space-between' }}>
+            <Typography style={{ width: 210, textAlign: 'center' }}>{item.price}</Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
-          <Box style={{ display: 'flex', padding: 4, width: 100, justifyContent: 'space-between' }}>
+          <Box style={{ display: 'flex', padding: 4, width: 200, justifyContent: 'space-between' }}>
             <Typography style={{ width: 100, textAlign: 'center' }}>{item.quantity}</Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
-          <Box style={{ display: 'flex', padding: 4, width: 156, justifyContent: 'space-between' }}>
+          {/* <Box style={{ display: 'flex', padding: 4, width: 156, justifyContent: 'space-between' }}>
             <Typography style={{ width: 140, textAlign: 'center' }}>{item.totalPrice}</Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
-          </Box>
+          </Box> */}
           <Button style={{ display: 'flex', padding: 4, width: 40, justifyContent: 'space-between' }}>
             <Typography style={{ width: 100, textAlign: 'center' }}>X</Typography>
             {/* <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} /> */}
@@ -321,18 +471,15 @@ export default function CreateQuote(props) {
             <Typography style={{ width: 100, textAlign: 'center' }}>{Vi.brand}</Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box> */}
-          <Box style={{ display: 'flex', padding: 4, width: 180, justifyContent: 'space-between' }}>
-            <Typography style={{ width: 100, textAlign: 'center' }}>{Vi.price}</Typography>
+          <Box style={{ display: 'flex', padding: 4, width: 240, justifyContent: 'space-between' }}>
+            <Typography style={{ width: 240, textAlign: 'center' }}>{Vi.price}</Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
-          <Box style={{ display: 'flex', padding: 4, width: 100 }}>
-            <Typography style={{ width: 100, textAlign: 'center' }}>{Vi.quantity}</Typography>
+          <Box style={{ display: 'flex', padding: 4, width: 200 }}>
+            <Typography style={{ width: 200, textAlign: 'center' }}>Nhân viên kỉ thuật</Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
-          <Box style={{ display: 'flex', padding: 4, width: 180 }}>
-            <Typography style={{ width: 140, textAlign: 'center' }}>{Vi.totalPrice}</Typography>
-            <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
-          </Box>
+
           <Box style={{ display: 'flex', padding: 4, width: 40 }}>
             <Typography style={{ width: 100, textAlign: 'center' }}></Typography>
             {/* <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} /> */}
@@ -416,6 +563,7 @@ export default function CreateQuote(props) {
                   shrink: true,
                 }}
                 disabled={true}
+                value={receiptChoose?.ReceiptID}
                 //   value={price}
                 //   onChange={(e) => setPrice(e.target.value)}
                 size="small"
@@ -428,6 +576,7 @@ export default function CreateQuote(props) {
                 InputLabelProps={{
                   shrink: true,
                 }}
+                placeholder={'Hệ thống tự sinh'}
                 disabled={true}
                 //   value={price}
                 //   onChange={(e) => setPrice(e.target.value)}
@@ -507,7 +656,7 @@ export default function CreateQuote(props) {
                 shrink: true,
               }}
               disabled={true}
-              value={inforVehicle?.brand}
+              value={inforVehicleApi?.brand?.BrandName}
               onChange={(e) => handleDataVehicle('brand', e.target.value)}
               required
               size="small"
@@ -521,7 +670,7 @@ export default function CreateQuote(props) {
                 shrink: true,
               }}
               disabled={true}
-              value={inforVehicle?.vehicleType}
+              value={inforVehicleApi?.Type}
               onChange={(e) => handleDataVehicle('vehicleType', e.target.value)}
               required
               size="small"
@@ -542,24 +691,41 @@ export default function CreateQuote(props) {
               defaultValue={ENUM_PRODUCT_TYPE?.[0]}
               renderInput={(params) => <TextField {...params} />}
             />
-            <Autocomplete
-              disablePortal
-              id="nameService"
-              options={type === ENUM_PRODUCT_TYPE?.[0]?.name ? listServcies : listProduct}
-              getOptionLabel={(option) => option?.name}
-              sx={{ width: 200, mr: 2 }}
-              onChange={(e, newValue) => {
-                type === ENUM_PRODUCT_TYPE?.[0]?.name ? setServiceChoose(newValue?.id) : setProductChoose(newValue?.id);
-              }}
-              size="small"
-              defaultValue={ENUM_PRODUCT_TYPE?.[0]}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label={type === ENUM_PRODUCT_TYPE?.[0]?.name ? Vi.nameService : Vi.nameProduct}
-                />
-              )}
-            />
+            {type === ENUM_PRODUCT_TYPE?.[0]?.name ? (
+              <Autocomplete
+                disablePortal
+                id="nameService"
+                options={listServcies}
+                getOptionLabel={(option) => option?.ServiceName}
+                sx={{ width: 400, mr: 2 }}
+                onChange={(e, newValue) => {
+                  handleChooseServce(newValue);
+                }}
+                size="small"
+                // defaultValue={ENUM_PRODUCT_TYPE?.[0]}
+                renderInput={(params) => <TextField {...params} label={Vi.nameService} />}
+              />
+            ) : (
+              <Autocomplete
+                disablePortal
+                id="option?.ServiceName"
+                options={listProduct}
+                getOptionLabel={(option) =>
+                  `${option?.product?.ProductName} - ${option?.product?.brand?.BrandName} - ${option?.supplier?.name}`
+                }
+                sx={{ width: 500, mr: 2 }}
+                onChange={(e, newValue) => {
+                  handleChooseNameProduct(newValue);
+                  setIsClear(false);
+                }}
+                size="small"
+                key={productChoose?.product?.ProductName}
+                value={isClear ? null : productChoose}
+                // defaultValue={ENUM_PRODUCT_TYPE?.[0]}
+                renderInput={(params) => <TextField {...params} label={Vi.nameProduct} />}
+              />
+            )}
+
             {type === ENUM_PRODUCT_TYPE?.[0]?.name ? (
               <Autocomplete
                 disablePortal
@@ -568,24 +734,25 @@ export default function CreateQuote(props) {
                 getOptionLabel={(option) => option?.name}
                 sx={{ width: 200, mr: 2 }}
                 onChange={(e, newValue) => {
-                  setStaffChoose(newValue);
+                  handleChooseStaffToServce(newValue);
+                  // staffChoose(newValue);
                   setIsClear(false);
                 }}
-                key={staffChoose?.name}
-                ref={refAutoStaff}
+                key={serviceChoose?.staff}
+                // ref={refAutoStaff}
                 // clearOnEscape=true
                 // value={staffChoose}
                 size="small"
                 // defaultValue={ENUM_PRODUCT_TYPE?.[0]}
                 // value={staffChoose}
-                value={isClear ? null : staffChoose}
-                blurOnSelect={true}
+                value={isClear ? null : serviceChoose?.staff}
+                // blurOnSelect={true}
                 // value={isClear ? data?.[0] : ''}
                 renderInput={(params) => <TextField {...params} label={Vi.staffWork} />}
               />
             ) : null}
 
-            {type === ENUM_PRODUCT_TYPE?.[1]?.name ? (
+            {/* {type === ENUM_PRODUCT_TYPE?.[1]?.name ? (
               <Autocomplete
                 disablePortal
                 id="brand"
@@ -614,7 +781,7 @@ export default function CreateQuote(props) {
                 // defaultValue={ENUM_PRODUCT_TYPE?.[0]}
                 renderInput={(params) => <TextField {...params} label={Vi.supplier} />}
               />
-            ) : null}
+            ) : null} */}
             {type === ENUM_PRODUCT_TYPE?.[1]?.name ? (
               <TextField
                 id="quantity"
@@ -629,13 +796,18 @@ export default function CreateQuote(props) {
                 //   ={createAt}
                 //   onChange={(e) => setCreateAt(e.target.value)}
                 required
-                value={inforVehicle?.vehicleNumber}
+                value={productChoose?.quantity}
                 size="small"
                 style={{ width: 100 }}
-                onChange={(e) => handleDataVehicle('vehicleNumber', e.target.value)}
+                onChange={(e) => handleChooseProduct('quantity', e.target.value)}
               />
             ) : null}
-            <Button variant="outlined" onClick={handleAddProduct} size="small" type="submit">
+            <Button
+              variant="outlined"
+              onClick={type === ENUM_PRODUCT_TYPE?.[0]?.name ? handleAddServiceToList : handleAddProductToList}
+              size="small"
+              type="submit"
+            >
               {Vi.add}
             </Button>
           </Box>
@@ -643,12 +815,12 @@ export default function CreateQuote(props) {
             <Typography style={{ fontSize: 18, marginBottom: 12, fontWeight: 600 }}> {Vi.product}:</Typography>
           </Box>
           {renderTitleProduct()}
-          {mockData?.map((e, index) => renderItemProduct(e, index))}
+          {listProductAdd?.map((e, index) => renderItemProduct(e, index))}
           <Box mt={2}>
             <Typography style={{ fontSize: 18, marginBottom: 12, fontWeight: 600 }}> {Vi.service}:</Typography>
           </Box>
           {renderTitleServices()}
-          {mockDataService?.map((e, index) => renderItemService(e, index))}
+          {listServiceAdd?.map((e, index) => renderItemService(e, index))}
         </DialogContent>
         {/* <p
           style={{

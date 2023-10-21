@@ -26,12 +26,14 @@ import Iconify from '../components/Iconify';
 import SearchNotFound from '../components/SearchNotFound';
 import { UserListHead, UserListToolbar, UserMoreMenu } from '../sections/@dashboard/user';
 // mock
-import { deleteProductAPI, getAllProductAPI } from '../components/services/index';
+import { deleteProductAPI, getAllCartAPI, getAllProductAPI } from '../components/services/index';
 import ProductDialog from 'src/dialog/Product/ProductDialog';
 import ProductEditDialog from 'src/dialog/Product/ProductEditDialog';
 import { Vi } from 'src/_mock/Vi';
 import ImportProductDialog from 'src/dialog/ImportProduct/ImportProductDialog';
 import ImportProductEditDialog from 'src/dialog/ImportProduct/ImportProductEditDialog';
+import { formatCreate } from 'src/utils/formatTime';
+import DetailImportProductDialog from 'src/dialog/ImportProduct/DetailImportProductDialog';
 
 // ----------------------------------------------------------------------
 
@@ -39,9 +41,10 @@ const TABLE_HEAD = [
   { id: 'accessoryId', label: 'ID', alignRight: false },
   // { id: 'image', label: 'Image', alignRight: false },
   { id: 'name', label: Vi.createName, alignRight: false },
-  // { id: 'quantity', label: 'Quantity', alignRight: false },
-  { id: 'price', label: Vi.priceProduct, alignRight: false },
-  // { id: 'manufacturer', label: 'Manufacturer', alignRight: false },
+  { id: 'createAt', label: Vi.createAt, alignRight: false },
+  { id: 'supplier', label: Vi.supplier, alignRight: false },
+  { id: 'price', label: Vi.totalPriceImport, alignRight: false },
+  { id: 'detail', label: Vi.detail, alignRight: false },
   // { id: 'accessoryType', label: 'Product Type', alignRight: false },
 ];
 
@@ -71,9 +74,15 @@ function applySortFilter(array, comparator, query) {
     return a[1] - b[1];
   });
   if (query) {
-    return filter(array, (_user) => _user.name.toLowerCase().indexOf(query.toLowerCase()) !== -1);
+    return filter(array, (_user) => {
+      return (
+        _user?.purchaseOrderDetails?.[0]?.productDetail?.supplier?.name.toLowerCase().indexOf(query.toLowerCase()) !==
+        -1
+      );
+    });
   }
   return stabilizedThis?.map((el) => el[0]);
+  // return array;
 }
 
 export default function ImportProducts() {
@@ -111,8 +120,11 @@ export default function ImportProducts() {
 
   const getAllProduct = async () => {
     try {
-      const res = await getAllProductAPI();
-      // setListProduct(res?.data);
+      const res = await getAllCartAPI();
+      if (res?.data?.purchaseOrders?.length > 0) {
+        setListProduct(res?.data?.purchaseOrders);
+      }
+      // console.log('pon console', res?.data?.purchaseOrders);
     } catch (error) {
       console.log(error);
     }
@@ -160,6 +172,18 @@ export default function ImportProducts() {
     setOpenDialog(true);
   };
 
+  const totalPriceImportProduct = (data) => {
+    const totalMoney = data?.reduce(
+      (a, b) => a * 1 + parseInt(b?.productDetail?.PurchasePrice || '0.0') * b?.Quantity,
+      0
+    );
+    // listProductAdd?.forEach((e)=>{
+    // parseInt(item?.productDetail?.PurchasePrice || '0.0') * item?.Quantity
+    //   const total =
+    // })
+    return totalMoney;
+  };
+
   return (
     <Page title="Product">
       <Container maxWidth="xl">
@@ -196,14 +220,24 @@ export default function ImportProducts() {
 
                 <TableBody>
                   {filteredUsers?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { id, image, name, quantity, price, manufacturer, accessoryType } = row;
+                    const {
+                      OrderID,
+                      name,
+                      staff,
+                      quantity,
+                      OrderDate,
+                      purchaseOrderDetails,
+                      price,
+                      manufacturer,
+                      accessoryType,
+                    } = row;
 
                     const isItemSelected = selected.indexOf(name) !== -1;
 
                     return (
                       <TableRow
                         hover
-                        key={id}
+                        key={OrderID}
                         tabIndex={-1}
                         role="checkbox"
                         selected={isItemSelected}
@@ -214,7 +248,7 @@ export default function ImportProducts() {
                         </TableCell> */}
 
                         <TableCell align="center" />
-                        <TableCell align="center">{id}</TableCell>
+                        <TableCell align="center">{OrderID}</TableCell>
                         {/* <TableCell align="center" style={{ display: 'flex', justifyContent: 'center' }}>
                           {
                             <img
@@ -229,15 +263,28 @@ export default function ImportProducts() {
                             />
                           }
                         </TableCell> */}
-                        <TableCell align="center">{name}</TableCell>
-                        {/* <TableCell align="center">{quantity}</TableCell> */}
-                        <TableCell align="center">{formatMoneyWithDot(price)}</TableCell>
+                        <TableCell align="center">{staff?.name}</TableCell>
+                        <TableCell align="center">{OrderDate}</TableCell>
+                        <TableCell align="center">{purchaseOrderDetails?.[0]?.productDetail?.supplier?.name}</TableCell>
+                        <TableCell align="center">
+                          {formatMoneyWithDot(totalPriceImportProduct(purchaseOrderDetails))}
+                        </TableCell>
                         {/* <TableCell align="center">{manufacturer?.name}</TableCell> */}
-                        {/* <TableCell align="center">{accessoryType?.name}</TableCell> */}
-                        <TableCell align="right">
+                        <TableCell align="center">
+                          <Button
+                            onClick={() => {
+                              setOpenDialogEdit(true);
+                              setCurrentProduct(row);
+                            }}
+                          >
+                            Xem chi tiết
+                          </Button>
+                        </TableCell>
+
+                        {/* <TableCell align="right">
                           <UserMoreMenu
-                            id={id}
-                            name={name}
+                            id={OrderID}
+                            name={staff?.name}
                             entity={row}
                             type={'sản phẩm'}
                             deleteAPI={deleteAPI}
@@ -248,7 +295,7 @@ export default function ImportProducts() {
                             setOpenDialogEdit={setOpenDialogEdit}
                             setCurrentEntity={setCurrentProduct}
                           />
-                        </TableCell>
+                        </TableCell> */}
                       </TableRow>
                     );
                   })}
@@ -291,7 +338,7 @@ export default function ImportProducts() {
         setSeverity={setSeverity}
         setOpenToast={setOpenToast}
       />
-      <ImportProductEditDialog
+      <DetailImportProductDialog
         product={currentProduct}
         openDialog={openDialogEdit}
         setOpenDialog={setOpenDialogEdit}
