@@ -108,6 +108,10 @@ export const API_DELETE_SUPPLIER = `${BASE_URL}/supplier`;
 export const API_GET_ALL_SERVICE = `${BASE_URL}/service`;
 //receipt
 export const API_GET_ALL_RECEIPT = `${BASE_URL}/receipt`;
+//quote
+export const API_GET_ALL_QUOTE = `${BASE_URL}/pricequote`;
+//repair
+export const API_GET_ALL_REPAIR = `${BASE_URL}/repair`;
 //vehicle
 export const API_GET_ALL_VEHICLE = `${BASE_URL}/vehicle`;
 //productdetail

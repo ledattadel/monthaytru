@@ -10,6 +10,7 @@ export const Vi = {
   service: 'Dịch vụ',
   receipt: 'Phiếu tiếp nhận',
   Quote: 'Phiếu báo giá',
+  RepairOrder: 'Lệnh sửa chửa',
   bill: 'Hoá đơn',
   addNewReceipt: 'Tạo phiếu tiếp nhận mới',
   addNewImportProduct: 'Tạo phiếu nhập mới',

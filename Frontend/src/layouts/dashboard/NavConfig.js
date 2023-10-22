@@ -68,6 +68,11 @@ const navConfig = [
     icon: getIcon('eva:alert-triangle-fill'),
   },
   {
+    title: Vi.RepairOrder,
+    path: '/dashboard/RepairOrder',
+    icon: getIcon('eva:alert-triangle-fill'),
+  },
+  {
     title: Vi.bill,
     path: '/dashboard/bill',
     icon: getIcon('eva:person-add-fill'),

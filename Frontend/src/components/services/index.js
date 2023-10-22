@@ -52,6 +52,8 @@ import {
   API_GET_ALL_PRODUCT_DETAIL,
   API_GET_ALL_RECEIPT,
   API_GET_ALL_VEHICLE,
+  API_GET_ALL_QUOTE,
+  API_GET_ALL_REPAIR,
 } from './configs';
 const token = JSON.parse(localStorage.getItem('adminInfo'));
 
@@ -381,6 +383,63 @@ export const getAllReceiptAPI = async () => {
 export const editReceiptlAPI = async (body, productId) => {
   try {
     const response = await axios.patch(`${API_GET_ALL_RECEIPT}/${productId}`, body);
+    return response;
+  } catch (error) {
+    return error?.response?.data || error;
+  }
+};
+
+/// quote
+
+export const addNewQuoteAPI = async (body) => {
+  try {
+    const response = await axios.post(API_GET_ALL_QUOTE, body, {
+      headers: { authorization: `Bearer ${token}` },
+    });
+    return response;
+  } catch (error) {
+    return error?.response?.data || error;
+  }
+};
+
+export const getAllQuoteAPI = async () => {
+  try {
+    const response = await axios.get(API_GET_ALL_QUOTE, {
+      headers: { authorization: `Bearer ${token}` },
+    });
+    return response;
+  } catch (error) {
+    return error?.response?.data || error;
+  }
+};
+
+export const addUpdateQuoteAPI = async (body, id) => {
+  try {
+    const response = await axios.patch(`${API_GET_ALL_QUOTE}/${id}`, body, {
+      headers: { authorization: `Bearer ${token}` },
+    });
+    return response;
+  } catch (error) {
+    return error?.response?.data || error;
+  }
+};
+
+//// REPAIR
+
+export const getAllRepairAPI = async () => {
+  try {
+    const response = await axios.get(API_GET_ALL_REPAIR, {
+      headers: { authorization: `Bearer ${token}` },
+    });
+    return response;
+  } catch (error) {
+    return error?.response?.data || error;
+  }
+};
+
+export const updateRepairAPI = async (body, id) => {
+  try {
+    const response = await axios.patch(`${API_GET_ALL_REPAIR}/${id}`, body);
     return response;
   } catch (error) {
     return error?.response?.data || error;

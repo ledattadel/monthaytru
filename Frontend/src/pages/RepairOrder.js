@@ -26,21 +26,21 @@ import { UserBillMoreMenu, UserListHead, UserListToolbar } from '../sections/@da
 
 import CreateReceipt from 'src/dialog/Receipt/CreateReceipt';
 import { Vi } from 'src/_mock/Vi';
-import { getAllQuoteAPI, getAllReceiptAPI, getAllStatusAPI, getUserInfoAPI } from '../components/services/index';
+import { getAllReceiptAPI, getAllRepairAPI, getAllStatusAPI, getUserInfoAPI } from '../components/services/index';
 import EditReceipt from 'src/dialog/Receipt/EditReceipt';
 import ReceiptDetail from 'src/dialog/Receipt/ReceiptDetail';
-import QuoteDetail from 'src/dialog/Quote/QuoteDetail';
 import formatMoneyWithDot from 'src/utils/formatMoney';
+import RepairDetail from 'src/dialog/Repair/RepairDetail';
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: 'cardId', label: 'Mã phiếu tiếp nhận', alignRight: false },
   { id: 'quoteId', label: 'Mã phiếu báo giá', alignRight: false },
+  { id: 'cardId', label: 'Mã phiếu sửa chửa', alignRight: false },
   { id: 'owner', label: Vi.nameCustomer, alignRight: false },
   { id: 'carNumber', label: Vi.plateNumber, alignRight: false },
-  // { id: 'createTime', label: Vi.createAt, alignRight: false },
-  { id: 'createName', label: Vi.createName, alignRight: false },
+  { id: 'createTime', label: Vi.createAt, alignRight: false },
+  // { id: 'createName', label: Vi.createName, alignRight: false },
   // { id: 'description', label: Vi.descriptionReceipt, alignRight: false },
   { id: 'price', label: Vi.price, alignRight: false },
   // { id: 'vehicleCondition', label: Vi.vehicleCondition, alignRight: false },
@@ -77,7 +77,7 @@ function applySortFilter(array, comparator, query) {
   return stabilizedThis?.map((el) => el[0]);
 }
 
-export default function Quote() {
+export default function RepairOrder() {
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('asc');
   const [selected, setSelected] = useState([]);
@@ -93,37 +93,37 @@ export default function Quote() {
   const [openDetailDialog, setOpenDetailDialog] = useState(false);
   const [receiptChoose, setReceiptChoose] = useState({});
 
-  // const getEmployeeInfo = async () => {
-  //   try {
-  //     const res = await getUserInfoAPI();
-  //     if (res?.status === 200) {
-  //       // setEmployeeInfo(res.data);
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
+  const getEmployeeInfo = async () => {
+    try {
+      const res = await getUserInfoAPI();
+      if (res?.status === 200) {
+        // setEmployeeInfo(res.data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const getAllCart = async () => {
     try {
-      const res = await getAllQuoteAPI();
+      const res = await getAllRepairAPI();
       if (res?.data) {
         setListCart(res?.data);
       }
     } catch (error) {}
   };
 
-  // const getAllStatus = async () => {
-  //   try {
-  //     const res = await getAllStatusAPI();
-  //     // setListStatus(res?.data);
-  //   } catch (error) {}
-  // };
+  const getAllStatus = async () => {
+    try {
+      const res = await getAllStatusAPI();
+      // setListStatus(res?.data);
+    } catch (error) {}
+  };
 
   useEffect(() => {
     getAllCart();
-    // getEmployeeInfo();
-    // getAllStatus();
+    getEmployeeInfo();
+    getAllStatus();
   }, []);
 
   const handleOpenDialog = () => {
@@ -166,7 +166,7 @@ export default function Quote() {
       <Container maxWidth="xl">
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
-            Phiếu báo giá
+            {Vi.RepairOrder}
           </Typography>
           {/* <Button
             variant="contained"
@@ -228,19 +228,19 @@ export default function Quote() {
           />
         </Card>
       </Container>
-      {/* <CreateReceipt
+      <CreateReceipt
         openDialog={openDialog}
         setOpenDialog={setOpenDialog}
         listCart={listCart}
         getAllCart={getAllCart}
-      /> */}
+      />
       <EditReceipt
         openDialog={openEditDialog}
         setOpenDialog={setOpenEditDialog}
         getAllCart={getAllCart}
         receiptChoose={receiptChoose}
       />
-      <QuoteDetail
+      <RepairDetail
         openDialog={openDetailDialog}
         setOpenDialog={setOpenDetailDialog}
         getAllCart={getAllCart}
@@ -256,7 +256,7 @@ export default function Quote() {
 const Row = ({ row, setReceiptChoose, setOpenEditDialog, setOpenDetailDialog }) => {
   const {
     ReceiptID,
-    Time,
+    TimeCreate,
     Note,
     customer,
     staff,
@@ -266,11 +266,12 @@ const Row = ({ row, setReceiptChoose, setOpenEditDialog, setOpenDetailDialog }) 
     // totalPrice,
     // carNumber,
     // timeToDone,
-    receipt,
+    RepairOrderID,
     QuoteID,
-    Status,
-    priceQuoteServiceDetails,
-    priceQuoteProductDetails,
+    priceQuote,
+    repairOrderDetails,
+    // priceQuoteProductDetails,
+    IsDone,
   } = row;
 
   const [openToast, setOpenToast] = useState(false);
@@ -279,43 +280,39 @@ const Row = ({ row, setReceiptChoose, setOpenEditDialog, setOpenDetailDialog }) 
 
   const [openToastDatePicker, setOpenToastDatePicker] = useState(false);
 
-  const returnStatus = (status) => {
-    switch (status) {
-      case 0:
-        return 'chờ xác nhận';
-      case 1:
-        return 'đã xác nhận';
-      case 2:
-        return 'xác nhận lại';
-
-      default:
-        return 'Chờ xác nhận';
-    }
-  };
-
   const countPrice = () => {
-    const priceQuoteService = priceQuoteServiceDetails?.reduce((a, b) => a * 1 + parseInt(b?.Price || '0.0'), 0);
-    const priceQuoteProduct = priceQuoteProductDetails?.reduce(
+    const priceQuoteService = repairOrderDetails?.reduce(
+      (a, b) => a * 1 + parseInt(b?.pqServiceDetail?.Price || '0.0'),
+      0
+    );
+
+    const priceQuoteProduct = priceQuote?.priceQuoteProductDetails?.reduce(
       (a, b) => a * 1 + parseInt(b?.SellingPrice || '0.0') * b?.Quantity || 1,
       0
     );
+    console.log('pon console', priceQuoteProduct);
     return priceQuoteService * 1 + priceQuoteProduct * 1;
   };
 
   return (
     <>
-      <TableRow hover key={ReceiptID} tabIndex={-1} role="checkbox">
+      <TableRow hover key={RepairOrderID} tabIndex={-1} role="checkbox">
         <TableCell></TableCell>
-        <TableCell align="center">{ReceiptID}</TableCell>
         <TableCell align="center">{QuoteID}</TableCell>
+        <TableCell align="center">{RepairOrderID}</TableCell>
+        {/* <TableCell align="center">{staff?.name}</TableCell> */}
+        <TableCell align="center">{priceQuote?.receipt?.customer?.name}</TableCell>
+        <TableCell align="center">{priceQuote?.receipt?.vehicle?.NumberPlate}</TableCell>
 
-        <TableCell align="center">{receipt?.customer?.name}</TableCell>
-        <TableCell align="center">{receipt?.vehicle?.NumberPlate}</TableCell>
-
-        <TableCell align="center">{staff?.name}</TableCell>
-
-        <TableCell align="center">{formatMoneyWithDot(countPrice() || 0)}</TableCell>
-        <TableCell align="center">{returnStatus(Status)}</TableCell>
+        <TableCell align="center">{TimeCreate}</TableCell>
+        {/* <TableCell align="center">{staff?.name}</TableCell> */}
+        {/* <TableCell align="center">{updateTime ? formatDateTime(updateTime) : ''}</TableCell> */}
+        {/* <TableCell align="center">{timeToDone ? formatDate(timeToDone) : ''}</TableCell> */}
+        {/* <TableCell align="center">{approvalEmployee?.name || ''}</TableCell> */}
+        <TableCell align="center">{formatMoneyWithDot(countPrice()) || 0}</TableCell>
+        <TableCell align="center">{IsDone ? 'Đã hoàn thành' : 'Chưa hoàn thành'}</TableCell>
+        {/* <TableCell align="center">{formatMoneyWithDot(totalPrice)}</TableCell> */}
+        {/* <TableCell align="center"><T</TableCell> */}
 
         <TableCell align="center">
           {' '}
@@ -331,16 +328,25 @@ const Row = ({ row, setReceiptChoose, setOpenEditDialog, setOpenDetailDialog }) 
         <TableCell>
           <UserBillMoreMenu
             id={ReceiptID}
-            status={Status}
+            // status={Status}
             entity={row}
             handleEditCart={() => {
               setOpenEditDialog(true);
               setReceiptChoose(row);
             }}
+            // handleRefuseCart={() => setOpenToastDatePicker(true)}
+            // handleDeleteCart={() => setOpenModalCancelOrder(true)}
+            // handleConfirmCart={handleCreateBill}
           />
         </TableCell>
       </TableRow>
 
+      {/* <DatePickerDialog
+        open={openToastDatePicker}
+        setOpen={setOpenToastDatePicker}
+        email={ReceiptID}
+        cartId={ReceiptID}
+      /> */}
       <AppToast
         content={contentToast}
         type={0}

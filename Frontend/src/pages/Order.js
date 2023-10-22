@@ -261,7 +261,7 @@ export default function Receipt() {
 const Row = ({ row, setReceiptChoose, setOpenEditDialog, setOpenDetailDialog }) => {
   const {
     ReceiptID,
-    Time,
+    TimeCreate,
     Note,
     customer,
     staff,
@@ -272,7 +272,7 @@ const Row = ({ row, setReceiptChoose, setOpenEditDialog, setOpenDetailDialog }) 
     // carNumber,
     // timeToDone,
   } = row;
-
+  console.log('pon console row', row);
   const [status, setStatus] = useState(ReceiptID);
 
   const [openToast, setOpenToast] = useState(false);
@@ -290,7 +290,7 @@ const Row = ({ row, setReceiptChoose, setOpenEditDialog, setOpenDetailDialog }) 
         <TableCell align="center">{customer?.name}</TableCell>
         <TableCell align="center">{vehicle?.NumberPlate}</TableCell>
 
-        <TableCell align="center">{Time}</TableCell>
+        <TableCell align="center">{TimeCreate}</TableCell>
         <TableCell align="center">{staff?.name}</TableCell>
         {/* <TableCell align="center">{updateTime ? formatDateTime(updateTime) : ''}</TableCell> */}
         {/* <TableCell align="center">{timeToDone ? formatDate(timeToDone) : ''}</TableCell> */}

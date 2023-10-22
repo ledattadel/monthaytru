@@ -11,6 +11,7 @@ import moment from 'moment';
 import {
   addCarDesAPI,
   addNewQuoteAPI,
+  addUpdateQuoteAPI,
   getAllProductDetailAPI,
   getAllServiceAPI,
   getAllStaffAPI,
@@ -31,8 +32,8 @@ const ENUM_PRODUCT_TYPE = [
   },
 ];
 
-export default function CreateQuote(props) {
-  const { openDialog, setOpenDialog, receiptChoose } = props;
+export default function QuoteDetail(props) {
+  const { openDialog, setOpenDialog, receiptChoose, getAllCart } = props;
 
   const [additionPrice, setAdditionPrice] = useState(0);
   const [productAdd, setProductAdd] = useState([]);
@@ -76,6 +77,9 @@ export default function CreateQuote(props) {
 
   /// state list services / product
 
+  const [listServiceAddDefault, setListServiceAddDefault] = useState([]);
+  const [listProductAddDefault, setListProductAddDefault] = useState([]);
+  ///
   const [listServiceAdd, setListServiceAdd] = useState([]);
   const [listProductAdd, setListProductAdd] = useState([]);
 
@@ -105,11 +109,42 @@ export default function CreateQuote(props) {
 
   useEffect(() => {
     if (receiptChoose?.ReceiptID) {
-      handleDataCustomer('phoneNumber', receiptChoose?.customer?.phoneNumber);
-      handleDataCustomer('name', receiptChoose?.customer?.name);
-      handleDataVehicle('vehicleNumber', receiptChoose?.vehicle?.NumberPlate);
+      handleDataCustomer('phoneNumber', receiptChoose?.receipt?.customer?.phoneNumber);
+      handleDataCustomer('name', receiptChoose?.receipt?.customer?.name);
+      handleDataVehicle('vehicleNumber', receiptChoose?.receipt?.vehicle?.NumberPlate);
+
+      const dataProduct = [];
+      receiptChoose?.priceQuoteProductDetails?.forEach((e, index) => {
+        const temp = {
+          ...e?.productDetail,
+          quantity: e?.Quantity,
+          supplier: e?.supplier,
+          isRemove: e?.Status === 1 ? true : false,
+          index: index + 1,
+          isAcceptedRepair: e?.isAcceptedRepair,
+        };
+        dataProduct?.push(temp);
+      });
+      setListProductAddDefault(dataProduct);
+      setListProductAdd(dataProduct);
+
+      const dataService = [];
+      receiptChoose?.priceQuoteServiceDetails?.forEach((e, index) => {
+        const temp = {
+          ...e?.service,
+          staff: e?.repairOrderDetails?.[0]?.staff,
+          isRemove: e?.Status === 1 ? true : false,
+          index: index + 1,
+          isAcceptedRepair: e?.isAcceptedRepair,
+        };
+        dataService?.push(temp);
+      });
+      setListServiceAddDefault(dataService);
+      setListServiceAdd(dataService);
     }
   }, [receiptChoose, openDialog]);
+
+  // useEffect(()=)
 
   const getVehicleByNumber = async (number) => {
     try {
@@ -126,6 +161,11 @@ export default function CreateQuote(props) {
   };
 
   /// function
+
+  const reNew = () => {
+    setListProductAdd(listProductAddDefault);
+    setListServiceAdd(listServiceAddDefault);
+  };
 
   const getAllService = async () => {
     try {
@@ -166,14 +206,14 @@ export default function CreateQuote(props) {
     setType(ENUM_PRODUCT_TYPE?.[0]?.name);
   };
 
-  const addNewQuote = async (data) => {
+  const addNewQuote = async (data, id) => {
     // try {
     //   const res = await addNewQuoteAPI(data)
     // } catch (error) {
 
     // }
     try {
-      const res = await addNewQuoteAPI(data);
+      const res = await addUpdateQuoteAPI(data, id);
       let errorMessage = res.message || 'Tạo báo giá thất bại';
       let successMessage = res.message || 'Tạo báo giá thành công';
       if (res.status === 201) {
@@ -182,6 +222,7 @@ export default function CreateQuote(props) {
         setAdditionPrice(0);
         setOpenToastHere(true);
         setOpenDialog(false);
+        getAllCart();
         handleClose();
       } else {
         setContentToastHere(errorMessage);
@@ -194,11 +235,6 @@ export default function CreateQuote(props) {
       setSeverityHere('error');
     }
   };
-
-  const reset = () => {
-    setListProductAdd([]);
-    setListServiceAdd([]);
-  };
   const handleAddProduct = (status) => {
     const dataService = [];
     listServiceAdd?.forEach((e) => {
@@ -206,6 +242,7 @@ export default function CreateQuote(props) {
         ServiceID: e?.ServiceID,
         Price: e?.Price,
         Technician: e?.staff?.id,
+        isAcceptedRepair: e?.isAcceptedRepair ? true : false,
       };
       dataService?.push(temp);
     });
@@ -218,20 +255,22 @@ export default function CreateQuote(props) {
         PurchasePrice: e?.PurchasePrice,
         Quantity: e?.quantity,
         productDetailID: e?.ProductDetailID,
+        isAcceptedRepair: e?.isAcceptedRepair ? true : false,
       };
       dataProduct?.push(temp);
     });
     const data = {
       Status: status,
-      Time: moment().format('DD-MM-yyyy hh:mm'),
-      StaffID: InfoAdmin?.userId,
-      ReceiptID: receiptChoose?.ReceiptID,
+      TimeUpdate: moment().format('DD-MM-yyyy hh:mm'),
+      EditorID: InfoAdmin?.userId,
+      // ReceiptID: receiptChoose?.ReceiptID,
       priceQuoteServiceDetails: dataService,
       priceQuoteProductDetails: dataProduct,
       TimeCreateRepair: status === 1 ? moment().format('DD-MM-yyyy hh:mm') : undefined,
     };
     // console.log('pon console ne ', data);
-    addNewQuote(data);
+    // console.log('pon console', receiptChoose);
+    addNewQuote(data, receiptChoose?.QuoteID);
   };
   const handleAddProductToList = () => {
     const flat = listProductAdd?.filter((e) => e?.ProductDetailID === productChoose?.ProductDetailID);
@@ -337,7 +376,21 @@ export default function CreateQuote(props) {
     const tempDate = { ...inforCustomer, [field]: value };
     setInforCustomer(tempDate);
   };
+  // const countPrice = () => {
+  //   const priceQuoteService = priceQuoteServiceDetails?.reduce((a, b) => a * 1 + parseInt(b?.Price || '0.0'), 0);
+  //   const priceQuoteProduct = priceQuoteProductDetails?.reduce(
+  //     (a, b) => a * 1 + parseInt(b?.SellingPrice || '0.0') * b?.Quantity || 1,
+  //     0
+  //   );
+  //   return priceQuoteService * 1 + priceQuoteProduct * 1;
+  // };
 
+  const priceQuoteService = listServiceAdd?.reduce((a, b) => a * 1 + parseInt(b?.Price || '0.0'), 0);
+
+  const priceQuoteProduct = listProductAdd?.reduce(
+    (a, b) => a * 1 + parseInt(b?.SellingPrice || '0.0') * b?.Quantity || 1,
+    0
+  );
   const renderItemProduct = (item, index) => {
     return (
       <Box>
@@ -384,6 +437,7 @@ export default function CreateQuote(props) {
           </Box>
           <Button
             onClick={() => removeProductAdd(item?.ProductDetailID)}
+            disabled={item?.isRemove}
             style={{ display: 'flex', padding: 4, width: 40, justifyContent: 'space-between' }}
           >
             <Typography style={{ width: 100, textAlign: 'center' }}>X</Typography>
@@ -432,6 +486,7 @@ export default function CreateQuote(props) {
 
           <Button
             onClick={() => removeServiceAdd(item?.ServiceID)}
+            disabled={item?.isRemove}
             style={{ display: 'flex', padding: 4, width: 40, justifyContent: 'space-between' }}
           >
             <Typography style={{ width: 100, textAlign: 'center' }}>X</Typography>
@@ -565,6 +620,7 @@ export default function CreateQuote(props) {
                 disabled={true}
                 size="small"
                 required
+                value={receiptChoose?.QuoteID}
               />
               <TextField
                 id="createAt"
@@ -763,10 +819,14 @@ export default function CreateQuote(props) {
           <Button variant="outlined" onClick={handleClose}>
             {Vi.Cancel}
           </Button>
-          <Button variant="outlined" onClick={() => handleAddProduct(0)} type="submit">
+          <Button
+            variant="outlined"
+            onClick={() => handleAddProduct(receiptChoose?.Status === 0 ? 0 : 2)}
+            type="submit"
+          >
             {Vi.save}
           </Button>
-          <Button variant="outlined" onClick={reset} type="submit">
+          <Button variant="outlined" onClick={reNew} type="submit">
             {Vi.reset}
           </Button>
           <Button variant="outlined" onClick={() => handleAddProduct(1)} type="submit">
