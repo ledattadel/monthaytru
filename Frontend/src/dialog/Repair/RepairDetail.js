@@ -492,10 +492,10 @@ export default function RepairDetail(props) {
   return (
     <div style={{ width: '1500px' }}>
       <Dialog open={openDialog} onClose={handleClose} maxWidth={'1500px'}>
-        <DialogTitle>{Vi.quote}</DialogTitle>
+        <DialogTitle>{Vi.RepairOrder}</DialogTitle>
         <DialogContent sx={{ height: 650, width: 1000 }}>
           <Box style={{ borderWidth: 1, borderColor: 'grey' }}>
-            <Typography style={{ fontSize: 14, marginTop: 8, marginBottom: 12 }}>{Vi.inforQuote}</Typography>
+            <Typography style={{ fontSize: 14, marginTop: 8, marginBottom: 12 }}>Thông tin lệnh sửa chửa</Typography>
             <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
               <TextField
                 id="receiptId"
