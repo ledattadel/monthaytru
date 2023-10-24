@@ -808,6 +808,13 @@ export default function QuoteDetail(props) {
           </Box>
           {renderTitleProduct()}
           {listProductAdd?.map((e, index) => renderItemProduct(e, index))}
+
+          <Box mt={2}>
+            <Typography style={{ fontSize: 18, marginBottom: 12, fontWeight: 600 }}> {Vi.service}:</Typography>
+          </Box>
+          {renderTitleServices()}
+          {listServiceAdd?.map((e, index) => renderItemService(e, index))}
+
           <Box style={{ display: 'flex', justifyContent: 'space-between', width: 330, marginLeft: 620 }}>
             <Typography textAlign={'right'} style={{ fontSize: 18, marginTop: 12 }}>
               Tổng tiền sản phẩm :{' '}
@@ -816,12 +823,6 @@ export default function QuoteDetail(props) {
               {formatMoneyWithDot(priceQuoteProduct || 0)}
             </Typography>
           </Box>
-
-          <Box mt={2}>
-            <Typography style={{ fontSize: 18, marginBottom: 12, fontWeight: 600 }}> {Vi.service}:</Typography>
-          </Box>
-          {renderTitleServices()}
-          {listServiceAdd?.map((e, index) => renderItemService(e, index))}
 
           <Box style={{ display: 'flex', justifyContent: 'space-between', width: 330, marginLeft: 620 }}>
             <Typography textAlign={'right'} style={{ fontSize: 18, marginTop: 12 }}>
@@ -832,6 +833,22 @@ export default function QuoteDetail(props) {
             </Typography>
           </Box>
 
+          <Box style={{ display: 'flex', justifyContent: 'space-between', width: 330, marginLeft: 620 }}>
+            <Typography textAlign={'right'} style={{ fontSize: 18, marginTop: 12 }}>
+              Tổng tiền:{' '}
+            </Typography>
+            <Typography style={{ fontSize: 18, marginTop: 12 }}>
+              {formatMoneyWithDot(parseInt(priceQuoteService * 1 + priceQuoteProduct * 1) || 0)}
+            </Typography>
+          </Box>
+          <Box style={{ display: 'flex', justifyContent: 'space-between', width: 330, marginLeft: 620 }}>
+            <Typography textAlign={'right'} style={{ fontSize: 18, marginTop: 12 }}>
+              (VAT 8%) :{' '}
+            </Typography>
+            <Typography style={{ fontSize: 18, marginTop: 12 }}>
+              {formatMoneyWithDot(parseInt((priceQuoteService * 1 + priceQuoteProduct * 1) * 0.08) || 0)}
+            </Typography>
+          </Box>
           <Box style={{ display: 'flex', justifyContent: 'space-between', width: 330, marginLeft: 620 }}>
             <Typography textAlign={'right'} style={{ fontSize: 18, marginTop: 12 }}>
               Tổng tiền (VAT 8%) :{' '}
