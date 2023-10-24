@@ -834,7 +834,7 @@ export default function QuoteDetail(props) {
 
           <Box style={{ display: 'flex', justifyContent: 'space-between', width: 330, marginLeft: 620 }}>
             <Typography textAlign={'right'} style={{ fontSize: 18, marginTop: 12 }}>
-              Tổng tiền:{' '}
+              Tổng tiền (VAT 8%) :{' '}
             </Typography>
             <Typography style={{ fontSize: 18, marginTop: 12 }}>
               {formatMoneyWithDot(parseInt((priceQuoteService * 1 + priceQuoteProduct * 1) * 1.08) || 0)}
