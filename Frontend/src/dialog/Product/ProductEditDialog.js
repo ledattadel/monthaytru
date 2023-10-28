@@ -19,7 +19,7 @@ export default function ProductEditDialog(props) {
   const [isError, setIsError] = React.useState(false);
   const [listBrand, setListBrand] = React.useState([]);
 
-  const brandRef = useRef(product?.brand?.BrandName)
+  const brandRef = useRef(product?.brand?.BrandName);
   React.useEffect(() => {
     fetchAllBrand();
     // getAllProductType();
@@ -35,9 +35,9 @@ export default function ProductEditDialog(props) {
   const editProduct = async (data, productId) => {
     try {
       const res = await editProductAPI(data, productId);
-      let errorMessage = res.message ||  'Sửa sản phẩm thất bại'
-      let successMessage =  res.message || 'Sửa sản phẩm thành công'
-     
+      let errorMessage = res.message || 'Sửa sản phẩm thất bại';
+      let successMessage = res.message || 'Sửa sản phẩm thành công';
+
       if (res.status === 200) {
         setContentToast(successMessage);
         setSeverity('success');
@@ -56,7 +56,6 @@ export default function ProductEditDialog(props) {
     }
   };
 
-  
   const fetchAllBrand = async () => {
     try {
       const res = await getAllBrand();
@@ -66,7 +65,6 @@ export default function ProductEditDialog(props) {
     }
   };
 
-
   const getAllProductType = async () => {
     try {
       const res = await getAllAccessoryTypeAPI();
@@ -75,8 +73,6 @@ export default function ProductEditDialog(props) {
       console.log(error);
     }
   };
-
-  
 
   const handleClose = () => {
     setOpenDialog(false);
@@ -98,17 +94,19 @@ export default function ProductEditDialog(props) {
     //   editProduct(data, product?.id);
     // }
 
-
-
-
-    if (!quantity || !name || !price || !brand  ) {
-      console.log(quantity,name,price,brand);
+    if (!name || !price || !brand) {
+      console.log(quantity, name, price, brand);
       setIsError(true);
     } else {
       setIsError(false);
 
-      
-      const data = { ProductName: name, ProductDescription : description, BrandName: brand, Unit:quantity, Price: price }
+      const data = {
+        ProductName: name,
+        ProductDescription: description,
+        BrandName: brand,
+        // Unit: quantity,
+        Price: price,
+      };
 
       editProduct(data, product?.ProductID);
     }
@@ -139,17 +137,6 @@ export default function ProductEditDialog(props) {
             }}
           >
             <TextField
-              autoFocus
-              id="quantity"
-              label="Số lượng"
-              type="number"
-              size="medium"
-              sx={{ width: 500, mr: 2 }}
-              value={quantity}
-              onChange={(e) => setQuantity(e.target.value)}
-              required
-            />
-            <TextField
               id="price"
               label="Giá"
               type="Number"
@@ -174,12 +161,10 @@ export default function ProductEditDialog(props) {
               sx={{ width: 500, mr: 2 }}
               value={brand ? brand : brandRef.current}
               onChange={(e, newValue) => {
-                
                 setBrand(newValue?.BrandName);
               }}
               renderInput={(params) => <TextField {...params} label="brand" />}
             />
-           
           </Box>
           <TextField
             margin="dense"
@@ -195,7 +180,6 @@ export default function ProductEditDialog(props) {
             required
           />
 
-      
           <p
             style={{
               margin: '10px',
@@ -205,7 +189,7 @@ export default function ProductEditDialog(props) {
               display: isError ? 'flex' : 'none',
             }}
           >
-              Vui lòng điền đầy đủ
+            Vui lòng điền đầy đủ
           </p>
         </DialogContent>
         <DialogActions>

@@ -16,6 +16,7 @@ import {
   Typography,
   TableContainer,
   TablePagination,
+  Button,
 } from '@mui/material';
 
 import KeyboardArrowUpIcon from '@mui/icons-material/ArrowDownward';
@@ -36,17 +37,22 @@ import BarChart from '../chart/BarChart';
 import BarChartMonth from '../chart/BarChartMonth';
 
 // mock
-import { getAllBillAPI, getCartDescriptionAPI } from '../components/services/index';
+import { getAllBillAPI, getAllInvoiceAPI, getCartDescriptionAPI } from '../components/services/index';
+import BillDetail from 'src/dialog/bill/BillDetail';
+import PrinterBill from 'src/dialog/bill/PrinterBill';
+import { Vi } from 'src/_mock/Vi';
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: 'id', label: 'Cart ID', alignRight: false },
-  { id: 'owner', label: 'Owner', alignRight: false },
-  { id: 'createAt', label: 'Create At', alignRight: false },
-  { id: 'completeAt', label: 'Complete At', alignRight: false },
-  { id: 'price', label: 'Price', alignRight: false },
-  { id: 'confirmBy', label: 'Confirm By', alignRight: false },
+  { id: 'id', label: 'Mã hoá đơn', alignRight: false },
+  { id: 'owner', label: 'Mã phiếu sửa chửa', alignRight: false },
+  { id: 'createAt', label: 'Tên khách hàng', alignRight: false },
+  { id: 'completeAt', label: 'Biển số xe', alignRight: false },
+  { id: 'price', label: 'thời gian tạo', alignRight: false },
+  { id: 'confirmBy', label: 'người tạo', alignRight: false },
+  { id: 'confirmBy', label: 'Tổng tiền', alignRight: false },
+  { id: 'confirmBy', label: 'Chi tiết', alignRight: false },
 ];
 
 // ----------------------------------------------------------------------
@@ -96,10 +102,14 @@ export default function Bill() {
   const [listBill, setListBill] = useState([]);
   const [monthInChart, setMonthInChart] = useState('2022-12');
 
+  const [openDetailDialog, setOpenDetailDialog] = useState(false);
+  const [openInvoiceDialog, setOpenInvoiceDialog] = useState(false);
+  const [receiptChoose, setReceiptChoose] = useState({});
+
   const getAllBill = async () => {
     try {
-      const res = await getAllBillAPI();
-      // setListBill(res?.data);
+      const res = await getAllInvoiceAPI();
+      setListBill(res?.data);
     } catch (error) {
       console.log(error);
     }
@@ -156,9 +166,9 @@ export default function Bill() {
       <Container maxWidth="xl">
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
-            Bill
+            Hoá đơn
           </Typography>
-          <ExportExcel excelData={dataExportExcel} fileName={'Thống kê doanh thu Garage'} />
+          {/* <ExportExcel excelData={dataExportExcel} fileName={'Thống kê doanh thu Garage'} /> */}
         </Stack>
 
         <Card>
@@ -179,7 +189,14 @@ export default function Bill() {
 
                 <TableBody>
                   {filteredUsers?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)?.map((row, index) => {
-                    return <Row row={row} key={index} />;
+                    return (
+                      <Row
+                        row={row}
+                        key={index}
+                        setReceiptChoose={setReceiptChoose}
+                        setOpenDetailDialog={setOpenDetailDialog}
+                      />
+                    );
                   })}
                   {emptyRows > 0 && (
                     <TableRow style={{ height: 53 * emptyRows }}>
@@ -211,7 +228,7 @@ export default function Bill() {
             onRowsPerPageChange={handleChangeRowsPerPage}
           />
         </Card>
-        <div style={{ marginTop: '150px' }}>
+        {/* <div style={{ marginTop: '150px' }}>
           <span style={{ marginBottom: '50px', display: 'inline-block' }}>
             <span>Month: </span>
             <input
@@ -230,22 +247,22 @@ export default function Bill() {
             />
           </span>
           <BarChartMonth data={filteredUsers} monthInChart={monthInChart} />
-        </div>
+        </div> */}
       </Container>
+      <BillDetail
+        setOpenInvoiceDialog={setOpenInvoiceDialog}
+        openDialog={openDetailDialog}
+        setOpenDialog={setOpenDetailDialog}
+        receiptChoose={receiptChoose}
+      />
+      <PrinterBill receiptChoose={receiptChoose} openDialog={openInvoiceDialog} setOpenDialog={setOpenInvoiceDialog} />
     </Page>
   );
 }
 
 function Row(props) {
-  const { row } = props;
-  const {
-    id,
-    createTime,
-    approvalEmployee,
-    totalPrice,
-    customer: { name: userName },
-    deleteAt: completeAt,
-  } = row || {};
+  const { row, setReceiptChoose, setOpenDetailDialog } = props;
+  const { InvoiceID, Time, priceQuote, QuoteID, staff } = row || {};
   const [open, setOpen] = React.useState(false);
   const [item, setItem] = useState([]);
 
@@ -260,59 +277,46 @@ function Row(props) {
 
   const handleClick = () => {
     setOpen(!open);
-    getCartDescription(id);
+    getCartDescription(InvoiceID);
+  };
+
+  const countPrice = () => {
+    const priceQuoteService = priceQuote?.priceQuoteServiceDetails?.reduce(
+      (a, b) => a * 1 + parseInt(b?.Price || '0.0'),
+      0
+    );
+    const priceQuoteProduct = priceQuote?.priceQuoteProductDetails?.reduce(
+      (a, b) => a * 1 + parseInt(b?.SellingPrice || '0.0') * b?.Quantity || 1,
+      0
+    );
+    return priceQuoteService * 1 + priceQuoteProduct * 1;
   };
 
   return (
     <>
       <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
-        <TableCell>
-          <IconButton aria-label="expand row" size="small" onClick={handleClick}>
-            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-          </IconButton>
-        </TableCell>
+        <TableCell></TableCell>
         <TableCell align="center" component="th" scope="row">
-          {id}
+          {InvoiceID}
         </TableCell>
-        <TableCell align="center">{userName}</TableCell>
-        <TableCell align="center">{formatDate(createTime)}</TableCell>
-        <TableCell align="center">{formatDate(completeAt)}</TableCell>
-        <TableCell align="center">{formatMoneyWithDot(totalPrice)}</TableCell>
-        <TableCell align="center">{approvalEmployee?.name}</TableCell>
-      </TableRow>
-      <TableRow>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={12}>
-          <Collapse in={open} timeout="auto" unmountOnExit>
-            {item?.length > 0 ? (
-              <Box sx={{ margin: 4 }}>
-                <Typography variant="h6" gutterBottom component="div">
-                  Sản phẩm
-                </Typography>
-                <Table size="small" aria-label="purchases">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Tên sản phẩm</TableCell>
-                      <TableCell align="center">Số lượng</TableCell>
-                      <TableCell align="right">Giá tiền</TableCell>
-                      <TableCell align="right">Bảo hành đến</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {item?.map((value) => (
-                      <TableRow key={value?.cartDesId}>
-                        <TableCell component="th" scope="row" sx={{ width: '400px' }}>
-                          {value?.product?.name}
-                        </TableCell>
-                        <TableCell align="center">{value?.quantity}</TableCell>
-                        <TableCell align="right">{formatMoneyWithDot(value?.price * value?.quantity)}</TableCell>
-                        <TableCell align="right">{value?.usageTime ? formatDate(value?.usageTime) : ''}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </Box>
-            ) : null}
-          </Collapse>
+        <TableCell align="center">{QuoteID}</TableCell>
+
+        <TableCell align="center">{priceQuote?.receipt?.customer?.name}</TableCell>
+        <TableCell align="center">{priceQuote?.receipt?.vehicle?.NumberPlate}</TableCell>
+        <TableCell align="center">{Time}</TableCell>
+        <TableCell align="center">{staff?.name}</TableCell>
+        <TableCell align="center">{formatMoneyWithDot(countPrice())}</TableCell>
+
+        <TableCell align="center">
+          {' '}
+          <Button
+            onClick={() => {
+              setReceiptChoose(row);
+              setOpenDetailDialog(true);
+            }}
+          >
+            {Vi.detail}
+          </Button>
         </TableCell>
       </TableRow>
     </>

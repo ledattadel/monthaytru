@@ -25,8 +25,8 @@ export default function ProductDialog(props) {
   const addNewProduct = async (data) => {
     try {
       const res = await addNewProductAPI(data);
-      let errorMessage = res.message ||  'Thêm sản phẩm thất bại'
-      let successMessage =  res.message || 'Thêm sản phẩm thành công'
+      let errorMessage = res.message || 'Thêm sản phẩm thất bại';
+      let successMessage = res.message || 'Thêm sản phẩm thành công';
       if (res.status === 200) {
         setName(null);
         setQuantity(null);
@@ -56,7 +56,7 @@ export default function ProductDialog(props) {
     try {
       const res = await getAllBrand();
       setListBrand(res?.data);
-      console.log("res:::",res);
+      console.log('res:::', res);
     } catch (error) {
       console.log(error);
     }
@@ -88,19 +88,23 @@ export default function ProductDialog(props) {
   };
 
   const handleAddProduct = () => {
-    if (!quantity || !name || !price || !brand  || !description) {
+    if (!name || !price || !brand || !description) {
       setIsError(true);
     } else {
       setIsError(false);
 
-      const data = { ProductName: name, ProductDescription : description, BrandName: brand, Unit:quantity, Price: price }
-
+      const data = {
+        ProductName: name,
+        ProductDescription: description,
+        BrandName: brand,
+        // Unit: quantity,
+        Price: price,
+      };
 
       // CALL API add new product
       addNewProduct(data);
     }
   };
-
 
   return (
     <div>
@@ -125,7 +129,7 @@ export default function ProductDialog(props) {
               mt: 2,
             }}
           >
-            <TextField
+            {/* <TextField
               autoFocus
               id="quantity"
               label="Số lượng"
@@ -134,7 +138,7 @@ export default function ProductDialog(props) {
               sx={{ width: 500, mr: 2 }}
               onChange={(e) => setQuantity(e.target.value)}
               required
-            />
+            /> */}
             <TextField
               id="price"
               label="Giá"
@@ -162,7 +166,6 @@ export default function ProductDialog(props) {
               }}
               renderInput={(params) => <TextField {...params} label="brand" />}
             />
-           
           </Box>
           <TextField
             margin="dense"
@@ -177,7 +180,6 @@ export default function ProductDialog(props) {
             required
           />
 
-      
           <p
             style={{
               margin: '10px',

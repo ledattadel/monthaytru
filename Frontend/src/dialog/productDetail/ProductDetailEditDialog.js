@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Box } from '@mui/material';
+import { Button, Box, Typography } from '@mui/material';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import Dialog from '@mui/material/Dialog';
@@ -8,17 +8,20 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import { editProductAPI, getAllBrand, getAllAccessoryTypeAPI, editProductDetailAPI } from 'src/components/services';
 import { useRef } from 'react';
+import { Vi } from 'src/_mock/Vi';
 
 export default function ProductDetailEditDialog(props) {
   const { openDialog, setOpenDialog, getAllProduct, setContentToast, setSeverity, setOpenToast, product } = props;
   const [name, setName] = React.useState();
   const [quantity, setQuantity] = React.useState();
+  const [importPrice, setInportPrice] = React.useState();
   const [price, setPrice] = React.useState();
   const [brand, setBrand] = React.useState();
   const [supplier, setSupplier] = React.useState();
   const [description, setDescription] = React.useState();
   const [isError, setIsError] = React.useState(false);
   const [listBrand, setListBrand] = React.useState([]);
+  const [isErrors, setIsErrors] = React.useState(false);
 
   const brandRef = useRef(product?.brand?.BrandName);
   React.useEffect(() => {
@@ -32,13 +35,14 @@ export default function ProductDetailEditDialog(props) {
     setSupplier(product?.supplier?.name);
     setBrand(product?.product?.brand?.BrandName);
     setDescription(product?.product?.ProductDescription);
+    setInportPrice(parseInt(product?.PurchasePrice));
   }, [product]);
 
   const editProduct = async (data, productId) => {
     try {
       const res = await editProductDetailAPI(data, productId);
-      let errorMessage = res.message || 'Sửa sản phẩm thất bại';
-      let successMessage = res.message || 'Sửa sản phẩm thành công';
+      let errorMessage = res.message || Vi.editProductFail;
+      let successMessage = res.message || Vi.editProductSucces;
 
       if (res.status === 200) {
         setContentToast(successMessage);
@@ -52,7 +56,7 @@ export default function ProductDetailEditDialog(props) {
         setSeverity('error');
       }
     } catch (error) {
-      setContentToast('Sửa sản phẩm thất bại');
+      setContentToast(Vi.editProductFail);
       setOpenToast(true);
       setSeverity('error');
     }
@@ -79,6 +83,16 @@ export default function ProductDetailEditDialog(props) {
   const handleClose = () => {
     setOpenDialog(false);
   };
+  const onlyNumber = (value) => {
+    const pattern = /^\d+$/;
+    let flat = false;
+    if (pattern.test(value)) {
+      flat = true;
+    } else if (value === '') {
+      setPrice('');
+    }
+    return flat;
+  };
 
   const handleEditUser = () => {
     // if (!name || !quantity || !manufacturer || !accessoryType) {
@@ -97,8 +111,15 @@ export default function ProductDetailEditDialog(props) {
     // }
 
     if (!quantity || !name || !price || !brand) {
-      console.log(quantity, name, price, brand);
       setIsError(true);
+    } else if (price < importPrice) {
+      setContentToast(Vi.priceError);
+      setOpenToast(true);
+      setSeverity('error');
+    } else if (price % 1000 !== 0) {
+      setContentToast(Vi.price1000);
+      setOpenToast(true);
+      setSeverity('error');
     } else {
       setIsError(false);
 
@@ -147,16 +168,49 @@ export default function ProductDetailEditDialog(props) {
               required
               disabled={true}
             />
+          </Box>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              mt: 2,
+            }}
+          >
+            <TextField
+              autoFocus
+              id="importPrice"
+              label="Gía nhập"
+              type="number"
+              size="medium"
+              sx={{ width: 500, mr: 2 }}
+              value={importPrice}
+              onChange={(e) => setInportPrice(e.target.value)}
+              required
+              disabled={true}
+            />
             <TextField
               id="price"
-              label="Giá"
+              label="Giá bán"
               type="Number"
               fullWidth
               value={price}
-              onChange={(e) => setPrice(e.target.value)}
+              onChange={(e) => {
+                if (!onlyNumber(e.target.value)) {
+                  return;
+                } else {
+                  if (e.target.value?.length < 4) {
+                    setIsErrors(true);
+                  } else {
+                    setIsErrors(false);
+                  }
+
+                  setPrice(e.target.value);
+                }
+              }}
               required
             />
           </Box>
+          {isErrors ? <Typography style={{ color: 'red' }}>Gía phải lớn hơn 1.000d</Typography> : null}
           <Box
             sx={{
               display: 'flex',

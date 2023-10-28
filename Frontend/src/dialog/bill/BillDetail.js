@@ -32,8 +32,8 @@ const ENUM_PRODUCT_TYPE = [
   },
 ];
 
-export default function QuoteDetail(props) {
-  const { openDialog, setOpenDialog, receiptChoose, getAllCart } = props;
+export default function BillDetail(props) {
+  const { openDialog, setOpenDialog, receiptChoose, getAllCart, setOpenInvoiceDialog } = props;
 
   const [additionPrice, setAdditionPrice] = useState(0);
   const [productAdd, setProductAdd] = useState([]);
@@ -84,10 +84,6 @@ export default function QuoteDetail(props) {
   const [listServiceAdd, setListServiceAdd] = useState([]);
   const [listProductAdd, setListProductAdd] = useState([]);
 
-  //
-  const [listServiceAdd1, setListServiceAdd1] = useState([]);
-  const [listProductAdd1, setListProductAdd1] = useState([]);
-
   const [productChoose, setProductChoose] = useState({
     quantity: 0,
   });
@@ -113,13 +109,13 @@ export default function QuoteDetail(props) {
   }, [inforVehicle?.vehicleNumber]);
 
   useEffect(() => {
-    if (receiptChoose?.ReceiptID) {
-      handleDataCustomer('phoneNumber', receiptChoose?.receipt?.customer?.phoneNumber);
-      handleDataCustomer('name', receiptChoose?.receipt?.customer?.name);
-      handleDataVehicle('vehicleNumber', receiptChoose?.receipt?.vehicle?.NumberPlate);
-
+    if (receiptChoose?.InvoiceID) {
+      handleDataCustomer('phoneNumber', receiptChoose?.priceQuote?.receipt?.customer?.phoneNumber);
+      handleDataCustomer('name', receiptChoose?.priceQuote?.receipt?.customer?.name);
+      handleDataVehicle('vehicleNumber', receiptChoose?.priceQuote?.receipt?.vehicle?.NumberPlate);
+      console.log('pon console');
       const dataProduct = [];
-      receiptChoose?.priceQuoteProductDetails?.forEach((e, index) => {
+      receiptChoose?.priceQuote?.priceQuoteProductDetails?.forEach((e, index) => {
         const temp = {
           ...e?.productDetail,
           quantity: e?.Quantity,
@@ -134,7 +130,7 @@ export default function QuoteDetail(props) {
       setListProductAdd(dataProduct);
 
       const dataService = [];
-      receiptChoose?.priceQuoteServiceDetails?.forEach((e, index) => {
+      receiptChoose?.priceQuote?.priceQuoteServiceDetails?.forEach((e, index) => {
         const temp = {
           ...e?.service,
           staff: e?.repairOrderDetails?.[0]?.staff,
@@ -170,8 +166,6 @@ export default function QuoteDetail(props) {
   const reNew = () => {
     setListProductAdd(listProductAddDefault);
     setListServiceAdd(listServiceAddDefault);
-    setListServiceAdd1([]);
-    setListProductAdd1([]);
   };
 
   const getAllService = async () => {
@@ -207,8 +201,6 @@ export default function QuoteDetail(props) {
     setProductAdd([]);
     setListProductAdd([]);
     setListServiceAdd([]);
-    setListServiceAdd1([]);
-    setListProductAdd1([]);
 
     setAdditionPrice(0);
     setOpenDialog(false);
@@ -246,60 +238,28 @@ export default function QuoteDetail(props) {
   };
   const handleAddProduct = (status) => {
     const dataService = [];
+    listServiceAdd?.forEach((e) => {
+      const temp = {
+        ServiceID: e?.ServiceID,
+        Price: e?.Price,
+        Technician: e?.staff?.id,
+        isAcceptedRepair: e?.isAcceptedRepair ? true : false,
+      };
+      dataService?.push(temp);
+    });
 
     const dataProduct = [];
-
-    // if (receiptChoose?.Status === '2' || receiptChoose?.Status === '1') {
-    //   const listProductAddTemp = listProductAdd?.filter((e) => e?.isAcceptedRepair !== true);
-    //   listProductAddTemp?.forEach((e) => {
-    //     const temp = {
-    //       SellingPrice: e?.SellingPrice,
-    //       PurchasePrice: e?.PurchasePrice,
-    //       Quantity: e?.quantity,
-    //       productDetailID: e?.ProductDetailID,
-    //       isAcceptedRepair: e?.isAcceptedRepair ? true : false,
-    //     };
-    //     dataProduct?.push(temp);
-    //   });
-
-    //   /// services
-
-    //   const listServiceAddTemp = listServiceAdd?.filter((e) => e?.isAcceptedRepair !== true);
-
-    //   listServiceAddTemp?.forEach((e) => {
-    //     const temp = {
-    //       ServiceID: e?.ServiceID,
-    //       Price: e?.Price,
-    //       Technician: e?.staff?.id,
-    //       isAcceptedRepair: e?.isAcceptedRepair ? true : false,
-    //     };
-    //     dataService?.push(temp);
-    //   });
-    // } else {
     listProductAdd?.forEach((e) => {
+      console.log();
       const temp = {
         SellingPrice: e?.SellingPrice,
         PurchasePrice: e?.PurchasePrice,
         Quantity: e?.quantity,
         productDetailID: e?.ProductDetailID,
-        isAcceptedRepair:
-          status === 1 ? true : status === 0 ? false : status === 2 && e?.isAcceptedRepair ? true : false,
+        isAcceptedRepair: e?.isAcceptedRepair ? true : false,
       };
       dataProduct?.push(temp);
-      /// service
-      listServiceAdd?.forEach((e) => {
-        const temp = {
-          ServiceID: e?.ServiceID,
-          Price: e?.Price,
-          Technician: e?.staff?.id,
-          isAcceptedRepair:
-            status === 1 ? true : status === 0 ? false : status === 2 && e?.isAcceptedRepair ? true : false,
-        };
-        dataService?.push(temp);
-      });
     });
-    // }
-
     const data = {
       Status: status,
       TimeUpdate: moment().format('DD-MM-yyyy hh:mm'),
@@ -307,8 +267,9 @@ export default function QuoteDetail(props) {
       // ReceiptID: receiptChoose?.ReceiptID,
       priceQuoteServiceDetails: dataService,
       priceQuoteProductDetails: dataProduct,
-      TimeCreateRepair: receiptChoose?.repairOrder?.TimeCreate ?? moment().format('DD-MM-yyyy hh:mm'),
+      TimeCreateRepair: status === 1 ? moment().format('DD-MM-yyyy hh:mm') : undefined,
     };
+    // console.log('pon console ne ', data);
     // console.log('pon console', receiptChoose);
     addNewQuote(data, receiptChoose?.QuoteID);
   };
@@ -329,11 +290,6 @@ export default function QuoteDetail(props) {
       const product = [...tempData, data]?.sort((a, b) => a.index - b.index);
 
       setListProductAdd(product);
-
-      const tempData1 = listProductAdd1?.filter((e) => e?.ProductDetailID !== productChoose?.ProductDetailID);
-      const product1 = [...tempData1, data]?.sort((a, b) => a.index - b.index);
-
-      setListProductAdd1(product1);
       setIsClear(true);
       setProductChoose({
         quantity: 0,
@@ -345,14 +301,6 @@ export default function QuoteDetail(props) {
         index: listProductAdd?.length > 0 ? listProductAdd?.[listProductAdd?.length - 1]?.index + 1 : 1,
       });
       setListProductAdd(product);
-
-      ////
-      const product1 = [];
-      product1.push({
-        ...productChoose,
-        index: listProductAdd?.length > 0 ? listProductAdd?.[listProductAdd?.length - 1]?.index + 1 : 1,
-      });
-      setListProductAdd1(product1);
       setIsClear(true);
       setProductChoose({
         quantity: 0,
@@ -384,18 +332,11 @@ export default function QuoteDetail(props) {
       setErrorMsg('');
     } else {
       const service = [...listServiceAdd];
-      const service1 = [];
-
       service.push({
         ...serviceChoose,
         index: listServiceAdd?.length > 0 ? listServiceAdd?.[listServiceAdd?.length - 1]?.index + 1 : 1,
       });
-      service1.push({
-        ...serviceChoose,
-        index: listServiceAdd?.length > 0 ? listServiceAdd?.[listServiceAdd?.length - 1]?.index + 1 : 1,
-      });
       setListServiceAdd(service);
-      setListServiceAdd1(service1);
       setIsClearService(true);
       setIsClear(true);
       setServiceChoose({
@@ -407,11 +348,8 @@ export default function QuoteDetail(props) {
   const removeServiceAdd = (ServiceID) => {
     const listTemp = [...listServiceAdd];
     const listNewProduct = listTemp?.filter((e) => e?.ServiceID !== ServiceID);
-    const listTemp1 = [...listServiceAdd1];
-    const listNewProduct1 = listTemp?.filter((e) => e?.ServiceID !== ServiceID);
 
     setListServiceAdd(listNewProduct);
-    setListServiceAdd1(listNewProduct1);
   };
 
   // const handleChooseProduct = (field, value) => {
@@ -530,14 +468,6 @@ export default function QuoteDetail(props) {
             </Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
-          <Button
-            onClick={() => removeProductAdd(item?.ProductDetailID)}
-            disabled={item?.isAcceptedRepair}
-            style={{ display: 'flex', padding: 4, width: 40, justifyContent: 'space-between' }}
-          >
-            <Typography style={{ width: 100, textAlign: 'center' }}>X</Typography>
-            {/* <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} /> */}
-          </Button>
         </Box>
         <Box style={{ height: 1, backgroundColor: 'gray', width: 950 }} />
       </Box>
@@ -578,14 +508,6 @@ export default function QuoteDetail(props) {
             <Typography style={{ width: 100, textAlign: 'center' }}>{item?.staff?.name}</Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
-
-          <Button
-            onClick={() => removeServiceAdd(item?.ServiceID)}
-            disabled={item?.isAcceptedRepair}
-            style={{ display: 'flex', padding: 4, width: 40, justifyContent: 'space-between' }}
-          >
-            <Typography style={{ width: 100, textAlign: 'center' }}>X</Typography>
-          </Button>
         </Box>
         <Box style={{ height: 1, backgroundColor: 'gray', width: 950 }} />
       </Box>
@@ -687,14 +609,21 @@ export default function QuoteDetail(props) {
   return (
     <div style={{ width: '1500px' }}>
       <Dialog open={openDialog} onClose={handleClose} maxWidth={'1500px'}>
-        <DialogTitle>{Vi.quote}</DialogTitle>
+        <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <DialogTitle>{'Hoá đơn'}</DialogTitle>
+          <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Button onClick={() => setOpenInvoiceDialog(true)}>In hoá đơn</Button>
+            <Button onClick={handleClose}>X</Button>
+          </Box>
+        </Box>
+
         <DialogContent sx={{ height: 650, width: 1000 }}>
           <Box style={{ borderWidth: 1, borderColor: 'grey' }}>
-            <Typography style={{ fontSize: 14, marginTop: 8, marginBottom: 12 }}>{Vi.inforQuote}</Typography>
+            {/* <Typography style={{ fontSize: 14, marginTop: 8, marginBottom: 12 }}></Typography> */}
             <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
               <TextField
                 id="receiptId"
-                label={Vi.receiptId}
+                label={'Mã hoá đơn'}
                 sx={{ mr: 2 }}
                 InputLabelProps={{
                   shrink: true,
@@ -706,7 +635,7 @@ export default function QuoteDetail(props) {
               />
               <TextField
                 id="quoteId"
-                label={Vi.quoteId}
+                label={'Mã phiếu tiếp nhận'}
                 sx={{ mr: 2 }}
                 InputLabelProps={{
                   shrink: true,
@@ -803,109 +732,102 @@ export default function QuoteDetail(props) {
               size="small"
             />
           </Box>
-          {receiptChoose?.repairOrder?.IsDone ? null : (
-            <Typography style={{ fontSize: 14, marginTop: 24, marginBottom: 12 }}>{Vi.addProductService}</Typography>
-          )}
-
-          {/* <Typography style={{ fontSize: 14, marginTop: 24, marginBottom: 12 }}>{'Hư kính'}</Typography> */}
-
-          {receiptChoose?.repairOrder?.IsDone ? null : (
-            <Box style={{ display: 'flex' }}>
+          {/* <Typography style={{ fontSize: 14, marginTop: 24, marginBottom: 12 }}>{Vi.addProductService}</Typography> */}
+          {/* <Box style={{ display: 'flex' }}>
+            <Autocomplete
+              disablePortal
+              //   id="manufacturer"
+              options={ENUM_PRODUCT_TYPE}
+              getOptionLabel={(option) => option?.name}
+              sx={{ width: 200, mr: 2 }}
+              onChange={(e, newValue) => {
+                setType(newValue?.name);
+              }}
+              size="small"
+              defaultValue={ENUM_PRODUCT_TYPE?.[0]}
+              renderInput={(params) => <TextField {...params} />}
+            />
+            {type === ENUM_PRODUCT_TYPE?.[0]?.name ? (
               <Autocomplete
                 disablePortal
-                //   id="manufacturer"
-                options={ENUM_PRODUCT_TYPE}
+                id="nameService"
+                options={listServcies}
+                getOptionLabel={(option) => option?.ServiceName}
+                sx={{ width: 400, mr: 2 }}
+                onChange={(e, newValue) => {
+                  handleChooseServce(newValue);
+                  setIsClearService(false);
+                }}
+                size="small"
+                key={serviceChoose?.ServiceName}
+                value={isClearService ? null : serviceChoose}
+                renderInput={(params) => <TextField {...params} label={Vi.nameService} />}
+              />
+            ) : (
+              <Autocomplete
+                disablePortal
+                id="option?.ServiceName"
+                options={listProduct}
+                getOptionLabel={(option) =>
+                  `${option?.product?.ProductName} - ${option?.product?.brand?.BrandName} - ${option?.supplier?.name}`
+                }
+                sx={{ width: 500, mr: 2 }}
+                onChange={(e, newValue) => {
+                  handleChooseNameProduct(newValue);
+                  setIsClear(false);
+                }}
+                size="small"
+                key={productChoose?.product?.ProductName}
+                value={isClear ? null : productChoose}
+                renderInput={(params) => <TextField {...params} label={Vi.nameProduct} />}
+              />
+            )}
+
+            {type === ENUM_PRODUCT_TYPE?.[0]?.name ? (
+              <Autocomplete
+                disablePortal
+                id="staff"
+                options={listStaff}
                 getOptionLabel={(option) => option?.name}
                 sx={{ width: 200, mr: 2 }}
                 onChange={(e, newValue) => {
-                  setType(newValue?.name);
+                  handleChooseStaffToServce(newValue);
+
+                  setIsClear(false);
                 }}
+                key={serviceChoose?.staff}
                 size="small"
-                defaultValue={ENUM_PRODUCT_TYPE?.[0]}
-                renderInput={(params) => <TextField {...params} />}
+                value={isClear ? null : serviceChoose?.staff}
+                renderInput={(params) => <TextField {...params} label={Vi.staffWork} />}
               />
-              {type === ENUM_PRODUCT_TYPE?.[0]?.name ? (
-                <Autocomplete
-                  disablePortal
-                  id="nameService"
-                  options={listServcies}
-                  getOptionLabel={(option) => option?.ServiceName}
-                  sx={{ width: 400, mr: 2 }}
-                  onChange={(e, newValue) => {
-                    handleChooseServce(newValue);
-                    setIsClearService(false);
-                  }}
-                  size="small"
-                  key={serviceChoose?.ServiceName}
-                  value={isClearService ? null : serviceChoose}
-                  renderInput={(params) => <TextField {...params} label={Vi.nameService} />}
-                />
-              ) : (
-                <Autocomplete
-                  disablePortal
-                  id="option?.ServiceName"
-                  options={listProduct}
-                  getOptionLabel={(option) =>
-                    `${option?.product?.ProductName} - ${option?.product?.brand?.BrandName} - ${option?.supplier?.name}`
-                  }
-                  sx={{ width: 500, mr: 2 }}
-                  onChange={(e, newValue) => {
-                    handleChooseNameProduct(newValue);
-                    setIsClear(false);
-                  }}
-                  size="small"
-                  key={productChoose?.product?.ProductName}
-                  value={isClear ? null : productChoose}
-                  renderInput={(params) => <TextField {...params} label={Vi.nameProduct} />}
-                />
-              )}
+            ) : null}
 
-              {type === ENUM_PRODUCT_TYPE?.[0]?.name ? (
-                <Autocomplete
-                  disablePortal
-                  id="staff"
-                  options={listStaff}
-                  getOptionLabel={(option) => option?.name}
-                  sx={{ width: 200, mr: 2 }}
-                  onChange={(e, newValue) => {
-                    handleChooseStaffToServce(newValue);
-
-                    setIsClear(false);
-                  }}
-                  key={serviceChoose?.staff}
-                  size="small"
-                  value={isClear ? null : serviceChoose?.staff}
-                  renderInput={(params) => <TextField {...params} label={Vi.staffWork} />}
-                />
-              ) : null}
-
-              {type === ENUM_PRODUCT_TYPE?.[1]?.name ? (
-                <TextField
-                  id="quantity"
-                  label={Vi.quantity}
-                  //   type="Number"
-                  sx={{ mr: 2 }}
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                  required
-                  value={productChoose?.quantity}
-                  size="small"
-                  style={{ width: 100 }}
-                  onChange={(e) => handleChooseProduct('quantity', e.target.value)}
-                />
-              ) : null}
-              <Button
-                variant="outlined"
-                onClick={type === ENUM_PRODUCT_TYPE?.[0]?.name ? handleAddServiceToList : handleAddProductToList}
+            {type === ENUM_PRODUCT_TYPE?.[1]?.name ? (
+              <TextField
+                id="quantity"
+                label={Vi.quantity}
+                //   type="Number"
+                sx={{ mr: 2 }}
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                required
+                value={productChoose?.quantity}
                 size="small"
-                type="submit"
-              >
-                {Vi.add}
-              </Button>
-            </Box>
-          )}
-          {errorMsg ? <Typography style={{ color: 'red', marginTop: 12 }}>{errorMsg}</Typography> : null}
+                style={{ width: 100 }}
+                onChange={(e) => handleChooseProduct('quantity', e.target.value)}
+              />
+            ) : null}
+            <Button
+              variant="outlined"
+              onClick={type === ENUM_PRODUCT_TYPE?.[0]?.name ? handleAddServiceToList : handleAddProductToList}
+              size="small"
+              type="submit"
+            >
+              {Vi.add}
+            </Button>
+          </Box>
+          {errorMsg ? <Typography style={{ color: 'red', marginTop: 12 }}>{errorMsg}</Typography> : null} */}
           <Box mt={2}>
             <Typography style={{ fontSize: 18, marginBottom: 12, fontWeight: 600 }}> {Vi.product}:</Typography>
           </Box>
@@ -926,6 +848,7 @@ export default function QuoteDetail(props) {
               {formatMoneyWithDot(priceQuoteProduct || 0)}
             </Typography>
           </Box>
+
           <Box style={{ display: 'flex', justifyContent: 'space-between', width: 330, marginLeft: 620 }}>
             <Typography textAlign={'right'} style={{ fontSize: 18, marginTop: 12 }}>
               Tổng tiền dịch vụ:{' '}
@@ -952,8 +875,8 @@ export default function QuoteDetail(props) {
             </Typography>
           </Box>
           <Box style={{ display: 'flex', justifyContent: 'space-between', width: 330, marginLeft: 620 }}>
-            <Typography textAlign={'right'} style={{ fontSize: 18, marginTop: 12 }}>
-              Tổng tiền(VAT 8%) :{' '}
+            <Typography textAlign={'right'} style={{ fontSize: 18, marginTop: 12, fontWeight: '600' }}>
+              Tổng tiền (VAT 8%) :{' '}
             </Typography>
             <Typography style={{ fontSize: 18, marginTop: 12 }}>
               {formatMoneyWithDot(parseInt((priceQuoteService * 1 + priceQuoteProduct * 1) * 1.08) || 0)}
@@ -961,32 +884,24 @@ export default function QuoteDetail(props) {
           </Box>
         </DialogContent>
 
-        {receiptChoose?.repairOrder?.IsDone ? (
-          <DialogActions>
-            <Button variant="outlined" onClick={handleClose}>
-              {Vi.Cancel}
-            </Button>
-          </DialogActions>
-        ) : (
-          <DialogActions>
-            <Button variant="outlined" onClick={handleClose}>
-              {Vi.Cancel}
-            </Button>
-            <Button
-              variant="outlined"
-              onClick={() => handleAddProduct(receiptChoose?.Status === 0 ? 0 : 2)}
-              type="submit"
-            >
-              {Vi.save}
-            </Button>
-            <Button variant="outlined" onClick={reNew} type="submit">
-              {Vi.reset}
-            </Button>
-            <Button variant="outlined" onClick={() => handleAddProduct(1)} type="submit">
-              {Vi.next}
-            </Button>
-          </DialogActions>
-        )}
+        <DialogActions>
+          {/* <Button variant="outlined" onClick={handleClose}>
+            {Vi.Cancel}
+          </Button> */}
+          {/* <Button
+            variant="outlined"
+            onClick={() => handleAddProduct(receiptChoose?.Status === 0 ? 0 : 2)}
+            type="submit"
+          >
+            {Vi.save}
+          </Button>
+          <Button variant="outlined" onClick={reNew} type="submit">
+            {Vi.reset}
+          </Button>
+          <Button variant="outlined" onClick={() => handleAddProduct(1)} type="submit">
+            {Vi.next}
+          </Button> */}
+        </DialogActions>
       </Dialog>
       <AppToast
         content={contentToastHere}

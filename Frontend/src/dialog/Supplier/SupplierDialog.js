@@ -27,9 +27,9 @@ export default function SupplierDialog(props) {
   const addNewProduct = async (data) => {
     try {
       const res = await addNewSupplierAPI(data);
-      let errorMessage = res.message ||  'Thêm nhà cung cấp thất bại'
-      let successMessage =  res.message || 'Thêm nhà cung cấp thành công'
-     
+      let errorMessage = res.message || 'Thêm nhà cung cấp thất bại';
+      let successMessage = res.message || 'Thêm nhà cung cấp thành công';
+
       if (res.status === 201) {
         setName(null);
 
@@ -57,19 +57,18 @@ export default function SupplierDialog(props) {
   };
 
   const handleAddProduct = () => {
-    if (!name) {
+    if (!name?.trim()) {
       setIsError(true);
     } else {
       setIsError(false);
       const data = {
         name: name,
         phoneNumber: phoneNumber,
-        address: address
+        address: address,
       };
       addNewProduct(data);
     }
   };
-
 
   return (
     <div>
@@ -120,7 +119,7 @@ export default function SupplierDialog(props) {
             }}
           >
             Please enter full information
-          </p> 
+          </p>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Huỷ</Button>

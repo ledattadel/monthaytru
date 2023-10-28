@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
 // @mui
 import { useTheme } from '@mui/material/styles';
-import { Grid, Container, Typography } from '@mui/material';
+import { Grid, Container, Typography, TextField, Box } from '@mui/material';
 // components
 import Page from '../components/Page';
 import Iconify from '../components/Iconify';
@@ -17,11 +17,18 @@ import {
   AppCurrentSubject,
   AppConversionRates,
 } from '../sections/@dashboard/app';
+import DatePickerDialog from 'src/dialog/DatePickerDialog';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { useState } from 'react';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 
 // ----------------------------------------------------------------------
 
 export default function DashboardApp() {
   const theme = useTheme();
+
+  const [value, setValue] = useState();
 
   return (
     <Page title="Dashboard">
@@ -29,7 +36,36 @@ export default function DashboardApp() {
         <Typography variant="h4" sx={{ mb: 5 }}>
           Hi, Welcome back
         </Typography>
-
+        <Box style={{ display: 'flex', width: 540, justifyContent: 'space-between', marginBottom: 20 }}>
+          <Box>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker
+                label="Ngày bắt đầu"
+                inputFormat="DD/MM/YYYY"
+                value={value}
+                maxDate={new Date()}
+                onChange={(newValue) => {
+                  setValue(newValue);
+                }}
+                renderInput={(params) => <TextField label={'Ngày bắt đầu'} {...params} />}
+              />
+            </LocalizationProvider>
+          </Box>
+          <Box>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker
+                label="Ngày bắt đầu"
+                inputFormat="DD/MM/YYYY"
+                value={value}
+                maxDate={new Date()}
+                onChange={(newValue) => {
+                  setValue(newValue);
+                }}
+                renderInput={(params) => <TextField label={'Ngày bắt đầu'} {...params} />}
+              />
+            </LocalizationProvider>
+          </Box>
+        </Box>
         <Grid container spacing={3}>
           <Grid item xs={12} sm={6} md={3}>
             <AppWidgetSummary title="Weekly Sales" total={714000} icon={'ant-design:android-filled'} />
@@ -47,7 +83,7 @@ export default function DashboardApp() {
             <AppWidgetSummary title="Bug Reports" total={234} color="error" icon={'ant-design:bug-filled'} />
           </Grid>
 
-          <Grid item xs={12} md={6} lg={8}>
+          {/* <Grid item xs={12} md={6} lg={8}>
             <AppWebsiteVisits
               title="Website Visits"
               subheader="(+43%) than last year"
@@ -85,7 +121,7 @@ export default function DashboardApp() {
                 },
               ]}
             />
-          </Grid>
+          </Grid> */}
 
           <Grid item xs={12} md={6} lg={4}>
             <AppCurrentVisits
@@ -105,7 +141,7 @@ export default function DashboardApp() {
             />
           </Grid>
 
-          <Grid item xs={12} md={6} lg={8}>
+          {/* <Grid item xs={12} md={6} lg={8}>
             <AppConversionRates
               title="Conversion Rates"
               subheader="(+43%) than last year"
@@ -122,9 +158,9 @@ export default function DashboardApp() {
                 { label: 'United Kingdom', value: 1380 },
               ]}
             />
-          </Grid>
+          </Grid> */}
 
-          <Grid item xs={12} md={6} lg={4}>
+          {/* <Grid item xs={12} md={6} lg={4}>
             <AppCurrentSubject
               title="Current Subject"
               chartLabels={['English', 'History', 'Physics', 'Geography', 'Chinese', 'Math']}
@@ -135,7 +171,7 @@ export default function DashboardApp() {
               ]}
               chartColors={[...Array(6)].map(() => theme.palette.text.secondary)}
             />
-          </Grid>
+          </Grid> */}
 
           <Grid item xs={12} md={6} lg={8}>
             <AppNewsUpdate

@@ -1,11 +1,12 @@
 import * as React from 'react';
-import { Button, Box, Autocomplete } from '@mui/material';
+import { Button, Box, Autocomplete, Typography } from '@mui/material';
 import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import { addNewStaffAPI, addNewUserAPI } from '../../components/services/index';
+import { Vi } from 'src/_mock/Vi';
 
 const DataRole = [
   {
@@ -27,14 +28,15 @@ export default function StaffDialog(props) {
   const [role, setRole] = React.useState(DataRole?.[0]?.name);
   const [email, setEmail] = React.useState();
   const [phoneNumber, setPhoneNumber] = React.useState();
-  
+
   const [isError, setIsError] = React.useState(false);
+  const [errors, setIsErrors] = React.useState([]);
 
   const addNewUser = async (data) => {
     try {
       const res = await addNewStaffAPI(data);
-      let errorMessage = res.message ||  'Thêm nhân viên thất bại'
-      let successMessage =  res.message || 'Thêm nhân viên thành công'
+      let errorMessage = res.message || 'Thêm nhân viên thất bại';
+      let successMessage = res.message || 'Thêm nhân viên thành công';
       if (res.status === 200) {
         setIdCardNumber(null);
         setName(null);
@@ -68,23 +70,72 @@ export default function StaffDialog(props) {
   };
 
   const handleAddStaff = () => {
-    if (!name || !phoneNumber || !userName || !password || !idCardNumber ) {
+    if (!name || !phoneNumber || !userName || !password || !idCardNumber) {
       setIsError(true);
     } else {
       setIsError(false);
       const data = {
         idCardNumber: idCardNumber,
         name: name,
-        email: email || "Chưa có email",
+        email: email || 'Chưa có email',
         phoneNumber: phoneNumber,
         username: userName,
         password: password,
-        address : address || "Chưa có địa chỉ",
+        address: address || 'Chưa có địa chỉ',
         roleName: role || DataRole?.[0]?.name,
-      };  
-     
+      };
+
       addNewUser(data);
     }
+  };
+
+  const regexPhoneNumber = (phone) => {
+    const regexPhoneNumber = /(0[3|5|7|8|9])+([0-9]{8})\b/g;
+
+    return phone.match(regexPhoneNumber) ? true : false;
+  };
+  const regexCCCD = (phone) => {
+    const regexPhoneNumber = /([0-9]{12})\b/g;
+
+    return phone.match(regexPhoneNumber) ? true : false;
+  };
+
+  const validateEmail = (email) => {
+    return String(email)
+      .toLowerCase()
+      .match(
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+      );
+  };
+
+  const checkUser = (value) => {
+    let flat = false;
+    if (value?.length < 6 || value?.length > 32) {
+      flat = true;
+    }
+    return flat;
+  };
+  const handleError = (value, isBool) => {
+    const tempErr = [...errors];
+    const data = tempErr?.filter((e) => e === value);
+    const data1 = tempErr?.filter((e) => e !== value);
+    if (data?.length > 0 && isBool) {
+      setIsErrors(data1);
+    } else if (data?.length > 0 || isBool) {
+    } else {
+      data1?.push(value);
+      setIsErrors(data1);
+    }
+  };
+
+  const isCheckError = (value) => {
+    const tempErr = [...errors];
+    const data = tempErr?.filter((e) => e === value);
+    let isFlat = false;
+    if (data?.length > 0) {
+      isFlat = true;
+    }
+    return isFlat;
   };
 
   return (
@@ -108,27 +159,49 @@ export default function StaffDialog(props) {
               onChange={(e) => setName(e.target.value)}
               required
             />
+
             <TextField
               id="demo-helper-text-aligned-no-helper"
               label="CCCD/CMND"
               type="number"
               fullWidth
               sx={{ mr: 2 }}
-              onChange={(e) => setIdCardNumber(e.target.value)}
+              onChange={(e) => {
+                if (!regexCCCD(e?.target?.value)) {
+                  handleError('CCCD', false);
+                } else {
+                  handleError('CCCD', true);
+                }
+                setIdCardNumber(e?.target?.value);
+              }}
               required
             />
-            <TextField
-              margin="dense"
-              id="Số điện thoại"
-              label="Số điện thoại"
-              type="number"
-              variant="outlined"
-              // sx={{ mt: 2 }}
-              fullWidth
-              onChange={(e) => setPhoneNumber(e.target.value)}
-              required
-            />
+
+            {/* <Box>
+              <TextField
+                margin="dense"
+                id="Số điện thoại"
+                label="Số điện thoại"
+                type="number"
+                variant="outlined"
+                // sx={{ mt: 2 }}
+                fullWidth
+                onChange={(e) => {
+                  if (!regexPhoneNumber(e?.target.value)) {
+                    setIsErrors('phoneNumber');
+                  } else {
+                    setIsErrors('');
+                  }
+                  setPhoneNumber(e.target.value);
+                }}
+                required
+              />
+              {errors === 'phoneNumber' ? (
+                <Typography style={{ color: 'red' }}>số điện thoại không hợp lệ</Typography>
+              ) : null}
+            </Box> */}
           </Box>
+          {isCheckError('CCCD') ? <Typography style={{ color: 'red' }}>{Vi.cccdError}</Typography> : null}
           <Box
             sx={{
               display: 'flex',
@@ -143,26 +216,46 @@ export default function StaffDialog(props) {
               type="string"
               size="medium"
               sx={{ mr: 2 }}
-              onChange={(e) => setUserName(e.target.value)}
+              onChange={(e) => {
+                if (checkUser(e?.target?.value)) {
+                  handleError('userName', false);
+                } else {
+                  handleError('userName', true);
+                }
+                setUserName(e?.target?.value);
+              }}
+              // setUserName(e.target.value)}
+
               required
             />
             <TextField
               margin="dense"
               id="Mật khẩu"
               label="Mật khẩu"
-              type="text"
+              type="password"
               variant="outlined"
               // sx={{ mr: 4 }}
               // fullWidth
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => {
+                if (checkUser(e?.target?.value)) {
+                  handleError('passWord', false);
+                } else {
+                  handleError('passWord', true);
+                }
+                setPassword(e?.target?.value);
+              }}
+              // security={true}
+
+              // setPassword(e.target.value)}
               required
             />
-   
           </Box>
+          {isCheckError('userName') ? <Typography style={{ color: 'red' }}>{Vi.userNameError}</Typography> : null}
+          {isCheckError('passWord') ? <Typography style={{ color: 'red' }}>{Vi.passwordError}</Typography> : null}
           <Box
             sx={{
-              display: 'flex',
-              alignItems: 'center',
+              // display: 'flex',
+              // alignItems: 'center',
               mt: 1,
             }}
           >
@@ -174,9 +267,18 @@ export default function StaffDialog(props) {
               variant="outlined"
               sx={{ mt: 2 }}
               fullWidth
-              onChange={(e) => setPhoneNumber(e.target.value)}
+              // onChange={(e) => setPhoneNumber(e.target.value)}
               required
+              onChange={(e) => {
+                if (!regexPhoneNumber(e?.target?.value)) {
+                  handleError('phoneNumber', false);
+                } else {
+                  handleError('phoneNumber', true);
+                }
+                setPhoneNumber(e?.target?.value);
+              }}
             />
+            {isCheckError('phoneNumber') ? <Typography style={{ color: 'red' }}>{Vi.phoneError}</Typography> : null}
           </Box>
           <TextField
             margin="dense"
@@ -186,10 +288,18 @@ export default function StaffDialog(props) {
             fullWidth
             variant="outlined"
             sx={{ mt: 2 }}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              if (!validateEmail(e?.target?.value)) {
+                handleError('email', false);
+              } else {
+                handleError('email', true);
+              }
+              setEmail(e?.target?.value);
+            }}
             required
           />
-            <TextField
+          {isCheckError('email') ? <Typography style={{ color: 'red' }}>{Vi.emailError}</Typography> : null}
+          <TextField
             margin="dense"
             id="address"
             label="Địa chỉ hiện tại"
@@ -207,7 +317,6 @@ export default function StaffDialog(props) {
             getOptionLabel={(option) => option?.label}
             fullWidth
             onChange={(e, newValue) => {
-            
               setRole(newValue?.name);
             }}
             sx={{ mt: 2 }}

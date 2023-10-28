@@ -21,6 +21,7 @@ import Staff from './pages/Staff';
 import ImportProducts from './pages/ImportProducts';
 import Quote from './pages/Quote';
 import RepairOrder from './pages/RepairOrder';
+import DashboardApp from './pages/DashboardApp';
 
 // ----------------------------------------------------------------------
 
@@ -31,6 +32,7 @@ export default function Router() {
       element: <DashboardLayout />,
       children: [
         { path: 'user', element: <User /> },
+        { path: 'DashboardApp', element: <DashboardApp /> },
         { path: 'Staff', element: <Staff /> },
         { path: 'accessory', element: <Products /> },
         { path: 'SaleProducts', element: <SaleProducts /> },

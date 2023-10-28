@@ -55,6 +55,7 @@ export default function CreateQuote(props) {
 
   const [isClear, setIsClear] = useState(true);
   const [isClearService, setIsClearService] = useState(true);
+  const [errorMsg, setErrorMsg] = useState('');
   ///
   const [createAt, setCreateAt] = useState();
 
@@ -312,8 +313,26 @@ export default function CreateQuote(props) {
   };
 
   const handleChooseProduct = (field, value) => {
-    const temp = { ...productChoose, [field]: value };
-    setProductChoose(temp);
+    if (field === 'quantity') {
+      if (!onlyNumber(value)) {
+        if (value === '') {
+          setErrorMsg(Vi.quantityMore0);
+          const temp = { ...productChoose, [field]: value };
+          setProductChoose(temp);
+        }
+      } else if (value > 100 || value === 0 || value === '') {
+        setErrorMsg(Vi.quantityMore0);
+        const temp = { ...productChoose, [field]: value };
+        setProductChoose(temp);
+      } else {
+        const temp = { ...productChoose, [field]: value };
+        setProductChoose(temp);
+        setErrorMsg('');
+      }
+    } else {
+      const temp = { ...productChoose, [field]: value };
+      setProductChoose(temp);
+    }
   };
   const handleChooseNameProduct = (value) => {
     const temp = { ...productChoose, ...value };
@@ -534,6 +553,15 @@ export default function CreateQuote(props) {
     );
   };
 
+  const onlyNumber = (value) => {
+    const pattern = /^\d+$/;
+    let flat = false;
+    if (pattern.test(value)) {
+      flat = true;
+    }
+    return flat;
+  };
+
   return (
     <div style={{ width: '1500px' }}>
       <Dialog open={openDialog} onClose={handleClose} maxWidth={'1500px'}>
@@ -747,6 +775,7 @@ export default function CreateQuote(props) {
               {Vi.add}
             </Button>
           </Box>
+          {errorMsg ? <Typography style={{ color: 'red', marginTop: 12 }}>{errorMsg}</Typography> : null}
           <Box mt={2}>
             <Typography style={{ fontSize: 18, marginBottom: 12, fontWeight: 600 }}> {Vi.product}:</Typography>
           </Box>

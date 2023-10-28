@@ -26,11 +26,18 @@ import { UserBillMoreMenu, UserListHead, UserListToolbar } from '../sections/@da
 
 import CreateReceipt from 'src/dialog/Receipt/CreateReceipt';
 import { Vi } from 'src/_mock/Vi';
-import { getAllQuoteAPI, getAllReceiptAPI, getAllStatusAPI, getUserInfoAPI } from '../components/services/index';
+import {
+  addNewInvoiceAPI,
+  getAllQuoteAPI,
+  getAllReceiptAPI,
+  getAllStatusAPI,
+  getUserInfoAPI,
+} from '../components/services/index';
 import EditReceipt from 'src/dialog/Receipt/EditReceipt';
 import ReceiptDetail from 'src/dialog/Receipt/ReceiptDetail';
 import QuoteDetail from 'src/dialog/Quote/QuoteDetail';
 import formatMoneyWithDot from 'src/utils/formatMoney';
+import moment from 'moment';
 
 // ----------------------------------------------------------------------
 
@@ -46,6 +53,7 @@ const TABLE_HEAD = [
   // { id: 'vehicleCondition', label: Vi.vehicleCondition, alignRight: false },
   { id: 'status', label: Vi.status, alignRight: false },
   { id: 'detail', label: Vi.detail, alignRight: false },
+  { id: 'bill', label: 'tạo hoá đơn', alignRight: false },
 ];
 
 function descendingComparator(a, b, orderBy) {
@@ -72,7 +80,9 @@ function applySortFilter(array, comparator, query) {
     return a[1] - b[1];
   });
   if (query) {
-    return filter(array, (_user) => _user?.customer?.name.toLowerCase().indexOf(query.toLowerCase()) !== -1);
+    return filter(array, (_user) => {
+      return _user?.receipt?.customer?.name?.toLowerCase().indexOf(query.toLowerCase()) !== -1;
+    });
   }
   return stabilizedThis?.map((el) => el[0]);
 }
@@ -92,17 +102,8 @@ export default function Quote() {
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [openDetailDialog, setOpenDetailDialog] = useState(false);
   const [receiptChoose, setReceiptChoose] = useState({});
-
-  // const getEmployeeInfo = async () => {
-  //   try {
-  //     const res = await getUserInfoAPI();
-  //     if (res?.status === 200) {
-  //       // setEmployeeInfo(res.data);
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
+  ///
+  const InfoAdmin = JSON.parse(localStorage.getItem('profileAdmin'));
 
   const getAllCart = async () => {
     try {
@@ -113,22 +114,11 @@ export default function Quote() {
     } catch (error) {}
   };
 
-  // const getAllStatus = async () => {
-  //   try {
-  //     const res = await getAllStatusAPI();
-  //     // setListStatus(res?.data);
-  //   } catch (error) {}
-  // };
-
   useEffect(() => {
     getAllCart();
     // getEmployeeInfo();
     // getAllStatus();
   }, []);
-
-  const handleOpenDialog = () => {
-    setOpenDialog(true);
-  };
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -204,6 +194,7 @@ export default function Quote() {
                       employee={employeeInfo}
                       setOpenEditDialog={setOpenEditDialog}
                       setOpenDetailDialog={setOpenDetailDialog}
+                      InfoAdmin={InfoAdmin}
                     />
                   ))}
                   {emptyRows > 0 && (
@@ -253,7 +244,7 @@ export default function Quote() {
   );
 }
 
-const Row = ({ row, setReceiptChoose, setOpenEditDialog, setOpenDetailDialog }) => {
+const Row = ({ row, setReceiptChoose, setOpenEditDialog, setOpenDetailDialog, InfoAdmin }) => {
   const {
     ReceiptID,
     Time,
@@ -272,7 +263,6 @@ const Row = ({ row, setReceiptChoose, setOpenEditDialog, setOpenDetailDialog }) 
     priceQuoteServiceDetails,
     priceQuoteProductDetails,
   } = row;
-
   const [openToast, setOpenToast] = useState(false);
   const [severity, setSeverity] = useState(false);
   const [contentToast, setContentToast] = useState('');
@@ -281,15 +271,45 @@ const Row = ({ row, setReceiptChoose, setOpenEditDialog, setOpenDetailDialog }) 
 
   const returnStatus = (status) => {
     switch (status) {
-      case 0:
+      case '0':
+        console.log('pon console ne Status 0', Status, status);
         return 'chờ xác nhận';
-      case 1:
+      case '1':
+        console.log('pon console ne Status 1', Status, status);
         return 'đã xác nhận';
-      case 2:
+      case '2':
+        console.log('pon console ne Status 2', Status, status);
         return 'xác nhận lại';
 
       default:
         return 'Chờ xác nhận';
+    }
+  };
+
+  const addNewInvoice = async () => {
+    const data = {
+      Time: moment().format('DD-MM-yyyy hh:mm'),
+      StaffID: InfoAdmin?.userId,
+      QuoteID: QuoteID,
+    };
+    try {
+      const res = await addNewInvoiceAPI(data);
+      let errorMessage = res.message || 'Tạo hoá đơn thất bại';
+      let successMessage = res.message || 'Tạo hoá đơn thành công';
+      if (res.status === 201) {
+        setContentToast(successMessage);
+        setSeverity('success');
+
+        setOpenToast(true);
+      } else {
+        setContentToast(errorMessage);
+        setSeverity('error');
+        setOpenToast(true);
+      }
+    } catch (error) {
+      setContentToast('Tạo hoá đơn thất bại');
+      setSeverity('error');
+      setOpenToast(true);
     }
   };
 
@@ -326,6 +346,18 @@ const Row = ({ row, setReceiptChoose, setOpenEditDialog, setOpenDetailDialog }) 
             }}
           >
             {Vi.detail}
+          </Button>
+        </TableCell>
+        <TableCell align="center">
+          {' '}
+          <Button
+            onClick={() => {
+              // setReceiptChoose(row);
+              // setOpenDetailDialog(true);
+              addNewInvoice();
+            }}
+          >
+            Tạo hoá đơn
           </Button>
         </TableCell>
         <TableCell>

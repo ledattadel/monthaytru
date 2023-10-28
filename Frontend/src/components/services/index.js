@@ -54,6 +54,7 @@ import {
   API_GET_ALL_VEHICLE,
   API_GET_ALL_QUOTE,
   API_GET_ALL_REPAIR,
+  API_GET_ALL_INVOICE,
 } from './configs';
 const token = JSON.parse(localStorage.getItem('adminInfo'));
 
@@ -440,6 +441,29 @@ export const getAllRepairAPI = async () => {
 export const updateRepairAPI = async (body, id) => {
   try {
     const response = await axios.patch(`${API_GET_ALL_REPAIR}/${id}`, body);
+    return response;
+  } catch (error) {
+    return error?.response?.data || error;
+  }
+};
+
+/// invoice
+export const getAllInvoiceAPI = async () => {
+  try {
+    const response = await axios.get(API_GET_ALL_INVOICE, {
+      headers: { authorization: `Bearer ${token}` },
+    });
+    return response;
+  } catch (error) {
+    return error?.response?.data || error;
+  }
+};
+
+export const addNewInvoiceAPI = async (body) => {
+  try {
+    const response = await axios.post(API_GET_ALL_INVOICE, body, {
+      headers: { authorization: `Bearer ${token}` },
+    });
     return response;
   } catch (error) {
     return error?.response?.data || error;

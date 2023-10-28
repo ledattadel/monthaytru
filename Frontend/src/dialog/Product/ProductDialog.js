@@ -245,7 +245,7 @@
 // }
 
 import * as React from 'react';
-import { Button, Box } from '@mui/material';
+import { Button, Box, Typography } from '@mui/material';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import Dialog from '@mui/material/Dialog';
@@ -253,6 +253,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import { addNewProductAPI, getAllBrand, getAllAccessoryTypeAPI } from '../../components/services/index';
+import { Vi } from 'src/_mock/Vi';
 
 export default function ProductDialog(props) {
   const { openDialog, setOpenDialog, getAllProduct, setContentToast, setSeverity, setOpenToast } = props;
@@ -262,13 +263,14 @@ export default function ProductDialog(props) {
   const [brand, setBrand] = React.useState();
   const [description, setDescription] = React.useState();
   const [isError, setIsError] = React.useState(false);
+  const [isErrors, setIsErrors] = React.useState(false);
   const [listBrand, setListBrand] = React.useState([]);
 
   const addNewProduct = async (data) => {
     try {
       const res = await addNewProductAPI(data);
-      let errorMessage = res.message || 'Thêm sản phẩm thất bại';
-      let successMessage = res.message || 'Thêm sản phẩm thành công';
+      let errorMessage = res.message || Vi.createProductFail;
+      let successMessage = res.message || Vi.createProductSucces;
       if (res.status === 201) {
         setName(null);
         setQuantity(null);
@@ -287,7 +289,7 @@ export default function ProductDialog(props) {
       }
     } catch (error) {
       console.log(error);
-      setContentToast('Thêm product thất bại');
+      setContentToast(Vi.createProductFail);
       setOpenToast(true);
       setSeverity('error');
     }
@@ -329,7 +331,7 @@ export default function ProductDialog(props) {
   };
 
   const handleAddProduct = () => {
-    if (!name || !price || !brand) {
+    if (!name?.trim() || !price || !brand) {
       console.log(quantity, name, price, brand);
       setIsError(true);
     } else {
@@ -347,6 +349,16 @@ export default function ProductDialog(props) {
     }
   };
 
+  const onlyNumber = (value) => {
+    const pattern = /^\d+$/;
+    let flat = false;
+    if (pattern.test(value)) {
+      flat = true;
+    } else if (value === '') {
+      setPrice('');
+    }
+    return flat;
+  };
   return (
     <div>
       <Dialog open={openDialog} onClose={handleClose}>
@@ -370,7 +382,7 @@ export default function ProductDialog(props) {
               mt: 2,
             }}
           >
-            <TextField
+            {/* <TextField
               autoFocus
               id="quantity"
               label="Số lượng"
@@ -379,16 +391,31 @@ export default function ProductDialog(props) {
               sx={{ width: 500, mr: 2 }}
               onChange={(e) => setQuantity(e.target.value)}
               required
-            />
+            /> */}
             <TextField
               id="price"
               label="Giá"
-              type="Number"
+              // type="number"
+              // type="number"
               fullWidth
-              onChange={(e) => setPrice(e.target.value)}
+              onChange={(e) => {
+                if (!onlyNumber(e.target.value)) {
+                  return;
+                } else {
+                  if (e.target.value?.length < 4) {
+                    setIsErrors(true);
+                  } else {
+                    setIsErrors(false);
+                  }
+
+                  setPrice(e.target.value);
+                }
+              }}
               required
+              value={price}
             />
           </Box>
+          {isErrors ? <Typography style={{ color: 'red' }}>Gía phải lớn hơn 1.000d</Typography> : null}
           <Box
             sx={{
               display: 'flex',
@@ -430,13 +457,13 @@ export default function ProductDialog(props) {
               display: isError ? 'flex' : 'none',
             }}
           >
-            Please enter full information
+            Vui lòng điền đủ thông tin
           </p>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
+          <Button onClick={handleClose}>Huỷ</Button>
           <Button onClick={handleAddProduct} type="submit">
-            Add Product
+            Tạo sản phẩm
           </Button>
         </DialogActions>
       </Dialog>

@@ -33,6 +33,7 @@ export default function CreateReceipt(props) {
   const [isError, setIsError] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [cartId, setCartId] = useState(0);
+  const [errors, setErrors] = useState('');
   ///
   const [createAt, setCreateAt] = useState();
   const [inforCustomerApi, setInforCustomerApi] = useState({});
@@ -173,14 +174,76 @@ export default function CreateReceipt(props) {
   };
 
   const handleDataVehicle = (field, value) => {
+    if (field === 'vehicleNumber' && !regexPlateNumber(value)) {
+      setErrors('plateNumber');
+      console.log('pon console', !regexPlateNumber(value));
+    } else {
+      setErrors('');
+    }
     const tempDate = { ...inforVehicle, [field]: value };
     setInforVehicle(tempDate);
   };
   const handleDataCustomer = (field, value) => {
-    const tempDate = { ...inforCustomer, [field]: value };
-    setInforCustomer(tempDate);
+    if (field === 'phoneNumber') {
+      if (!onlyNumber(value)) {
+      } else if (value === '') {
+        const tempDate = { ...inforCustomer, [field]: value };
+        setInforCustomer(tempDate);
+      } else if (!regexPhoneNumber(value)) {
+        setErrors('phoneNumber');
+        const tempDate = { ...inforCustomer, [field]: value };
+        setInforCustomer(tempDate);
+      } else {
+        const tempDate = { ...inforCustomer, [field]: value };
+        setInforCustomer(tempDate);
+        setErrors('');
+      }
+    } else {
+      if (field === 'email' && !validateEmail(value)) {
+        setErrors('email');
+      } else if (field === 'phoneNumber' && !regexPhoneNumber(value)) {
+        setErrors('phoneNumber');
+      } else {
+        setErrors('');
+      }
+      const tempDate = { ...inforCustomer, [field]: value };
+      setInforCustomer(tempDate);
+    }
   };
 
+  const regexPhoneNumber = (phone) => {
+    const regexPhoneNumber = /(0[3|5|7|8|9])+([0-9]{8})\b/g;
+
+    return phone.match(regexPhoneNumber) ? true : false;
+  };
+
+  const validateEmail = (email) => {
+    return String(email)
+      .toLowerCase()
+      .match(
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+      );
+  };
+
+  const regexPlateNumber = (value) => {
+    const pattern = /^[0-9A-Z]{3}-\d{3}\.\d{2}$/;
+    const licensePlate = '29A-123.456'; // Ví dụ biển số không hợp lệ
+    let flat = false;
+    console.log('pon console ne', pattern.test(value));
+    if (pattern.test(value)) {
+      flat = true;
+    }
+    return flat;
+  };
+
+  const onlyNumber = (value) => {
+    const pattern = /^\d+$/;
+    let flat = false;
+    if (pattern.test(value)) {
+      flat = true;
+    }
+    return flat;
+  };
   return (
     <div style={{ width: '1500px' }}>
       <Dialog open={openDialog} onClose={handleClose} maxWidth={'1500px'}>
@@ -235,23 +298,28 @@ export default function CreateReceipt(props) {
           </Box>
           <Typography style={{ fontSize: 14, marginTop: 12, marginBottom: 12 }}>{Vi.customer}</Typography>
           <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <TextField
-              id="createAt"
-              label={Vi.phoneCustomer}
-              //   type="Number"
-              sx={{ mr: 2 }}
-              InputLabelProps={{
-                shrink: true,
-              }}
-              disabled={false}
-              value={inforCustomerApi?.phoneNumber ? inforCustomerApi?.phoneNumber : inforCustomer?.phoneNumber}
-              onChange={(e) => handleDataCustomer('phoneNumber', e.target.value)}
-              //   value={createAt}
-              //   ={createAt}
-              //   onChange={(e) => setCreateAt(e.target.value)}
-              required
-              size="small"
-            />
+            <Box>
+              <TextField
+                id="createAt"
+                label={Vi.phoneCustomer}
+                // type="Number"
+                sx={{ mr: 2 }}
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                disabled={false}
+                value={inforCustomerApi?.phoneNumber ? inforCustomerApi?.phoneNumber : inforCustomer?.phoneNumber}
+                onChange={(e) => handleDataCustomer('phoneNumber', e.target.value)}
+                //   value={createAt}
+                //   ={createAt}
+                //   onChange={(e) => setCreateAt(e.target.value)}
+                required
+                size="small"
+              />
+              {errors === 'phoneNumber' ? (
+                <Typography style={{ color: 'red' }}>Số điện thoại không hợp lệ</Typography>
+              ) : null}
+            </Box>
             <TextField
               id="price"
               label={Vi.nameCustomer}
@@ -267,21 +335,23 @@ export default function CreateReceipt(props) {
               required
               size="small"
             />
-
-            <TextField
-              id="createName"
-              label={Vi.emailCustomer}
-              //   type="Number"
-              sx={{ mr: 2 }}
-              InputLabelProps={{
-                shrink: true,
-              }}
-              value={inforCustomerApi?.email ? inforCustomerApi?.email : inforCustomer?.email}
-              disabled={inforCustomerApi?.email ? true : false}
-              onChange={(e) => handleDataCustomer('email', e.target.value)}
-              required
-              size="small"
-            />
+            <Box>
+              <TextField
+                id="createName"
+                label={Vi.emailCustomer}
+                type="email"
+                sx={{ mr: 2 }}
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                value={inforCustomerApi?.email ? inforCustomerApi?.email : inforCustomer?.email}
+                disabled={inforCustomerApi?.email ? true : false}
+                onChange={(e) => handleDataCustomer('email', e.target.value)}
+                required
+                size="small"
+              />
+              {errors === 'email' ? <Typography style={{ color: 'red' }}>Email không hợp lệ</Typography> : null}
+            </Box>
           </Box>
           <Typography style={{ fontSize: 14, marginTop: 12, marginBottom: 12 }}>{Vi.vehicleInformation}</Typography>
           <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -331,6 +401,9 @@ export default function CreateReceipt(props) {
               size="small"
             />
           </Box>
+          {errors === 'plateNumber' ? (
+            <Typography style={{ color: 'red' }}>biển số xe không hợp lệ , Ví dụ : 29A-123.45</Typography>
+          ) : null}
           <Box style={{ display: 'flex', justifyContent: 'space-between', marginTop: 24 }}>
             <TextField
               id="vehicleColor"
@@ -397,6 +470,7 @@ export default function CreateReceipt(props) {
             minRows={3}
             size="small"
           />
+          <Button>Thêm hạng mục sửa chửa</Button>
           <TextField
             id="noteVehicle"
             label={Vi.noteVehicle}

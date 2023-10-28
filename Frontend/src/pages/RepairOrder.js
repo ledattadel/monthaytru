@@ -325,6 +325,7 @@ const Row = ({ row, setReceiptChoose, setOpenEditDialog, setOpenDetailDialog }) 
             {Vi.detail}
           </Button>
         </TableCell>
+
         <TableCell>
           <UserBillMoreMenu
             id={ReceiptID}

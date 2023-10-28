@@ -219,7 +219,7 @@ export default function User() {
                         {/* <TableCell align="center">{ProductDescription}</TableCell> */}
                         <TableCell align="center">{ProductName}</TableCell>
                         {/* <TableCell align="center">{Unit}</TableCell> */}
-                        <TableCell align="center">{Price}</TableCell>
+                        <TableCell align="center">{formatMoneyWithDot(parseInt(Price))}</TableCell>
                         <TableCell align="center">{brand?.BrandName}</TableCell>
                         <TableCell align="right">
                           <UserMoreMenu

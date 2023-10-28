@@ -32,6 +32,7 @@ import {
   deleteStaffAPI,
   deleteUserAPI,
   getAllStaffAPI,
+  getAllStaffTechnicalAPI,
   getAllUserMainAPI,
   getCartByUserIdAPI,
 } from '../components/services/index';
@@ -55,6 +56,7 @@ const TABLE_HEAD = [
   { id: 'name', label: Vi.nameStaff, alignRight: false },
   { id: 'username', label: Vi.userName, alignRight: false },
   { id: 'phoneNumber', label: Vi.phoneStaff, alignRight: false },
+  { id: 'CCCD', label: 'CCCD', alignRight: false },
   { id: 'email', label: 'Email', alignRight: false },
   { id: 'address', label: Vi.address, alignRight: false },
   { id: 'Role', label: Vi.role, alignRight: false },
@@ -139,7 +141,7 @@ export default function Staff() {
 
   const getAllUser = async () => {
     try {
-      const res = await getAllStaffAPI();
+      const res = await getAllStaffTechnicalAPI();
       const temp = res?.data || [];
       setListUser(temp);
     } catch (error) {
@@ -321,7 +323,7 @@ function Row({
 
   const { user, purchaseCount } = row || {};
 
-  const { id, name, phoneNumber, email, address, username, Role } = row;
+  const { id, name, phoneNumber, email, address, username, Role, idCardNumber } = row;
   const isItemSelected = selected.indexOf(phoneNumber) !== -1;
 
   const getCartByUserId = async (id) => {
@@ -366,6 +368,7 @@ function Row({
         <TableCell align="center">{name}</TableCell>
         <TableCell align="center">{username}</TableCell>
         <TableCell align="center">{phoneNumber}</TableCell>
+        <TableCell align="center">{idCardNumber}</TableCell>
         <TableCell align="center">{email}</TableCell>
         <TableCell align="center">{address}</TableCell>
         <TableCell align="center">{changeRoleFromEnToVi(Role)}</TableCell>

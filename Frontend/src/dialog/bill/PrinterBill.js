@@ -16,7 +16,6 @@ import {
   getAllServiceAPI,
   getAllStaffAPI,
   getVehicleByNumberAPI,
-  updateRepairAPI,
 } from 'src/components/services';
 import AppToast from 'src/myTool/AppToast';
 import { Vi } from 'src/_mock/Vi';
@@ -33,30 +32,15 @@ const ENUM_PRODUCT_TYPE = [
   },
 ];
 
-export default function RepairDetail(props) {
+export default function PrinterBill(props) {
   const { openDialog, setOpenDialog, receiptChoose, getAllCart } = props;
 
-  const [additionPrice, setAdditionPrice] = useState(0);
-  const [productAdd, setProductAdd] = useState([]);
   const [openToastHere, setOpenToastHere] = useState(false);
   const [contentToastHere, setContentToastHere] = useState('');
   const [severityHere, setSeverityHere] = useState('');
 
-  const [cartId, setCartId] = useState(0);
-
   /// services/product
 
-  const [listServcies, setListServices] = useState([]);
-
-  const [staffChoose, setStaffChoose] = useState({
-    staffName: '',
-  });
-  const [listStaff, setListStaff] = useState([]);
-  const [type, setType] = useState(ENUM_PRODUCT_TYPE?.[0]?.name);
-  const [listProduct, setListProduct] = useState([]);
-
-  const [isClear, setIsClear] = useState(true);
-  const [isClearService, setIsClearService] = useState(true);
   ///
   const [createAt, setCreateAt] = useState();
 
@@ -83,26 +67,13 @@ export default function RepairDetail(props) {
   ///
   const [listServiceAdd, setListServiceAdd] = useState([]);
   const [listProductAdd, setListProductAdd] = useState([]);
-  const [isDoneAll, setIsDoneAll] = useState(false);
-
-  const [productChoose, setProductChoose] = useState({
-    quantity: 0,
-  });
-  const [serviceChoose, setServiceChoose] = useState({
-    staff: {},
-  });
 
   const InfoAdmin = JSON.parse(localStorage.getItem('profileAdmin'));
 
   //// useEffect
 
-  useEffect(() => {
-    getAllProduct();
-    getAllService();
-  }, []);
   React.useEffect(() => {
-    // setCreateAt(moment().format('DD-MM-yyyy hh:mm'));
-    getAllStaff();
+    setCreateAt(moment().format('DD-MM-yyyy hh:mm'));
   }, []);
   React.useEffect(() => {
     // getAllUser();
@@ -110,11 +81,13 @@ export default function RepairDetail(props) {
   }, [inforVehicle?.vehicleNumber]);
 
   useEffect(() => {
-    if (receiptChoose?.RepairOrderID) {
-      handleDataCustomer('phoneNumber', receiptChoose?.priceQuote?.receipt?.customer?.phoneNumber);
-      handleDataCustomer('name', receiptChoose?.priceQuote?.receipt?.customer?.name);
+    if (receiptChoose?.InvoiceID) {
+      //   handleDataCustomer('phoneNumber', receiptChoose?.priceQuote?.receipt?.customer?.phoneNumber);
+      //   handleDataCustomer('name', receiptChoose?.priceQuote?.receipt?.customer?.name);
+      const dataCustomer = { ...receiptChoose?.priceQuote?.receipt?.customer };
+      setInforCustomer(dataCustomer);
       handleDataVehicle('vehicleNumber', receiptChoose?.priceQuote?.receipt?.vehicle?.NumberPlate);
-
+      console.log('pon console');
       const dataProduct = [];
       receiptChoose?.priceQuote?.priceQuoteProductDetails?.forEach((e, index) => {
         const temp = {
@@ -131,15 +104,13 @@ export default function RepairDetail(props) {
       setListProductAdd(dataProduct);
 
       const dataService = [];
-      receiptChoose?.repairOrderDetails?.forEach((e, index) => {
+      receiptChoose?.priceQuote?.priceQuoteServiceDetails?.forEach((e, index) => {
         const temp = {
-          ...e?.pqServiceDetail?.service,
-          staff: e?.staff,
+          ...e?.service,
+          staff: e?.repairOrderDetails?.[0]?.staff,
           isRemove: e?.Status === 1 ? true : false,
           index: index + 1,
           isAcceptedRepair: e?.isAcceptedRepair,
-          IsDone: e?.IsDone,
-          RODID: e?.RODID,
         };
         dataService?.push(temp);
       });
@@ -164,89 +135,6 @@ export default function RepairDetail(props) {
     }
   };
 
-  /// function
-
-  const getAllService = async () => {
-    try {
-      const res = await getAllServiceAPI();
-      const temp = res?.data;
-      setListServices(temp);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const getAllStaff = async () => {
-    try {
-      const res = await getAllStaffAPI();
-      setListStaff(res?.data);
-    } catch (error) {}
-  };
-
-  const getAllProduct = async () => {
-    try {
-      const res = await getAllProductDetailAPI();
-      if (res?.data) {
-        setListProduct(res?.data);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const handleClose = () => {
-    setCartId(null);
-    setProductAdd([]);
-    setListProductAdd([]);
-    setListServiceAdd([]);
-
-    setAdditionPrice(0);
-    setOpenDialog(false);
-    setType(ENUM_PRODUCT_TYPE?.[0]?.name);
-  };
-
-  const addNewQuote = async (data, id) => {
-    try {
-      const res = await updateRepairAPI(data, id);
-      let errorMessage = res.message || 'Chỉnh sửa thất bại';
-      let successMessage = res.message || 'Chỉnh sửa thành công';
-      if (res.status === 200) {
-        setContentToastHere(successMessage);
-        setSeverityHere('success');
-        setAdditionPrice(0);
-        setOpenToastHere(true);
-        setOpenDialog(false);
-        getAllCart();
-        handleClose();
-      } else {
-        setContentToastHere(errorMessage);
-        setOpenToastHere(true);
-        setSeverityHere('error');
-      }
-    } catch (error) {
-      setContentToastHere('Chỉnh sửa thất bại');
-      setOpenToastHere(true);
-      setSeverityHere('error');
-    }
-  };
-  const handleAddProduct = () => {
-    const dataService = [];
-    listServiceAdd?.forEach((e) => {
-      const temp = {
-        RODID: e?.RODID,
-        IsDone: e?.IsDone,
-      };
-      dataService?.push(temp);
-    });
-
-    const data = {
-      RepairOrderID: receiptChoose?.RepairOrderID,
-      priceQuoteServiceDetails: dataService,
-    };
-    // console.log('pon console', receiptChoose);
-    addNewQuote(data, receiptChoose?.RepairOrderID);
-  };
-
   const handleDataVehicle = (field, value) => {
     const tempDate = { ...inforVehicle, [field]: value };
     setInforVehicle(tempDate);
@@ -255,40 +143,21 @@ export default function RepairDetail(props) {
     const tempDate = { ...inforCustomer, [field]: value };
     setInforCustomer(tempDate);
   };
+  // const countPrice = () => {
+  //   const priceQuoteService = priceQuoteServiceDetails?.reduce((a, b) => a * 1 + parseInt(b?.Price || '0.0'), 0);
+  //   const priceQuoteProduct = priceQuoteProductDetails?.reduce(
+  //     (a, b) => a * 1 + parseInt(b?.SellingPrice || '0.0') * b?.Quantity || 1,
+  //     0
+  //   );
+  //   return priceQuoteService * 1 + priceQuoteProduct * 1;
+  // };
 
-  const handleDone = (status, id) => {
-    if (!receiptChoose?.IsDone) {
-      const listService = listServiceAdd?.filter((e) => e?.ServiceID === id);
-      const tempList = listServiceAdd?.filter((e) => e?.ServiceID !== id);
-      const dataNew = { ...listService?.[0], IsDone: !status };
+  const priceQuoteService = listServiceAdd?.reduce((a, b) => a * 1 + parseInt(b?.Price || '0.0'), 0);
 
-      const newList = [...tempList, dataNew]?.sort((a, b) => a?.index - b?.index);
-      setListServiceAdd(newList);
-    }
-  };
-
-  const handleAllDone = () => {
-    if (!receiptChoose?.IsDone) {
-      const listData = [];
-      listServiceAdd?.forEach((e) => {
-        const dataNew = { ...e, IsDone: true };
-        listData?.push(dataNew);
-      });
-      setListServiceAdd(listData);
-      setIsDoneAll(true);
-    }
-  };
-  const handleAllNotDone = () => {
-    if (!receiptChoose?.IsDone) {
-      const listData = [];
-      listServiceAdd?.forEach((e) => {
-        const dataNew = { ...e, IsDone: false };
-        listData?.push(dataNew);
-      });
-      setListServiceAdd(listData);
-      setIsDoneAll(false);
-    }
-  };
+  const priceQuoteProduct = listProductAdd?.reduce(
+    (a, b) => a * 1 + parseInt(b?.SellingPrice || '0.0') * b?.quantity || 1,
+    0
+  );
 
   const renderItemProduct = (item, index) => {
     return (
@@ -334,13 +203,6 @@ export default function RepairDetail(props) {
             </Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
-          {/* <Button
-            onClick={() => removeProductAdd(item?.ProductDetailID)}
-            disabled={item?.isRemove}
-            style={{ display: 'flex', padding: 4, width: 40, justifyContent: 'space-between' }}
-          >
-            <Typography style={{ width: 100, textAlign: 'center' }}>X</Typography>
-          </Button> */}
         </Box>
         <Box style={{ height: 1, backgroundColor: 'gray', width: 950 }} />
       </Box>
@@ -381,16 +243,6 @@ export default function RepairDetail(props) {
             <Typography style={{ width: 100, textAlign: 'center' }}>{item?.staff?.name}</Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
-
-          <Button
-            onClick={() => handleDone(item?.IsDone, item?.ServiceID)}
-            disabled={item?.isRemove}
-            style={{ display: 'flex', padding: 4, width: 30, height: 30, justifyContent: 'space-between' }}
-          >
-            <Typography style={{ width: 30, height: 30, textAlign: 'center', border: '1px solid red' }}>
-              {item?.IsDone ? 'V' : ''}
-            </Typography>
-          </Button>
         </Box>
         <Box style={{ height: 1, backgroundColor: 'gray', width: 950 }} />
       </Box>
@@ -430,13 +282,8 @@ export default function RepairDetail(props) {
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
 
-          <Box
-            onClick={isDoneAll ? handleAllNotDone : handleAllDone}
-            style={{ display: 'flex', padding: 4, width: 40 }}
-          >
-            <Typography style={{ width: 30, height: 30, textAlign: 'center', border: '1px solid red' }}>
-              {isDoneAll ? 'V' : ''}
-            </Typography>
+          <Box style={{ display: 'flex', padding: 4, width: 40 }}>
+            <Typography style={{ width: 100, textAlign: 'center' }}></Typography>
             {/* <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} /> */}
           </Box>
         </Box>
@@ -496,252 +343,151 @@ export default function RepairDetail(props) {
 
   return (
     <div style={{ width: '1500px' }}>
-      <Dialog open={openDialog} onClose={handleClose} maxWidth={'1500px'}>
-        <DialogTitle>{Vi.RepairOrder}</DialogTitle>
+      <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth={'1500px'}>
+        <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <DialogTitle>{}</DialogTitle>
+          <Box>
+            <Button
+              onClick={() => {
+                setOpenDialog(false);
+                setContentToastHere('In hoá đơn thành công');
+                setOpenToastHere(true);
+                setSeverityHere('success');
+              }}
+            >
+              In
+            </Button>
+            <Button onClick={() => setOpenDialog(false)}>X</Button>
+          </Box>
+        </Box>
+
         <DialogContent sx={{ height: 650, width: 1000 }}>
-          <Box style={{ borderWidth: 1, borderColor: 'grey' }}>
-            <Typography style={{ fontSize: 14, marginTop: 8, marginBottom: 12 }}>Thông tin lệnh sửa chửa</Typography>
-            <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <TextField
-                id="receiptId"
-                label={Vi.receiptId}
-                sx={{ mr: 2 }}
-                InputLabelProps={{
-                  shrink: true,
-                }}
-                disabled={true}
-                value={receiptChoose?.priceQuote?.ReceiptID}
-                size="small"
-                required
-              />
-              <TextField
-                id="receiptId"
-                label={Vi.quoteId}
-                sx={{ mr: 2 }}
-                InputLabelProps={{
-                  shrink: true,
-                }}
-                disabled={true}
-                value={receiptChoose?.QuoteID}
-                size="small"
-                required
-              />
-              <TextField
-                id="quoteId"
-                label={'Mã phiếu lệnh sửa chửa'}
-                sx={{ mr: 2 }}
-                InputLabelProps={{
-                  shrink: true,
-                }}
-                placeholder={'Hệ thống tự sinh'}
-                disabled={true}
-                size="small"
-                required
-                value={receiptChoose?.RepairOrderID}
-              />
-              <TextField
-                id="createAt"
-                label={Vi.createAt}
-                sx={{ mr: 2 }}
-                InputLabelProps={{
-                  shrink: true,
-                }}
-                disabled={true}
-                value={createAt}
-                size="small"
-              />
-              {/* <TextField
-                id="createName"
-                label={Vi.createName}
-                sx={{ mr: 2 }}
-                InputLabelProps={{
-                  shrink: true,
-                }}
-                disabled={true}
-                value={'Pôn'}
-                size="small"
-                required
-              /> */}
+          <Box>
+            <Typography>CÔNG TY TNHN BÙA ĐI FEN</Typography>
+            <Typography>Địa chỉ : 97 , đường Man Thiện, phường Hiệp Phú , Quận 9 , thành phố Hồ Chí Minh</Typography>
+            <Typography>Số điện thoại : 0389803709</Typography>
+            <Typography>STK : 0389803709 - VCB - NGUYEN TRAN TRONG HIEU</Typography>
+            <Typography>Email : hieutran@gmail.com</Typography>
+            {/* <Typography>CÔNG TY TNHN BÙA ĐI FEN</Typography> */}
+          </Box>
+          <Box style={{ display: 'flex', justifyContent: 'center', marginTop: 30 }}>
+            <Typography style={{ fontSize: 20, fontWeight: '600' }}>Hoá đơn </Typography>
+          </Box>
+          <Box style={{ border: '1px solid grey', marginTop: 20 }}>
+            <Box style={{ display: 'flex', alignItems: 'center', borderBottom: '1px solid grey' }}>
+              <Typography style={{ borderRight: '1px solid grey', width: 130 }}>Khách hàng: </Typography>
+              <Typography style={{ borderRight: '1px solid grey', width: 400, marginLeft: 30 }}>
+                {inforCustomer?.name}
+              </Typography>
+              <Typography sx={{ ml: 1 }} style={{ borderRight: '1px solid grey', width: 160 }}>
+                Số điện thoại :
+              </Typography>
+              <Typography sx={{ ml: 1 }} style={{ width: 200 }}>
+                {' '}
+                {inforCustomer?.phoneNumber}
+              </Typography>
+            </Box>
+            <Box style={{ display: 'flex', alignItems: 'center', borderBottom: '1px solid grey' }}>
+              <Typography style={{ borderRight: '1px solid grey', width: 158 }}>Biển số xe </Typography>
+              <Typography style={{ borderRight: '1px solid grey', width: 200, marginLeft: 30 }}>
+                {inforVehicleApi?.NumberPlate}{' '}
+              </Typography>
+              <Typography sx={{ ml: 1 }} style={{ borderRight: '1px solid grey', width: 160 }}>
+                Mẫu xe :
+              </Typography>
+              <Typography sx={{ ml: 1 }} style={{ width: 200, borderRight: '1px solid grey' }}>
+                {' '}
+                {inforVehicleApi?.Type}
+              </Typography>
+              <Typography sx={{ ml: 1 }} style={{ borderRight: '1px solid grey', width: 160 }}>
+                Hãng :
+              </Typography>
+              <Typography sx={{ ml: 1 }} style={{ width: 200 }}>
+                {' '}
+                {inforVehicleApi?.brand?.BrandName}
+              </Typography>
+            </Box>
+            <Box style={{ display: 'flex', alignItems: 'center', borderBottom: '1px solid grey' }}>
+              <Typography style={{ borderRight: '1px solid grey', width: 158 }}>Số khung xe </Typography>
+              <Typography style={{ borderRight: '1px solid grey', width: 200, marginLeft: 30 }}>
+                {inforVehicleApi?.ChassisNumber}
+              </Typography>
+              <Typography sx={{ ml: 1 }} style={{ borderRight: '1px solid grey', width: 160 }}>
+                Số máy xe :
+              </Typography>
+              <Typography sx={{ ml: 1 }} style={{ width: 200, borderRight: '1px solid grey' }}>
+                {' '}
+                {inforVehicleApi?.EngineNumber}
+              </Typography>
+              <Typography sx={{ ml: 1 }} style={{ borderRight: '1px solid grey', width: 160 }}>
+                Màu xe :
+              </Typography>
+              <Typography sx={{ ml: 1 }} style={{ width: 200 }}>
+                {' '}
+                {inforVehicleApi?.Color}
+              </Typography>
             </Box>
           </Box>
 
-          <Box style={{ display: 'flex', justifyContent: 'space-between', marginTop: 20, marginBottom: 20 }}>
-            <TextField
-              id="nameCustomer"
-              label={Vi.nameCustomer}
-              sx={{ mr: 2 }}
-              InputLabelProps={{
-                shrink: true,
-              }}
-              disabled={true}
-              //   value={price}
-              value={inforCustomer?.name}
-              onChange={(e) => handleDataCustomer('name', e.target.value)}
-              required
-              size="small"
-            />
-            <TextField
-              id="vehicleNumber"
-              label={Vi.vehicleNumber}
-              //   type="Number"
-              sx={{ mr: 2 }}
-              InputLabelProps={{
-                shrink: true,
-              }}
-              disabled={true}
-              //   value={createAt}
-              //   ={createAt}
-              //   onChange={(e) => setCreateAt(e.target.value)}
-              required
-              value={inforVehicle?.vehicleNumber}
-              size="small"
-              onChange={(e) => handleDataVehicle('vehicleNumber', e.target.value)}
-            />
-            <TextField
-              id="brand"
-              label={Vi.brand}
-              sx={{ mr: 2 }}
-              InputLabelProps={{
-                shrink: true,
-              }}
-              disabled={true}
-              value={inforVehicleApi?.brand?.BrandName}
-              onChange={(e) => handleDataVehicle('brand', e.target.value)}
-              required
-              size="small"
-            />
-            <TextField
-              id="vehicleType"
-              label={Vi.vehicleType}
-              //   type="Number"
-              sx={{ mr: 2 }}
-              InputLabelProps={{
-                shrink: true,
-              }}
-              disabled={true}
-              value={inforVehicleApi?.Type}
-              onChange={(e) => handleDataVehicle('vehicleType', e.target.value)}
-              required
-              size="small"
-            />
-          </Box>
-          {/* <Typography style={{ fontSize: 14, marginTop: 24, marginBottom: 12 }}>{Vi.addProductService}</Typography>
-          <Box style={{ display: 'flex' }}>
-            <Autocomplete
-              disablePortal
-              //   id="manufacturer"
-              options={ENUM_PRODUCT_TYPE}
-              getOptionLabel={(option) => option?.name}
-              sx={{ width: 200, mr: 2 }}
-              onChange={(e, newValue) => {
-                setType(newValue?.name);
-              }}
-              size="small"
-              defaultValue={ENUM_PRODUCT_TYPE?.[0]}
-              renderInput={(params) => <TextField {...params} />}
-            />
-            {type === ENUM_PRODUCT_TYPE?.[0]?.name ? (
-              <Autocomplete
-                disablePortal
-                id="nameService"
-                options={listServcies}
-                getOptionLabel={(option) => option?.ServiceName}
-                sx={{ width: 400, mr: 2 }}
-                onChange={(e, newValue) => {
-                  handleChooseServce(newValue);
-                  setIsClearService(false);
-                }}
-                size="small"
-                key={serviceChoose?.ServiceName}
-                value={isClearService ? null : serviceChoose}
-                renderInput={(params) => <TextField {...params} label={Vi.nameService} />}
-              />
-            ) : (
-              <Autocomplete
-                disablePortal
-                id="option?.ServiceName"
-                options={listProduct}
-                getOptionLabel={(option) =>
-                  `${option?.product?.ProductName} - ${option?.product?.brand?.BrandName} - ${option?.supplier?.name}`
-                }
-                sx={{ width: 500, mr: 2 }}
-                onChange={(e, newValue) => {
-                  handleChooseNameProduct(newValue);
-                  setIsClear(false);
-                }}
-                size="small"
-                key={productChoose?.product?.ProductName}
-                value={isClear ? null : productChoose}
-                renderInput={(params) => <TextField {...params} label={Vi.nameProduct} />}
-              />
-            )}
+          <Typography sx={{ mt: 2 }}>
+            Theo yêu cầu của quý khách và sau khi xem xét, chúng tôi phục vụ các dịch vụ và sản phẩm sau
+          </Typography>
 
-            {type === ENUM_PRODUCT_TYPE?.[0]?.name ? (
-              <Autocomplete
-                disablePortal
-                id="staff"
-                options={listStaff}
-                getOptionLabel={(option) => option?.name}
-                sx={{ width: 200, mr: 2 }}
-                onChange={(e, newValue) => {
-                  handleChooseStaffToServce(newValue);
-
-                  setIsClear(false);
-                }}
-                key={serviceChoose?.staff}
-                size="small"
-                value={isClear ? null : serviceChoose?.staff}
-                renderInput={(params) => <TextField {...params} label={Vi.staffWork} />}
-              />
-            ) : null}
-
-            {type === ENUM_PRODUCT_TYPE?.[1]?.name ? (
-              <TextField
-                id="quantity"
-                label={Vi.quantity}
-                //   type="Number"
-                sx={{ mr: 2 }}
-                InputLabelProps={{
-                  shrink: true,
-                }}
-                required
-                value={productChoose?.quantity}
-                size="small"
-                style={{ width: 100 }}
-                onChange={(e) => handleChooseProduct('quantity', e.target.value)}
-              />
-            ) : null}
-            <Button
-              variant="outlined"
-              onClick={type === ENUM_PRODUCT_TYPE?.[0]?.name ? handleAddServiceToList : handleAddProductToList}
-              size="small"
-              type="submit"
-            >
-              {Vi.add}
-            </Button>
-          </Box>
-         */}
           <Box mt={2}>
             <Typography style={{ fontSize: 18, marginBottom: 12, fontWeight: 600 }}> {Vi.product}:</Typography>
           </Box>
           {renderTitleProduct()}
           {listProductAdd?.map((e, index) => renderItemProduct(e, index))}
+
           <Box mt={2}>
             <Typography style={{ fontSize: 18, marginBottom: 12, fontWeight: 600 }}> {Vi.service}:</Typography>
           </Box>
           {renderTitleServices()}
           {listServiceAdd?.map((e, index) => renderItemService(e, index))}
+
+          <Box style={{ display: 'flex', justifyContent: 'space-between', width: 330, marginLeft: 620 }}>
+            <Typography textAlign={'right'} style={{ fontSize: 18, marginTop: 12 }}>
+              Tổng tiền sản phẩm :{' '}
+            </Typography>
+            <Typography style={{ fontSize: 18, marginTop: 12 }}>
+              {formatMoneyWithDot(priceQuoteProduct || 0)}
+            </Typography>
+          </Box>
+
+          <Box style={{ display: 'flex', justifyContent: 'space-between', width: 330, marginLeft: 620 }}>
+            <Typography textAlign={'right'} style={{ fontSize: 18, marginTop: 12 }}>
+              Tổng tiền dịch vụ:{' '}
+            </Typography>
+            <Typography style={{ fontSize: 18, marginTop: 12 }}>
+              {formatMoneyWithDot(priceQuoteService || 0)}
+            </Typography>
+          </Box>
+
+          <Box style={{ display: 'flex', justifyContent: 'space-between', width: 330, marginLeft: 620 }}>
+            <Typography textAlign={'right'} style={{ fontSize: 18, marginTop: 12 }}>
+              Tổng tiền:{' '}
+            </Typography>
+            <Typography style={{ fontSize: 18, marginTop: 12 }}>
+              {formatMoneyWithDot(parseInt(priceQuoteService * 1 + priceQuoteProduct * 1) || 0)}
+            </Typography>
+          </Box>
+          <Box style={{ display: 'flex', justifyContent: 'space-between', width: 330, marginLeft: 620 }}>
+            <Typography textAlign={'right'} style={{ fontSize: 18, marginTop: 12 }}>
+              (VAT 8%) :{' '}
+            </Typography>
+            <Typography style={{ fontSize: 18, marginTop: 12 }}>
+              {formatMoneyWithDot(parseInt((priceQuoteService * 1 + priceQuoteProduct * 1) * 0.08) || 0)}
+            </Typography>
+          </Box>
+          <Box style={{ display: 'flex', justifyContent: 'space-between', width: 330, marginLeft: 620 }}>
+            <Typography textAlign={'right'} style={{ fontSize: 18, marginTop: 12, fontWeight: '600' }}>
+              Tổng tiền (VAT 8%) :{' '}
+            </Typography>
+            <Typography style={{ fontSize: 18, marginTop: 12 }}>
+              {formatMoneyWithDot(parseInt((priceQuoteService * 1 + priceQuoteProduct * 1) * 1.08) || 0)}
+            </Typography>
+          </Box>
         </DialogContent>
-
-        <DialogActions>
-          <Button variant="outlined" onClick={handleClose}>
-            {Vi.Cancel}
-          </Button>
-
-          <Button variant="outlined" onClick={() => handleAddProduct()} type="submit">
-            Lưu
-          </Button>
-        </DialogActions>
       </Dialog>
       <AppToast
         content={contentToastHere}

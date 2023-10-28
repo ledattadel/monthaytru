@@ -27,6 +27,7 @@ export default function ImportProductDialog(props) {
   const [severityHere, setSeverityHere] = useState('');
   const [isError, setIsError] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [isErrors, setIsErrors] = React.useState(false);
 
   /// services/product
 
@@ -167,7 +168,7 @@ export default function ImportProductDialog(props) {
   const getAllProduct = async () => {
     try {
       const res = await getAllProductAPI();
-      // setListProduct(res?.data);
+      setListProduct(res?.data);
     } catch (error) {
       console.log(error);
     }
@@ -245,7 +246,7 @@ export default function ImportProductDialog(props) {
         BrandName: brand,
         Price: price,
       };
-
+      getAllProduct();
       addNewProduct(data);
     }
   };
@@ -253,12 +254,17 @@ export default function ImportProductDialog(props) {
   const handleAddProduct = () => {
     const flat = listProductAdd?.filter((e) => e?.ProductID === inforProduct?.ProductID);
     if (!inforProduct?.ProductID || inforProduct?.purchasePrice === '' || !inforProduct?.quantity === '') {
+      setContentToastHere('Vui lòng nhập đủ thông tin');
+      setOpenToastHere(true);
+      setSeverityHere('error');
     } else if (flat?.length > 0) {
-      setErrorMsg('Phiếu nhập đã có sản phẩm này rồi');
+      setErrorMsg(Vi.productIsExit);
       setInfoProduct({
         purchasePrice: '',
         quantity: '',
       });
+    } else if (inforProduct?.purchasePrice % 1000 !== 0) {
+      setErrorMsg(Vi.price1000);
     } else {
       const product = [...listProductAdd];
       product.push(inforProduct);
@@ -297,11 +303,11 @@ export default function ImportProductDialog(props) {
 
   const handleNext = () => {
     if (!supplierChoose?.SupplierID) {
-      setContentToastHere('Vui lòng chọn nhà cung cấp');
+      setContentToastHere(Vi.chooseSupplier);
       setSeverityHere('error');
       setOpenToastHere(true);
     } else if (listProductAdd?.length === 0) {
-      setContentToastHere('Danh sách sản phẩm không tồn tại');
+      setContentToastHere(Vi.listProductAddNull);
       setSeverityHere('error');
       setOpenToastHere(true);
     } else {
@@ -335,13 +341,73 @@ export default function ImportProductDialog(props) {
   };
 
   const handleDataProduct = (field, value) => {
-    if (field === 'product') {
-      const tempDate = { ...inforProduct, ...value };
-      setInfoProduct(tempDate);
+    if (field === 'quantity') {
+      if (!onlyNumber(value)) {
+        if (value === '') {
+          setErrorMsg(Vi.quantityMore0);
+          const tempDate = { ...inforProduct, quantity: '' };
+          setInfoProduct(tempDate);
+        }
+      } else if (value > 100 || value === 0 || value === '') {
+        setErrorMsg(Vi.quantityMore0);
+        const tempDate = { ...inforProduct, [field]: value };
+        setInfoProduct(tempDate);
+      } else {
+        const tempDate = { ...inforProduct, [field]: value };
+        setInfoProduct(tempDate);
+        setErrorMsg('');
+      }
+    } else if (field === 'purchasePrice') {
+      if (!onlyNumber(value)) {
+        if (value === '') {
+          const tempDate = { ...inforProduct, [field]: value };
+          setInfoProduct(tempDate);
+        }
+      } else if (value?.length < 4) {
+        setErrorMsg(Vi.pusecharprice);
+        const tempDate = { ...inforProduct, [field]: value };
+        setInfoProduct(tempDate);
+      } else if (value === '') {
+        if (field === 'product') {
+          const tempDate = { ...inforProduct, ...value };
+          setInfoProduct(tempDate);
+        } else {
+          const tempDate = { ...inforProduct, [field]: value };
+          setInfoProduct(tempDate);
+        }
+      } else {
+        const tempDate = { ...inforProduct, [field]: value };
+        setInfoProduct(tempDate);
+        setErrorMsg('');
+      }
     } else {
-      const tempDate = { ...inforProduct, [field]: value };
-      setInfoProduct(tempDate);
+      if (field === 'product') {
+        const tempDate = { ...inforProduct, ...value };
+        setInfoProduct(tempDate);
+      } else {
+        const tempDate = { ...inforProduct, [field]: value };
+        setInfoProduct(tempDate);
+      }
     }
+  };
+  const onlyNumber = (value) => {
+    const pattern = /^\d+$/;
+    let flat = false;
+    if (pattern.test(value)) {
+      flat = true;
+    }
+    return flat;
+  };
+
+  const onlyNumber1 = (value) => {
+    const pattern = /^\d+$/;
+    let flat = false;
+    if (pattern.test(value)) {
+      flat = true;
+    } else if (value === '') {
+      setPrice('');
+    }
+    return flat;
   };
 
   const renderItemProduct = (item, index) => {
@@ -557,7 +623,7 @@ export default function ImportProductDialog(props) {
             />
             <TextField
               id="purchasePrice"
-              label={Vi.purchasePrice}
+              label={'Giá nhập'}
               sx={{ mr: 2 }}
               InputLabelProps={{
                 shrink: true,
@@ -603,10 +669,23 @@ export default function ImportProductDialog(props) {
                   <TextField
                     id="price"
                     label="Giá"
-                    type="Number"
+                    // type="Number"
                     sx={{ width: 500, mr: 2 }}
                     // fullWidth
-                    onChange={(e) => setPrice(e.target.value)}
+                    value={price}
+                    onChange={(e) => {
+                      if (!onlyNumber1(e.target.value)) {
+                        return;
+                      } else {
+                        if (e.target.value?.length < 4) {
+                          setIsErrors(true);
+                        } else {
+                          setIsErrors(false);
+                        }
+
+                        setPrice(e.target.value);
+                      }
+                    }}
                     required
                   />
                 </Box>
@@ -655,6 +734,7 @@ export default function ImportProductDialog(props) {
                   Nhập đủ thông tin sản phẩm
                 </p>
               </Box>
+              {isErrors ? <Typography style={{ color: 'red' }}>Gía phải lớn hơn 1.000d</Typography> : null}
               <DialogActions>
                 <Button onClick={() => setIsAddProduct(false)}>Huỷ</Button>
                 <Button onClick={handleAddNewProduct} type="submit">

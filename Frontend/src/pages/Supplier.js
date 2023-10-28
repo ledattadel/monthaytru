@@ -42,8 +42,6 @@ const TABLE_HEAD = [
   { id: 'name', label: Vi.nameSupplier, alignRight: false },
   { id: 'phoneNumber', label: Vi.phoneNumberSupplier, alignRight: false },
   { id: 'address', label: Vi.addressSupplier, alignRight: false },
-
-
 ];
 
 // ----------------------------------------------------------------------
@@ -124,9 +122,9 @@ export default function Supplier() {
   const deleteAPI = async (id) => {
     try {
       const res = await deleteSupplierAPI(id);
-      let errorMessage = res.message ||  'Xoá nhà cung cấp thất bại'
-      let successMessage =  res.message || 'Xoá nhà cung cấp thành công'
-     
+      let errorMessage = res.message || 'Xoá nhà cung cấp thất bại';
+      let successMessage = res.message || 'Xoá nhà cung cấp thành công';
+
       if (res.status === 200) {
         setContentToast(successMessage);
         setSeverity('success');
@@ -232,7 +230,7 @@ export default function Supplier() {
 
                 <TableBody>
                   {filteredUsers?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { SupplierID, name,  phoneNumber, address} = row;
+                    const { SupplierID, name, phoneNumber, address } = row;
 
                     const isItemSelected = selected.indexOf(name) !== -1;
 
@@ -251,7 +249,7 @@ export default function Supplier() {
 
                         <TableCell align="center" />
                         <TableCell align="center">{SupplierID}</TableCell>
-                       
+
                         <TableCell align="center">{name}</TableCell>
                         <TableCell align="center">{phoneNumber}</TableCell>
                         <TableCell align="center">{address}</TableCell>

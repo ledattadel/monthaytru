@@ -23,10 +23,9 @@ export default function BrandDialog(props) {
   const addNewProduct = async (data) => {
     try {
       const res = await addNewBrandAPI(data);
-      let errorMessage = res.message ||  'Thêm Hãng thất bại'
-      let successMessage =  res.message || 'Thêm Hãng thành công'
-     
-     
+      let errorMessage = res.message || 'Thêm Hãng thất bại';
+      let successMessage = res.message || 'Thêm Hãng thành công';
+
       if (res.status === 201) {
         setName(null);
         setContentToast(successMessage);
@@ -53,7 +52,7 @@ export default function BrandDialog(props) {
   };
 
   const handleAddProduct = () => {
-    if (!name) {
+    if (!name?.trim()) {
       setIsError(true);
     } else {
       setIsError(false);
