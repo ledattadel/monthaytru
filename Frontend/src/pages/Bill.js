@@ -37,10 +37,12 @@ import BarChart from '../chart/BarChart';
 import BarChartMonth from '../chart/BarChartMonth';
 
 // mock
-import { getAllBillAPI, getAllInvoiceAPI, getCartDescriptionAPI } from '../components/services/index';
+import { addNewInvoiceAPI, getAllBillAPI, getAllInvoiceAPI, getCartDescriptionAPI } from '../components/services/index';
 import BillDetail from 'src/dialog/bill/BillDetail';
 import PrinterBill from 'src/dialog/bill/PrinterBill';
 import { Vi } from 'src/_mock/Vi';
+import moment from 'moment';
+import AppToast from 'src/myTool/AppToast';
 
 // ----------------------------------------------------------------------
 
@@ -266,6 +268,9 @@ function Row(props) {
   const [open, setOpen] = React.useState(false);
   const [item, setItem] = useState([]);
 
+  const [openToast, setOpenToast] = useState(false);
+  const [severity, setSeverity] = useState(false);
+  const [contentToast, setContentToast] = useState('');
   const getCartDescription = async (id) => {
     try {
       const res = await getCartDescriptionAPI(id);
@@ -319,6 +324,15 @@ function Row(props) {
           </Button>
         </TableCell>
       </TableRow>
+      <AppToast
+        content={contentToast}
+        type={0}
+        isOpen={openToast}
+        severity={severity}
+        callback={() => {
+          setOpenToast(false);
+        }}
+      />
     </>
   );
 }

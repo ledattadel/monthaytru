@@ -53,7 +53,6 @@ const TABLE_HEAD = [
   // { id: 'vehicleCondition', label: Vi.vehicleCondition, alignRight: false },
   { id: 'status', label: Vi.status, alignRight: false },
   { id: 'detail', label: Vi.detail, alignRight: false },
-  { id: 'bill', label: 'tạo hoá đơn', alignRight: false },
 ];
 
 function descendingComparator(a, b, orderBy) {
@@ -346,7 +345,7 @@ const Row = ({ row, setReceiptChoose, setOpenEditDialog, setOpenDetailDialog, In
             {Vi.detail}
           </Button>
         </TableCell>
-        <TableCell align="center">
+        {/* <TableCell align="center">
           {' '}
           <Button
             onClick={() => {
@@ -358,7 +357,7 @@ const Row = ({ row, setReceiptChoose, setOpenEditDialog, setOpenDetailDialog, In
           >
             Tạo hoá đơn
           </Button>
-        </TableCell>
+        </TableCell> */}
         <TableCell>
           <UserBillMoreMenu
             id={ReceiptID}

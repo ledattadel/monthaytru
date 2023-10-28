@@ -26,11 +26,18 @@ import { UserBillMoreMenu, UserListHead, UserListToolbar } from '../sections/@da
 
 import CreateReceipt from 'src/dialog/Receipt/CreateReceipt';
 import { Vi } from 'src/_mock/Vi';
-import { getAllReceiptAPI, getAllRepairAPI, getAllStatusAPI, getUserInfoAPI } from '../components/services/index';
+import {
+  addNewInvoiceAPI,
+  getAllReceiptAPI,
+  getAllRepairAPI,
+  getAllStatusAPI,
+  getUserInfoAPI,
+} from '../components/services/index';
 import EditReceipt from 'src/dialog/Receipt/EditReceipt';
 import ReceiptDetail from 'src/dialog/Receipt/ReceiptDetail';
 import formatMoneyWithDot from 'src/utils/formatMoney';
 import RepairDetail from 'src/dialog/Repair/RepairDetail';
+import moment from 'moment/moment';
 
 // ----------------------------------------------------------------------
 
@@ -46,6 +53,7 @@ const TABLE_HEAD = [
   // { id: 'vehicleCondition', label: Vi.vehicleCondition, alignRight: false },
   { id: 'status', label: Vi.status, alignRight: false },
   { id: 'detail', label: Vi.detail, alignRight: false },
+  { id: 'bill', label: 'tạo hoá đơn', alignRight: false },
 ];
 
 function descendingComparator(a, b, orderBy) {
@@ -279,6 +287,7 @@ const Row = ({ row, setReceiptChoose, setOpenEditDialog, setOpenDetailDialog }) 
   const [contentToast, setContentToast] = useState('');
 
   const [openToastDatePicker, setOpenToastDatePicker] = useState(false);
+  const InfoAdmin = JSON.parse(localStorage.getItem('profileAdmin'));
 
   const countPrice = () => {
     const priceQuoteService = repairOrderDetails?.reduce(
@@ -290,8 +299,34 @@ const Row = ({ row, setReceiptChoose, setOpenEditDialog, setOpenDetailDialog }) 
       (a, b) => a * 1 + parseInt(b?.SellingPrice || '0.0') * b?.Quantity || 1,
       0
     );
-    console.log('pon console', priceQuoteProduct);
     return priceQuoteService * 1 + priceQuoteProduct * 1;
+  };
+
+  const addNewInvoice = async () => {
+    const data = {
+      Time: moment().format('DD-MM-yyyy hh:mm'),
+      StaffID: InfoAdmin?.userId,
+      QuoteID: QuoteID,
+    };
+    try {
+      const res = await addNewInvoiceAPI(data);
+      let errorMessage = res.message || 'Tạo hoá đơn thất bại';
+      let successMessage = res.message || 'Tạo hoá đơn thành công';
+      if (res.status === 201) {
+        setContentToast(successMessage);
+        setSeverity('success');
+
+        setOpenToast(true);
+      } else {
+        setContentToast(errorMessage);
+        setSeverity('error');
+        setOpenToast(true);
+      }
+    } catch (error) {
+      setContentToast('Tạo hoá đơn thất bại');
+      setSeverity('error');
+      setOpenToast(true);
+    }
   };
 
   return (
@@ -323,6 +358,19 @@ const Row = ({ row, setReceiptChoose, setOpenEditDialog, setOpenDetailDialog }) 
             }}
           >
             {Vi.detail}
+          </Button>
+        </TableCell>
+        <TableCell align="center">
+          {' '}
+          <Button
+            onClick={() => {
+              // setReceiptChoose(row);
+              // setOpenDetailDialog(true);
+              addNewInvoice();
+            }}
+            disabled={priceQuote?.Status === '1' && IsDone ? false : true}
+          >
+            Tạo hoá đơn
           </Button>
         </TableCell>
 
