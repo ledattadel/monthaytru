@@ -247,7 +247,7 @@ export default function DashboardApp() {
             />
           </Grid> */}
 
-          <Grid item xs={12} md={6} lg={4}>
+          {/* <Grid item xs={12} md={6} lg={4}>
             <AppCurrentVisits
               title="Current Visits"
               chartData={[
@@ -263,7 +263,7 @@ export default function DashboardApp() {
                 theme.palette.chart.yellow[0],
               ]}
             />
-          </Grid>
+          </Grid> */}
 
           <Grid item xs={12} md={6} lg={8}>
             <AppConversionRates
