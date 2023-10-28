@@ -565,7 +565,12 @@ export default function CreateQuote(props) {
   return (
     <div style={{ width: '1500px' }}>
       <Dialog open={openDialog} onClose={handleClose} maxWidth={'1500px'}>
-        <DialogTitle>{Vi.quote}</DialogTitle>
+        {/* <DialogTitle>{Vi.quote}</DialogTitle> */}
+        <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <DialogTitle>{Vi.quote}</DialogTitle>
+
+          <Button onClick={() => setOpenDialog(false)}>X</Button>
+        </Box>
         <DialogContent sx={{ height: 650, width: 1000 }}>
           <Box style={{ borderWidth: 1, borderColor: 'grey' }}>
             <Typography style={{ fontSize: 14, marginTop: 8, marginBottom: 12 }}>{Vi.inforQuote}</Typography>
@@ -789,9 +794,9 @@ export default function CreateQuote(props) {
         </DialogContent>
 
         <DialogActions>
-          <Button variant="outlined" onClick={handleClose}>
+          {/* <Button variant="outlined" onClick={handleClose}>
             {Vi.Cancel}
-          </Button>
+          </Button> */}
           <Button variant="outlined" onClick={() => handleAddProduct(0)} type="submit">
             {Vi.save}
           </Button>
