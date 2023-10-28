@@ -93,24 +93,12 @@ export default function RepairOrder() {
   const [filterName, setFilterName] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [listCart, setListCart] = useState([]);
-  const [listStatus, setListStatus] = useState([]);
-  const [employeeInfo, setEmployeeInfo] = useState();
+
   //-------------------------------------------------
   const [openDialog, setOpenDialog] = useState(false);
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [openDetailDialog, setOpenDetailDialog] = useState(false);
   const [receiptChoose, setReceiptChoose] = useState({});
-
-  const getEmployeeInfo = async () => {
-    try {
-      const res = await getUserInfoAPI();
-      if (res?.status === 200) {
-        // setEmployeeInfo(res.data);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
   const getAllCart = async () => {
     try {
@@ -121,17 +109,8 @@ export default function RepairOrder() {
     } catch (error) {}
   };
 
-  const getAllStatus = async () => {
-    try {
-      const res = await getAllStatusAPI();
-      // setListStatus(res?.data);
-    } catch (error) {}
-  };
-
   useEffect(() => {
     getAllCart();
-    getEmployeeInfo();
-    getAllStatus();
   }, []);
 
   const handleOpenDialog = () => {
@@ -207,9 +186,7 @@ export default function RepairOrder() {
                     <Row
                       row={row}
                       setReceiptChoose={setReceiptChoose}
-                      listStatus={listStatus}
                       getAllCart={getAllCart}
-                      employee={employeeInfo}
                       setOpenEditDialog={setOpenEditDialog}
                       setOpenDetailDialog={setOpenDetailDialog}
                     />
@@ -368,7 +345,7 @@ const Row = ({ row, setReceiptChoose, setOpenEditDialog, setOpenDetailDialog }) 
               // setOpenDetailDialog(true);
               addNewInvoice();
             }}
-            disabled={priceQuote?.Status === '1' && IsDone ? false : true}
+            disabled={priceQuote?.Status === '1' && IsDone && !priceQuote?.invoice ? false : true}
           >
             Tạo hoá đơn
           </Button>

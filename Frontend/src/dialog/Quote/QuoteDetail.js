@@ -810,13 +810,13 @@ export default function QuoteDetail(props) {
               size="small"
             />
           </Box>
-          {receiptChoose?.repairOrder?.IsDone && receiptChoose?.Status === '1' ? null : (
+          {receiptChoose?.repairOrder?.IsDone && receiptChoose?.Status === '1' && receiptChoose?.invoice ? null : (
             <Typography style={{ fontSize: 14, marginTop: 24, marginBottom: 12 }}>{Vi.addProductService}</Typography>
           )}
 
           {/* <Typography style={{ fontSize: 14, marginTop: 24, marginBottom: 12 }}>{'Hư kính'}</Typography> */}
 
-          {receiptChoose?.repairOrder?.IsDone && receiptChoose?.Status === '1' ? null : (
+          {receiptChoose?.repairOrder?.IsDone && receiptChoose?.Status === '1' && receiptChoose?.invoice ? null : (
             <Box style={{ display: 'flex' }}>
               <Autocomplete
                 disablePortal
@@ -968,7 +968,7 @@ export default function QuoteDetail(props) {
           </Box>
         </DialogContent>
 
-        {receiptChoose?.repairOrder?.IsDone && receiptChoose?.Status === '1' ? (
+        {receiptChoose?.repairOrder?.IsDone && receiptChoose?.Status === '1' && receiptChoose?.invoice ? (
           <DialogActions>
             {/* <Button variant="outlined" onClick={handleClose}>
               {Vi.Cancel}

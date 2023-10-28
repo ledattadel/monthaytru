@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
 // @mui
 import { useTheme } from '@mui/material/styles';
-import { Grid, Container, Typography, TextField, Box } from '@mui/material';
+import { Grid, Container, Typography, TextField, Box, Button as BaseButton } from '@mui/material';
 // components
 import Page from '../components/Page';
 import Iconify from '../components/Iconify';
@@ -19,9 +19,18 @@ import {
 } from '../sections/@dashboard/app';
 import DatePickerDialog from 'src/dialog/DatePickerDialog';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import moment from 'moment';
+import {
+  getDashboardCustomerAPI,
+  getDashboardInvoiceAPI,
+  getDashboardInvoicePriceAPI,
+  getDashboardReceiptAPI,
+  getDashboardVehicleAPI,
+} from 'src/components/services';
+import styled from '@emotion/styled';
 
 // ----------------------------------------------------------------------
 
@@ -29,7 +38,106 @@ export default function DashboardApp() {
   const theme = useTheme();
 
   const [value, setValue] = useState();
+  const [startTime, setStartTime] = useState(new Date());
+  const [endTime, setEndTime] = useState(new Date());
 
+  const [trigger, setTrigger] = useState(false);
+
+  const [customer, setCustomer] = useState({});
+  const [vehicle, setVehicle] = useState({});
+  const [invoice, setInvoice] = useState({});
+  const [receipt, setReceipt] = useState({});
+  const [invoicePrice, setInvoicePrice] = useState({});
+
+  const getAllDashboard = async () => {
+    console.log('pon console', moment(startTime?.$d).format('DD-MM-yyyy'));
+    try {
+      const startTime1 = moment(startTime?.$d).format('DD-MM-yyyy');
+      const endTime1 = moment(endTime?.$d).format('DD-MM-yyyy');
+      const res = await getDashboardCustomerAPI(startTime1, endTime1);
+      setCustomer(res?.data);
+      const res1 = await getDashboardVehicleAPI(startTime1, endTime1);
+      const res2 = await getDashboardInvoiceAPI(startTime1, endTime1);
+      const res3 = await getDashboardReceiptAPI(startTime1, endTime1);
+      const res4 = await getDashboardInvoicePriceAPI(startTime1, endTime1);
+      setInvoicePrice(res4?.data);
+      setVehicle(res1?.data);
+      setInvoice(res2?.data);
+      setReceipt(res3?.data);
+    } catch (error) {}
+  };
+  useEffect(() => {
+    getAllDashboard();
+  }, [trigger]);
+
+  const blue = {
+    200: '#99CCFF',
+    300: '#66B2FF',
+    400: '#3399FF',
+    500: '#007FFF',
+    600: '#0072E5',
+    700: '#0066CC',
+  };
+
+  const grey = {
+    50: '#F3F6F9',
+    100: '#E5EAF2',
+    200: '#DAE2ED',
+    300: '#C7D0DD',
+    400: '#B0B8C4',
+    500: '#9DA8B7',
+    600: '#6B7A90',
+    700: '#434D5B',
+    800: '#303740',
+    900: '#1C2025',
+  };
+
+  const Button = styled(BaseButton)(
+    ({ theme }) => `
+    font-family: IBM Plex Sans, sans-serif;
+    font-weight: 600;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    background-color: ${blue[500]};
+    padding: 8px 16px;
+    border-radius: 8px;
+    color: white;
+    transition: all 150ms ease;
+    cursor: pointer;
+    border: 1px solid ${blue[500]};
+    box-shadow: 0 2px 1px ${
+      theme.palette.mode === 'dark' ? 'rgba(0, 0, 0, 0.5)' : 'rgba(45, 45, 60, 0.2)'
+    }, inset 0 1.5px 1px ${blue[400]}, inset 0 -2px 1px ${blue[600]};
+  
+    &:hover {
+      background-color: ${blue[600]};
+    }
+  
+    &:active {
+      background-color: ${blue[700]};
+      box-shadow: none;
+    }
+  
+    &:focus-visible {
+      box-shadow: 0 0 0 4px ${theme.palette.mode === 'dark' ? blue[300] : blue[200]};
+      outline: none;
+    }
+  
+    &:disabled {
+      background-color: ${theme.palette.mode === 'dark' ? grey[700] : grey[200]};
+      color: ${theme.palette.mode === 'dark' ? grey[200] : grey[700]};
+      border: 1px solid ${theme.palette.mode === 'dark' ? grey[700] : grey[200]};
+      cursor: not-allowed;
+      box-shadow: none;
+  
+      &:hover {
+        background-color: ${theme.palette.mode === 'dark' ? grey[700] : grey[200]};
+      }
+    }
+  `
+  );
+
+  console.log('pon console', invoicePrice?.totalSellingPricesProduct * 1);
   return (
     <Page title="Dashboard">
       <Container maxWidth="xl">
@@ -37,16 +145,25 @@ export default function DashboardApp() {
           Hi, Welcome back
         </Typography>
 
-        <Box style={{ display: 'flex', width: 540, justifyContent: 'space-between', marginBottom: 20 }}>
+        <Box
+          style={{
+            display: 'flex',
+            width: 620,
+            justifyContent: 'space-between',
+            marginBottom: 20,
+            alignItems: 'center',
+          }}
+        >
           <Box>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
                 label="Ngày bắt đầu"
-                inputFormat="DD/MM/YYYY"
-                value={value}
+                inputFormat="DD-MM-YYYY"
+                value={startTime}
                 maxDate={new Date()}
                 onChange={(newValue) => {
-                  setValue(newValue);
+                  console.log('pon console e ahahaha', moment(newValue?.$d).format('DD-MM-yyyy'));
+                  setStartTime(newValue);
                 }}
                 renderInput={(params) => <TextField label={'Ngày bắt đầu'} {...params} />}
               />
@@ -55,33 +172,39 @@ export default function DashboardApp() {
           <Box>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
-                label="Ngày bắt đầu"
-                inputFormat="DD/MM/YYYY"
-                value={value}
+                label="Ngày kết thúc"
+                // inputFormat="DD-MM-yyyy"
+                value={endTime}
                 maxDate={new Date()}
                 onChange={(newValue) => {
-                  setValue(newValue);
+                  setEndTime(newValue);
                 }}
                 renderInput={(params) => <TextField label={'Ngày bắt đầu'} {...params} />}
               />
             </LocalizationProvider>
+          </Box>
+          <Box>
+            <Button onClick={() => setTrigger(!trigger)}>Thống kê</Button>
           </Box>
         </Box>
         <Grid container spacing={3}>
           <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="Weekly Sales" total={714000} icon={'ant-design:android-filled'} />
+            <AppWidgetSummary title="Khách hàng mới" total={customer?.total} icon={'ant-design:android-filled'} />
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <AppWidgetSummary title="Xe mới" total={vehicle?.total} color="error" icon={'ant-design:bug-filled'} />
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <AppWidgetSummary
+              title="Phiếu tiếp nhận"
+              total={receipt?.total}
+              color="warning"
+              icon={'ant-design:windows-filled'}
+            />
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="New Users" total={1352831} color="info" icon={'ant-design:apple-filled'} />
-          </Grid>
-
-          <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="Item Orders" total={1723315} color="warning" icon={'ant-design:windows-filled'} />
-          </Grid>
-
-          <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="Bug Reports" total={234} color="error" icon={'ant-design:bug-filled'} />
+            <AppWidgetSummary title="Hoá đơn" total={invoice?.total} color="info" icon={'ant-design:apple-filled'} />
           </Grid>
 
           {/* <Grid item xs={12} md={6} lg={8}>
@@ -142,24 +265,28 @@ export default function DashboardApp() {
             />
           </Grid>
 
-          {/* <Grid item xs={12} md={6} lg={8}>
+          <Grid item xs={12} md={6} lg={8}>
             <AppConversionRates
               title="Conversion Rates"
-              subheader="(+43%) than last year"
+              // subheader="(+43%) than last year"
               chartData={[
-                { label: 'Italy', value: 400 },
-                { label: 'Japan', value: 430 },
-                { label: 'China', value: 448 },
-                { label: 'Canada', value: 470 },
-                { label: 'France', value: 540 },
-                { label: 'Germany', value: 580 },
-                { label: 'South Korea', value: 690 },
-                { label: 'Netherlands', value: 1100 },
-                { label: 'United States', value: 1200 },
-                { label: 'United Kingdom', value: 1380 },
+                { label: 'Sản phẩm', value: invoicePrice?.totalSellingPricesProduct || 0 },
+                { label: 'dịch vụ', value: invoicePrice?.totalPriceService * 1 || 0 },
+                {
+                  label: 'Lợi nhuận sản phẩm',
+                  value:
+                    invoicePrice?.totalSellingPricesProduct * 1 - invoicePrice?.totalPurchasePricesProduct * 1 || 0,
+                },
+                // { label: 'Canada', value: 470 },
+                // { label: 'France', value: 540 },
+                // { label: 'Germany', value: 580 },
+                // { label: 'South Korea', value: 690 },
+                // { label: 'Netherlands', value: 1100 },
+                // { label: 'United States', value: 1200 },
+                // { label: 'United Kingdom', value: 1380 },
               ]}
             />
-          </Grid> */}
+          </Grid>
 
           {/* <Grid item xs={12} md={6} lg={4}>
             <AppCurrentSubject
@@ -174,7 +301,7 @@ export default function DashboardApp() {
             />
           </Grid> */}
 
-          <Grid item xs={12} md={6} lg={8}>
+          {/* <Grid item xs={12} md={6} lg={8}>
             <AppNewsUpdate
               title="News Update"
               list={[...Array(5)].map((_, index) => ({
@@ -185,9 +312,9 @@ export default function DashboardApp() {
                 postedAt: faker.date.recent(),
               }))}
             />
-          </Grid>
+          </Grid> */}
 
-          <Grid item xs={12} md={6} lg={4}>
+          {/* <Grid item xs={12} md={6} lg={4}>
             <AppOrderTimeline
               title="Order Timeline"
               list={[...Array(5)].map((_, index) => ({
@@ -203,9 +330,9 @@ export default function DashboardApp() {
                 time: faker.date.past(),
               }))}
             />
-          </Grid>
+          </Grid> */}
 
-          <Grid item xs={12} md={6} lg={4}>
+          {/* <Grid item xs={12} md={6} lg={4}>
             <AppTrafficBySite
               title="Traffic by Site"
               list={[
@@ -231,9 +358,9 @@ export default function DashboardApp() {
                 },
               ]}
             />
-          </Grid>
+          </Grid> */}
 
-          <Grid item xs={12} md={6} lg={8}>
+          {/* <Grid item xs={12} md={6} lg={8}>
             <AppTasks
               title="Tasks"
               list={[
@@ -244,7 +371,7 @@ export default function DashboardApp() {
                 { id: '5', label: 'Sprint Showcase' },
               ]}
             />
-          </Grid>
+          </Grid> */}
         </Grid>
       </Container>
     </Page>

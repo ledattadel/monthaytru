@@ -6,6 +6,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import { addNewUserAPI } from '../../components/services/index';
+import moment from 'moment';
 
 export default function UserDialog(props) {
   const { openDialog, setOpenDialog, getAllUser, setContentToast, setSeverity, setOpenToast } = props;
@@ -65,6 +66,7 @@ export default function UserDialog(props) {
         // address,
         email,
         phoneNumber,
+        TimeCreate: moment().format('DD-MM-yyyy hh:mm'),
       };
 
       addNewUser(data);

@@ -21,6 +21,7 @@ import {
 import AppToast from 'src/myTool/AppToast';
 import { Vi } from 'src/_mock/Vi';
 import formatMoneyWithDot from 'src/utils/formatMoney';
+import { useNavigate } from 'react-router-dom';
 
 const ENUM_PRODUCT_TYPE = [
   {
@@ -77,6 +78,7 @@ export default function RepairDetail(props) {
   const [inforVehicleApi, setInforVehicleApi] = useState();
 
   /// state list services / product
+  const navigate = useNavigate();
 
   const [listServiceAddDefault, setListServiceAddDefault] = useState([]);
   const [listProductAddDefault, setListProductAddDefault] = useState([]);
@@ -203,6 +205,11 @@ export default function RepairDetail(props) {
     setAdditionPrice(0);
     setOpenDialog(false);
     setType(ENUM_PRODUCT_TYPE?.[0]?.name);
+  };
+
+  const handleAdd = () => {
+    handleClose();
+    navigate('/dashboard/Quote', { replace: true, state: receiptChoose?.QuoteID });
   };
 
   const addNewQuote = async (data, id) => {
@@ -739,9 +746,11 @@ export default function RepairDetail(props) {
         </DialogContent>
 
         <DialogActions>
-          {/* <Button variant="outlined" onClick={handleClose}>
-            {Vi.Cancel}
-          </Button> */}
+          {!receiptChoose?.priceQuote?.invoice ? (
+            <Button variant="outlined" onClick={handleAdd}>
+              Phát sinh
+            </Button>
+          ) : null}
 
           <Button variant="outlined" onClick={() => handleAddProduct()} type="submit">
             Lưu

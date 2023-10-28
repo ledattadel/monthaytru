@@ -1,10 +1,11 @@
-import { Box, Button } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import TextField from '@mui/material/TextField';
 import * as React from 'react';
+import { Vi } from 'src/_mock/Vi';
 import { addNewServiceAPI } from '../components/services/index';
 
 export default function ServiceDialog(props) {
@@ -13,6 +14,7 @@ export default function ServiceDialog(props) {
   const [price, setPrice] = React.useState();
   const [description, setDescription] = React.useState();
   const [isError, setIsError] = React.useState(false);
+  const [isErrors, setIsErrors] = React.useState('');
 
   const addNewService = async (data) => {
     try {
@@ -87,6 +89,17 @@ export default function ServiceDialog(props) {
     }
   };
 
+  const onlyNumber1 = (value) => {
+    const pattern = /^\d+$/;
+    let flat = false;
+    if (pattern.test(value)) {
+      flat = true;
+    } else if (value === '') {
+      setPrice('');
+    }
+    return flat;
+  };
+
   return (
     <div>
       <Dialog open={openDialog} onClose={handleClose}>
@@ -122,10 +135,25 @@ export default function ServiceDialog(props) {
               type="number"
               size="medium"
               sx={{ width: 500, mr: 2 }}
-              onChange={(e) => setPrice(e.target.value)}
+              onChange={(e) => {
+                if (!onlyNumber1(e.target.value)) {
+                  return;
+                } else {
+                  if (e.target.value?.length < 4) {
+                    setIsErrors(Vi.pusecharprice);
+                  } else if (e.target.value % 1000 !== 0) {
+                    setIsErrors(Vi.price1000);
+                  } else {
+                    setIsErrors('');
+                  }
+
+                  setPrice(e.target.value);
+                }
+              }}
               required
             />
           </Box>
+          {isErrors ? <Typography style={{ color: 'red' }}>{isErrors}</Typography> : null}
           <TextField
             margin="dense"
             id="description"

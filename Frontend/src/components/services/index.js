@@ -469,6 +469,72 @@ export const addNewInvoiceAPI = async (body) => {
     return error?.response?.data || error;
   }
 };
+///// dashboard
+export const getDashboardCustomerAPI = async (startDate, endDate) => {
+  try {
+    const response = await axios.get(
+      `${API_GET_ALL_USER}/statistics/total-by-time?startDate=${startDate}&endDate=${endDate}`,
+      {
+        headers: { authorization: `Bearer ${token}` },
+      }
+    );
+    return response;
+  } catch (error) {
+    return error?.response?.data || error;
+  }
+};
+export const getDashboardVehicleAPI = async (startDate, endDate) => {
+  try {
+    const response = await axios.get(
+      `${API_GET_ALL_VEHICLE}/statistics/total-by-time?startDate=${startDate}&endDate=${endDate}`,
+      {
+        headers: { authorization: `Bearer ${token}` },
+      }
+    );
+    return response;
+  } catch (error) {
+    return error?.response?.data || error;
+  }
+};
+export const getDashboardInvoiceAPI = async (startDate, endDate) => {
+  try {
+    const response = await axios.get(
+      `${API_GET_ALL_INVOICE}/statistics/total-by-time?startDate=${startDate}&endDate=${endDate}`,
+      {
+        headers: { authorization: `Bearer ${token}` },
+      }
+    );
+    return response;
+  } catch (error) {
+    return error?.response?.data || error;
+  }
+};
+export const getDashboardInvoicePriceAPI = async (startDate, endDate) => {
+  try {
+    const response = await axios.get(
+      `${API_GET_ALL_INVOICE}/statistics/price-by-time?startDate=${startDate}&endDate=${endDate}`,
+      {
+        headers: { authorization: `Bearer ${token}` },
+      }
+    );
+    return response;
+  } catch (error) {
+    return error?.response?.data || error;
+  }
+};
+export const getDashboardReceiptAPI = async (startDate, endDate) => {
+  try {
+    const response = await axios.get(
+      `${API_GET_ALL_RECEIPT}/statistics/total-by-time?startDate=${startDate}&endDate=${endDate}`,
+      {
+        headers: { authorization: `Bearer ${token}` },
+      }
+    );
+    return response;
+  } catch (error) {
+    return error?.response?.data || error;
+  }
+};
 
 /// import product
 export const addNewImportProductAPI = async (body) => {

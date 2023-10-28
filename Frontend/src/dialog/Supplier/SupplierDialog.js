@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, Box } from '@mui/material';
+import { Button, Box, Typography } from '@mui/material';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import Dialog from '@mui/material/Dialog';
@@ -21,8 +21,8 @@ export default function SupplierDialog(props) {
   const [phoneNumber, setPhoneNumber] = React.useState();
   const [address, setAddress] = React.useState();
   const [isError, setIsError] = React.useState(false);
-  const [selectedFile, setSelectedFile] = React.useState();
-  const [imageUrl, setImageUrl] = React.useState();
+
+  const [errors, setErrors] = React.useState('');
 
   const addNewProduct = async (data) => {
     try {
@@ -70,6 +70,37 @@ export default function SupplierDialog(props) {
     }
   };
 
+  const handlePhoneNumber = (value) => {
+    if (!onlyNumber(value)) {
+      if (value === '') {
+        setPhoneNumber(value);
+      }
+    } else if (value === '') {
+      setPhoneNumber(value);
+    } else if (!regexPhoneNumber(value)) {
+      setErrors('phoneNumber');
+      setPhoneNumber(value);
+    } else {
+      setPhoneNumber(value);
+      setErrors('');
+    }
+  };
+
+  const regexPhoneNumber = (phone) => {
+    const regexPhoneNumber = /(0[3|5|7|8|9])+([0-9]{8})\b/g;
+
+    return phone.match(regexPhoneNumber) ? true : false;
+  };
+
+  const onlyNumber = (value) => {
+    const pattern = /^\d+$/;
+    let flat = false;
+    if (pattern.test(value)) {
+      flat = true;
+    }
+    return flat;
+  };
+
   return (
     <div>
       <Dialog open={openDialog} onClose={handleClose}>
@@ -99,9 +130,11 @@ export default function SupplierDialog(props) {
             fullWidth
             variant="outlined"
             sx={{ mt: 2 }}
-            onChange={(e) => setPhoneNumber(e.target.value)}
+            onChange={(e) => handlePhoneNumber(e.target.value)}
             required
           />
+
+          {errors === 'phoneNumber' ? <Typography style={{ color: 'red' }}>{Vi.phoneError}</Typography> : null}
           <TextField
             margin="dense"
             id="address"

@@ -1,6 +1,6 @@
 import { filter } from 'lodash';
 import { useEffect, useState } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useLocation } from 'react-router-dom';
 
 // material
 import {
@@ -102,8 +102,9 @@ export default function Quote() {
   const [openDetailDialog, setOpenDetailDialog] = useState(false);
   const [receiptChoose, setReceiptChoose] = useState({});
   ///
-  const InfoAdmin = JSON.parse(localStorage.getItem('profileAdmin'));
 
+  const location = useLocation();
+  const InfoAdmin = JSON.parse(localStorage.getItem('profileAdmin'));
   const getAllCart = async () => {
     try {
       const res = await getAllQuoteAPI();
@@ -119,6 +120,14 @@ export default function Quote() {
     // getAllStatus();
   }, []);
 
+  useEffect(() => {
+    if (location?.state) {
+      const tempData = listCart?.filter((e) => e?.QuoteID === location?.state);
+
+      setReceiptChoose(tempData?.[0]);
+      setOpenDetailDialog(true);
+    }
+  }, [location?.state, listCart]);
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');

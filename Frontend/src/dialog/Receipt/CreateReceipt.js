@@ -186,8 +186,12 @@ export default function CreateReceipt(props) {
   const handleDataCustomer = (field, value) => {
     if (field === 'phoneNumber') {
       if (!onlyNumber(value)) {
+        if (value === '') {
+          const tempDate = { ...inforCustomer, [field]: '' };
+          setInforCustomer(tempDate);
+        }
       } else if (value === '') {
-        const tempDate = { ...inforCustomer, [field]: value };
+        const tempDate = { ...inforCustomer, [field]: '' };
         setInforCustomer(tempDate);
       } else if (!regexPhoneNumber(value)) {
         setErrors('phoneNumber');

@@ -362,7 +362,7 @@ export default function ProductDialog(props) {
   return (
     <div>
       <Dialog open={openDialog} onClose={handleClose}>
-        <DialogTitle>Tạo mới sản phẩm</DialogTitle>
+        {/* <DialogTitle>Tạo mới sản phẩm</DialogTitle> */}
         <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
           <DialogTitle>Tạo mới sản phẩm</DialogTitle>
 
