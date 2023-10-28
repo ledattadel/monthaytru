@@ -36,6 +36,7 @@ export default function DashboardApp() {
         <Typography variant="h4" sx={{ mb: 5 }}>
           Hi, Welcome back
         </Typography>
+
         <Box style={{ display: 'flex', width: 540, justifyContent: 'space-between', marginBottom: 20 }}>
           <Box>
             <LocalizationProvider dateAdapter={AdapterDayjs}>

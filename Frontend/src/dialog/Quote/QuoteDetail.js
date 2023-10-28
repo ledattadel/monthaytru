@@ -439,6 +439,8 @@ export default function QuoteDetail(props) {
         setErrorMsg(Vi.quantityMore0);
         const temp = { ...productChoose, [field]: value };
         setProductChoose(temp);
+      } else if (value > productChoose?.Quantity) {
+        setErrorMsg(`sản phẩm trong kho k đủ chỉ còn ${productChoose?.Quantity}`);
       } else {
         const temp = { ...productChoose, [field]: value };
         setProductChoose(temp);
@@ -803,13 +805,13 @@ export default function QuoteDetail(props) {
               size="small"
             />
           </Box>
-          {receiptChoose?.repairOrder?.IsDone ? null : (
+          {receiptChoose?.repairOrder?.IsDone && receiptChoose?.Status === '1' ? null : (
             <Typography style={{ fontSize: 14, marginTop: 24, marginBottom: 12 }}>{Vi.addProductService}</Typography>
           )}
 
           {/* <Typography style={{ fontSize: 14, marginTop: 24, marginBottom: 12 }}>{'Hư kính'}</Typography> */}
 
-          {receiptChoose?.repairOrder?.IsDone ? null : (
+          {receiptChoose?.repairOrder?.IsDone && receiptChoose?.Status === '1' ? null : (
             <Box style={{ display: 'flex' }}>
               <Autocomplete
                 disablePortal
@@ -961,7 +963,7 @@ export default function QuoteDetail(props) {
           </Box>
         </DialogContent>
 
-        {receiptChoose?.repairOrder?.IsDone ? (
+        {receiptChoose?.repairOrder?.IsDone && receiptChoose?.Status === '1' ? (
           <DialogActions>
             <Button variant="outlined" onClick={handleClose}>
               {Vi.Cancel}

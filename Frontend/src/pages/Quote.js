@@ -262,6 +262,7 @@ const Row = ({ row, setReceiptChoose, setOpenEditDialog, setOpenDetailDialog, In
     Status,
     priceQuoteServiceDetails,
     priceQuoteProductDetails,
+    repairOrder,
   } = row;
   const [openToast, setOpenToast] = useState(false);
   const [severity, setSeverity] = useState(false);
@@ -272,13 +273,10 @@ const Row = ({ row, setReceiptChoose, setOpenEditDialog, setOpenDetailDialog, In
   const returnStatus = (status) => {
     switch (status) {
       case '0':
-        console.log('pon console ne Status 0', Status, status);
         return 'chờ xác nhận';
       case '1':
-        console.log('pon console ne Status 1', Status, status);
         return 'đã xác nhận';
       case '2':
-        console.log('pon console ne Status 2', Status, status);
         return 'xác nhận lại';
 
       default:
@@ -356,6 +354,7 @@ const Row = ({ row, setReceiptChoose, setOpenEditDialog, setOpenDetailDialog, In
               // setOpenDetailDialog(true);
               addNewInvoice();
             }}
+            disabled={Status === '1' && repairOrder?.IsDone ? false : true}
           >
             Tạo hoá đơn
           </Button>
