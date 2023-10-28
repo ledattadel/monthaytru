@@ -247,7 +247,12 @@ export default function CreateReceipt(props) {
   return (
     <div style={{ width: '1500px' }}>
       <Dialog open={openDialog} onClose={handleClose} maxWidth={'1500px'}>
-        <DialogTitle>{Vi.addNewReceipt}</DialogTitle>
+        {/* <DialogTitle>{Vi.addNewReceipt}</DialogTitle> */}
+        <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <DialogTitle>{Vi.addNewReceipt}</DialogTitle>
+
+          <Button onClick={() => setOpenDialog(false)}>X</Button>
+        </Box>
         <DialogContent sx={{ height: 650, width: 800 }}>
           <Box style={{ borderWidth: 1, borderColor: 'grey' }}>
             <Typography style={{ fontSize: 14, marginTop: 8, marginBottom: 12 }}>{Vi.receipt}</Typography>
@@ -502,7 +507,7 @@ export default function CreateReceipt(props) {
           Please enter full information {errorMsg}
         </p>
         <DialogActions>
-          <Button onClick={handleClose}>Huỷ</Button>
+          {/* <Button onClick={handleClose}>Huỷ</Button> */}
           <Button onClick={handleAddProduct} type="submit">
             Tạo phiếu tiếp nhận
           </Button>

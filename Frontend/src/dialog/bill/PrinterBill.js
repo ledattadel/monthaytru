@@ -427,6 +427,16 @@ export default function PrinterBill(props) {
                 {inforVehicleApi?.Color}
               </Typography>
             </Box>
+            <Box style={{ display: 'flex', alignItems: 'center', borderBottom: '1px solid grey' }}>
+              <Typography style={{ borderRight: '1px solid grey', width: 131 }}>Tình trạng xe : </Typography>
+              <Typography style={{ width: 800, marginLeft: 30 }}>
+                {receiptChoose?.priceQuote?.receipt?.VehicleStatus}
+              </Typography>
+            </Box>
+            <Box style={{ display: 'flex', alignItems: 'center' }}>
+              <Typography style={{ borderRight: '1px solid grey', width: 131 }}>Ghi chú : </Typography>
+              <Typography style={{ width: 800, marginLeft: 30 }}>{receiptChoose?.priceQuote?.receipt?.Note}</Typography>
+            </Box>
           </Box>
 
           <Typography sx={{ mt: 2 }}>

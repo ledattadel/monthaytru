@@ -90,7 +90,12 @@ export default function ServiceDialog(props) {
   return (
     <div>
       <Dialog open={openDialog} onClose={handleClose}>
-        <DialogTitle>Tạo mới dịch vụ</DialogTitle>
+        {/* <DialogTitle>Tạo mới dịch vụ</DialogTitle> */}
+        <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <DialogTitle>Tạo mới dịch vụ</DialogTitle>
+
+          <Button onClick={() => setOpenDialog(false)}>X</Button>
+        </Box>
         <DialogContent sx={{ height: 500 }}>
           <TextField
             margin="dense"
@@ -147,7 +152,7 @@ export default function ServiceDialog(props) {
           </p>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Huỷ</Button>
+          {/* <Button onClick={handleClose}>Huỷ</Button> */}
           <Button onClick={handleAddUser} type="submit">
             Tạo dịch vụ
           </Button>

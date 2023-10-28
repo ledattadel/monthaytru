@@ -363,6 +363,11 @@ export default function ProductDialog(props) {
     <div>
       <Dialog open={openDialog} onClose={handleClose}>
         <DialogTitle>Tạo mới sản phẩm</DialogTitle>
+        <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <DialogTitle>Tạo mới sản phẩm</DialogTitle>
+
+          <Button onClick={() => setOpenDialog(false)}>X</Button>
+        </Box>
         <DialogContent sx={{ height: 650 }}>
           <TextField
             margin="dense"
@@ -461,7 +466,7 @@ export default function ProductDialog(props) {
           </p>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Huỷ</Button>
+          {/* <Button onClick={handleClose}>Huỷ</Button> */}
           <Button onClick={handleAddProduct} type="submit">
             Tạo sản phẩm
           </Button>

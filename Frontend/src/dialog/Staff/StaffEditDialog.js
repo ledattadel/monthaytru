@@ -44,9 +44,9 @@ export default function StaffEditDialog(props) {
 
   const editUser = async (data) => {
     try {
-      const res = await editStaffAPI(user?.id,data);
-      let errorMessage = res.message ||  'Sửa nhân viên thất bại'
-      let successMessage =  res.message || 'Sửa nhân viên thành công'
+      const res = await editStaffAPI(user?.id, data);
+      let errorMessage = res.message || 'Sửa nhân viên thất bại';
+      let successMessage = res.message || 'Sửa nhân viên thành công';
       if (res.status === 200) {
         setContentToast(successMessage);
         setSeverity('success');
@@ -70,28 +70,33 @@ export default function StaffEditDialog(props) {
   };
 
   const handleEditUser = () => {
-    if (!name || !phoneNumber || !userName || !idCardNumber ) {
+    if (!name || !phoneNumber || !userName || !idCardNumber) {
       setIsError(true);
     } else {
       setIsError(false);
       const data = {
         idCardNumber: idCardNumber,
         name: name,
-        email: email || "Chưa có email",
+        email: email || 'Chưa có email',
         phoneNumber: phoneNumber,
         username: userName,
         password: password || '',
-        address : address || "Chưa có địa chỉ",
+        address: address || 'Chưa có địa chỉ',
         roleName: role || DataRole?.[0]?.name,
-      };  
-     
+      };
+
       editUser(data);
     }
   };
   return (
     <div>
       <Dialog open={openDialog} onClose={handleClose}>
-        <DialogTitle>Chỉnh sửa nhân viên</DialogTitle>
+        {/* <DialogTitle>Chỉnh sửa nhân viên</DialogTitle> */}
+        <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <DialogTitle>Chỉnh sửa nhân viên</DialogTitle>
+
+          <Button onClick={() => setOpenDialog(false)}>X</Button>
+        </Box>
         <DialogContent>
           <Box
             sx={{
@@ -110,7 +115,7 @@ export default function StaffEditDialog(props) {
               required
               value={name}
             />
-             <TextField
+            <TextField
               id="demo-helper-text-aligned-no-helper"
               label="CCCD/CMND"
               type="number"
@@ -170,9 +175,7 @@ export default function StaffEditDialog(props) {
               alignItems: 'center',
               mt: 1,
             }}
-          >
-     
-          </Box>
+          ></Box>
           <TextField
             margin="dense"
             id="email"
@@ -185,7 +188,7 @@ export default function StaffEditDialog(props) {
             onChange={(e) => setEmail(e.target.value)}
             required
           />
-  <TextField
+          <TextField
             margin="dense"
             id="address"
             label="Địa chỉ hiện tại"
@@ -223,7 +226,7 @@ export default function StaffEditDialog(props) {
           </p>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Huỷ</Button>
+          {/* <Button onClick={handleClose}>Huỷ</Button> */}
           <Button onClick={handleEditUser} type="submit">
             sửa
           </Button>

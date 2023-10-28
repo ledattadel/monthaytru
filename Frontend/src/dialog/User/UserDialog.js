@@ -20,8 +20,8 @@ export default function UserDialog(props) {
     try {
       const res = await addNewUserAPI(data);
       let errorMessage = res.message || 'Thêm user thất bại';
-      let successMessage =  res.message || 'Thêm user thành công'
-    
+      let successMessage = res.message || 'Thêm user thành công';
+
       if (res.status === 200) {
         setIdCardNumber(null);
         setName(null);
@@ -74,7 +74,12 @@ export default function UserDialog(props) {
   return (
     <div>
       <Dialog open={openDialog} onClose={handleClose}>
-        <DialogTitle>Tạo khách hàng mới</DialogTitle>
+        {/* <DialogTitle>Tạo khách hàng mới</DialogTitle> */}
+        <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <DialogTitle>Tạo khách hàng mới</DialogTitle>
+
+          <Button onClick={() => setOpenDialog(false)}>X</Button>
+        </Box>
         <DialogContent>
           <Box
             sx={{
@@ -148,7 +153,7 @@ export default function UserDialog(props) {
           </p>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Huỷ</Button>
+          {/* <Button onClick={handleClose}>Huỷ</Button> */}
           <Button onClick={handleAddUser} type="submit">
             Tạo khách hàng
           </Button>

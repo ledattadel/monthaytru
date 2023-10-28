@@ -207,7 +207,12 @@ export default function EditReceipt(props) {
   return (
     <div style={{ width: '1500px' }}>
       <Dialog open={openDialog} onClose={handleClose} maxWidth={'1500px'}>
-        <DialogTitle>Chỉnh sửa phiếu tiếp nhận</DialogTitle>
+        {/* <DialogTitle>Chỉnh sửa phiếu tiếp nhận</DialogTitle> */}
+        <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <DialogTitle>Chỉnh sửa phiếu tiếp nhận</DialogTitle>
+
+          <Button onClick={() => setOpenDialog(false)}>X</Button>
+        </Box>
         <DialogContent sx={{ height: 650, width: 800 }}>
           <Box style={{ borderWidth: 1, borderColor: 'grey' }}>
             <Typography style={{ fontSize: 14, marginTop: 8, marginBottom: 12 }}>{Vi.receipt}</Typography>
@@ -452,7 +457,7 @@ export default function EditReceipt(props) {
           Please enter full information {errorMsg}
         </p>
         <DialogActions>
-          <Button onClick={handleClose}>Huỷ</Button>
+          {/* <Button onClick={handleClose}>Huỷ</Button> */}
           <Button onClick={handleAddProduct} type="submit">
             Sửa
           </Button>

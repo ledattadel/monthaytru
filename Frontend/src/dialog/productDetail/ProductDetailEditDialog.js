@@ -134,7 +134,12 @@ export default function ProductDetailEditDialog(props) {
   return (
     <div>
       <Dialog open={openDialog} onClose={handleClose}>
-        <DialogTitle>Cập nhật sản phẩm</DialogTitle>
+        {/* <DialogTitle>Cập nhật sản phẩm</DialogTitle> */}
+        <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <DialogTitle>Cập nhật sản phẩm</DialogTitle>
+
+          <Button onClick={() => setOpenDialog(false)}>X</Button>
+        </Box>
         <DialogContent sx={{ height: 650 }}>
           <TextField
             margin="dense"
@@ -273,7 +278,7 @@ export default function ProductDetailEditDialog(props) {
           </p>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Huỷ</Button>
+          {/* <Button onClick={handleClose}>Huỷ</Button> */}
           <Button onClick={handleEditUser} type="submit">
             Cập nhật
           </Button>

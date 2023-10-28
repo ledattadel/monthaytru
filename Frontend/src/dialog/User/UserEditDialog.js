@@ -24,10 +24,9 @@ export default function UserEditDialog(props) {
 
   const editUser = async (data) => {
     try {
-      
-      const res = await editUserAPI(user?.CustomerID,data);
-      let errorMessage = res.message ||  'Sửa user thất bại'
-      let successMessage =  res.message || 'success'
+      const res = await editUserAPI(user?.CustomerID, data);
+      let errorMessage = res.message || 'Sửa user thất bại';
+      let successMessage = res.message || 'success';
       if (res.status === 200) {
         setContentToast(successMessage);
         setSeverity('success');
@@ -70,7 +69,12 @@ export default function UserEditDialog(props) {
   return (
     <div>
       <Dialog open={openDialog} onClose={handleClose}>
-        <DialogTitle>Chỉnh sửa khách hàng</DialogTitle>
+        {/* <DialogTitle>Chỉnh sửa khách hàng</DialogTitle> */}
+        <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <DialogTitle>Chỉnh sửa khách hàng</DialogTitle>
+
+          <Button onClick={() => setOpenDialog(false)}>X</Button>
+        </Box>
         <DialogContent>
           <TextField
             autoFocus
@@ -132,7 +136,7 @@ export default function UserEditDialog(props) {
           </p>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Huỷ</Button>
+          {/* <Button onClick={handleClose}>Huỷ</Button> */}
           <Button onClick={handleEditUser} type="submit">
             Sửa
           </Button>

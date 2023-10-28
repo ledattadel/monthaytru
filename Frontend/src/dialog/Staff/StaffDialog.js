@@ -141,7 +141,12 @@ export default function StaffDialog(props) {
   return (
     <div>
       <Dialog open={openDialog} onClose={handleClose}>
-        <DialogTitle>Tạo nhân viên mới</DialogTitle>
+        {/* <DialogTitle>Tạo nhân viên mới</DialogTitle> */}
+        <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <DialogTitle>Tạo nhân viên mới</DialogTitle>
+
+          <Button onClick={() => setOpenDialog(false)}>X</Button>
+        </Box>
         <DialogContent>
           <Box
             sx={{
@@ -336,7 +341,7 @@ export default function StaffDialog(props) {
           </p>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Huỷ</Button>
+          {/* <Button onClick={handleClose}>Huỷ</Button> */}
           <Button onClick={handleAddStaff} type="submit">
             Tạo nhân viên
           </Button>

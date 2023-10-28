@@ -30,9 +30,9 @@ export default function BrandEditDialog(props) {
   const editProduct = async (data, productId) => {
     try {
       const res = await editBrandAPI(data, productId);
-      let errorMessage = res.message ||  'Cập nhật Hãng thất bại'
-      let successMessage =  res.message || 'Cập nhật Hãng thành công'
-     
+      let errorMessage = res.message || 'Cập nhật Hãng thất bại';
+      let successMessage = res.message || 'Cập nhật Hãng thành công';
+
       if (res.status === 200) {
         setContentToast(successMessage);
         setSeverity('success');
@@ -71,7 +71,12 @@ export default function BrandEditDialog(props) {
   return (
     <div>
       <Dialog open={openDialog} onClose={handleClose}>
-        <DialogTitle>Chỉnh sửa hãng</DialogTitle>
+        {/* <DialogTitle>Chỉnh sửa hãng</DialogTitle> */}
+        <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <DialogTitle>Chỉnh sửa hãng</DialogTitle>
+
+          <Button onClick={() => setOpenDialog(false)}>X</Button>
+        </Box>
         <DialogContent sx={{ height: 150, width: 500 }}>
           <TextField
             margin="dense"
@@ -126,7 +131,7 @@ export default function BrandEditDialog(props) {
           </p> */}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Huỷ</Button>
+          {/* <Button onClick={handleClose}>Huỷ</Button> */}
           <Button onClick={handleEditUser} type="submit">
             Sửa
           </Button>

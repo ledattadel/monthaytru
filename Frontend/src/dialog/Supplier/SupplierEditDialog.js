@@ -19,15 +19,15 @@ export default function SupplierEditDialog(props) {
   React.useEffect(() => {
     setName(product?.name);
     setPhoneNumber(product?.phoneNumber);
-    setAddress(product?.address)
+    setAddress(product?.address);
   }, [product]);
 
   const editProduct = async (data, productId) => {
     try {
       const res = await editSupplierAPI(data, productId);
-      let errorMessage = res.message ||  'Cập nhật nhà cung cấp thất bại'
-      let successMessage =  res.message || 'Cập nhật nhà cung cấp thành công'
-     
+      let errorMessage = res.message || 'Cập nhật nhà cung cấp thất bại';
+      let successMessage = res.message || 'Cập nhật nhà cung cấp thành công';
+
       if (res.status === 200) {
         setContentToast(successMessage);
         setSeverity('success');
@@ -58,7 +58,7 @@ export default function SupplierEditDialog(props) {
       const data = {
         name: name,
         phoneNumber: phoneNumber,
-        address: address
+        address: address,
       };
 
       editProduct(data, product?.SupplierID);
@@ -68,7 +68,12 @@ export default function SupplierEditDialog(props) {
   return (
     <div>
       <Dialog open={openDialog} onClose={handleClose}>
-        <DialogTitle>Chỉnh sửa nhà cung cấp</DialogTitle>
+        {/* <DialogTitle>Chỉnh sửa nhà cung cấp</DialogTitle> */}
+        <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <DialogTitle>Chỉnh sửa nhà cung cấp</DialogTitle>
+
+          <Button onClick={() => setOpenDialog(false)}>X</Button>
+        </Box>
         <DialogContent sx={{ height: 300, width: 500 }}>
           <TextField
             margin="dense"
@@ -82,7 +87,7 @@ export default function SupplierEditDialog(props) {
             onChange={(e) => setName(e.target.value)}
             required
           />
-           <TextField
+          <TextField
             margin="dense"
             id="phone"
             label={Vi.phoneNumberSupplier}
@@ -116,10 +121,10 @@ export default function SupplierEditDialog(props) {
             }}
           >
             Please enter full information
-          </p> 
+          </p>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Huỷ</Button>
+          {/* <Button onClick={handleClose}>Huỷ</Button> */}
           <Button onClick={handleEditUser} type="submit">
             Sửa
           </Button>

@@ -73,7 +73,12 @@ export default function SupplierDialog(props) {
   return (
     <div>
       <Dialog open={openDialog} onClose={handleClose}>
-        <DialogTitle>{Vi.addNewSupplier}</DialogTitle>
+        {/* <DialogTitle>{Vi.addNewSupplier}</DialogTitle> */}
+        <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <DialogTitle>{Vi.addNewSupplier}</DialogTitle>
+
+          <Button onClick={() => setOpenDialog(false)}>X</Button>
+        </Box>
         <DialogContent sx={{ height: 300, width: 500 }}>
           <TextField
             margin="dense"
@@ -122,7 +127,7 @@ export default function SupplierDialog(props) {
           </p>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Huỷ</Button>
+          {/* <Button onClick={handleClose}>Huỷ</Button> */}
           <Button onClick={handleAddProduct} type="submit">
             Tạo nhà cung cấp
           </Button>

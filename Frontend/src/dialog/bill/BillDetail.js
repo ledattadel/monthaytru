@@ -732,6 +732,39 @@ export default function BillDetail(props) {
               size="small"
             />
           </Box>
+          <TextField
+            id="vehicleType"
+            label={'Tình trạng xe tiếp nhận'}
+            //   type="Number"
+            sx={{ mr: 2, mt: 2 }}
+            InputLabelProps={{
+              shrink: true,
+            }}
+            fullWidth
+            // minRows={3}
+            minRows={receiptChoose?.priceQuote?.receipt?.VehicleStatus / 100 + 1}
+            multiline={true}
+            disabled={true}
+            value={receiptChoose?.priceQuote?.receipt?.VehicleStatus}
+            // onChange={(e) => handleDataVehicle('vehicleType', e.target.value)}
+            // required
+            // size="small"
+          />
+          <TextField
+            id="vehicleType"
+            label={Vi.vehicleType}
+            //   type="Number"
+            sx={{ mr: 2, mt: 2 }}
+            InputLabelProps={{
+              shrink: true,
+            }}
+            fullWidth
+            minRows={receiptChoose?.priceQuote?.receipt?.Note / 100 + 1}
+            multiline={true}
+            disabled={true}
+            // onChange={(e) => console.log('pon console', e?.target?.value?.length)}
+            value={receiptChoose?.priceQuote?.receipt?.Note}
+          />
           {/* <Typography style={{ fontSize: 14, marginTop: 24, marginBottom: 12 }}>{Vi.addProductService}</Typography> */}
           {/* <Box style={{ display: 'flex' }}>
             <Autocomplete
