@@ -596,7 +596,7 @@ export default function QuoteDetail(props) {
 
   const renderTitleServices = () => {
     return (
-      <Box style={{ width: 950 }}>
+      <Box style={{ width: 1200 }}>
         <Box
           style={{
             display: 'flex',
@@ -626,7 +626,10 @@ export default function QuoteDetail(props) {
             <Typography style={{ width: 200, textAlign: 'center' }}>Nhân viên kỉ thuật</Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
-
+          <Box style={{ display: 'flex', padding: 4, width: 230 }}>
+            <Typography style={{ width: 220, textAlign: 'center' }}>Hạng mục sửa chửa</Typography>
+            <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+          </Box>
           <Box style={{ display: 'flex', padding: 4, width: 40 }}>
             <Typography style={{ width: 100, textAlign: 'center' }}></Typography>
             {/* <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} /> */}
@@ -639,7 +642,7 @@ export default function QuoteDetail(props) {
 
   const renderTitleProduct = () => {
     return (
-      <Box style={{ width: 950 }}>
+      <Box style={{ width: 1200 }}>
         <Box
           style={{
             display: 'flex',
@@ -676,6 +679,10 @@ export default function QuoteDetail(props) {
             <Typography style={{ width: 140, textAlign: 'center' }}>{Vi.totalPrice}</Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
+          <Box style={{ display: 'flex', padding: 4, width: 220 }}>
+            <Typography style={{ width: 190, textAlign: 'center' }}>Hạng mục sửa chửa</Typography>
+            <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+          </Box>
           <Box style={{ display: 'flex', padding: 4, width: 40 }}>
             <Typography style={{ width: 100, textAlign: 'center' }}></Typography>
             {/* <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} /> */}
@@ -695,7 +702,7 @@ export default function QuoteDetail(props) {
 
           <Button onClick={() => setOpenDialog(false)}>X</Button>
         </Box>
-        <DialogContent sx={{ height: 650, width: 1000 }}>
+        <DialogContent sx={{ height: 650, width: 1300 }}>
           <Box style={{ borderWidth: 1, borderColor: 'grey' }}>
             <Typography style={{ fontSize: 14, marginTop: 8, marginBottom: 12 }}>{Vi.inforQuote}</Typography>
             <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -823,6 +830,19 @@ export default function QuoteDetail(props) {
                 //   id="manufacturer"
                 options={ENUM_PRODUCT_TYPE}
                 getOptionLabel={(option) => option?.name}
+                sx={{ width: 300, mr: 2 }}
+                onChange={(e, newValue) => {
+                  setType(newValue?.name);
+                }}
+                size="small"
+                // defaultValue={ENUM_PRODUCT_TYPE?.[0]}
+                renderInput={(params) => <TextField {...params} label={'chọn hạng mục sửa chửa'} />}
+              />
+              <Autocomplete
+                disablePortal
+                //   id="manufacturer"
+                options={ENUM_PRODUCT_TYPE}
+                getOptionLabel={(option) => option?.name}
                 sx={{ width: 200, mr: 2 }}
                 onChange={(e, newValue) => {
                   setType(newValue?.name);
@@ -925,7 +945,7 @@ export default function QuoteDetail(props) {
           {renderTitleServices()}
           {listServiceAdd?.map((e, index) => renderItemService(e, index))}
 
-          <Box style={{ display: 'flex', justifyContent: 'space-between', width: 330, marginLeft: 620 }}>
+          <Box style={{ display: 'flex', justifyContent: 'space-between', width: 330, marginLeft: 850 }}>
             <Typography textAlign={'right'} style={{ fontSize: 18, marginTop: 12 }}>
               Tổng tiền sản phẩm :{' '}
             </Typography>
@@ -933,7 +953,7 @@ export default function QuoteDetail(props) {
               {formatMoneyWithDot(priceQuoteProduct || 0)}
             </Typography>
           </Box>
-          <Box style={{ display: 'flex', justifyContent: 'space-between', width: 330, marginLeft: 620 }}>
+          <Box style={{ display: 'flex', justifyContent: 'space-between', width: 330, marginLeft: 850 }}>
             <Typography textAlign={'right'} style={{ fontSize: 18, marginTop: 12 }}>
               Tổng tiền dịch vụ:{' '}
             </Typography>
@@ -942,7 +962,7 @@ export default function QuoteDetail(props) {
             </Typography>
           </Box>
 
-          <Box style={{ display: 'flex', justifyContent: 'space-between', width: 330, marginLeft: 620 }}>
+          <Box style={{ display: 'flex', justifyContent: 'space-between', width: 330, marginLeft: 850 }}>
             <Typography textAlign={'right'} style={{ fontSize: 18, marginTop: 12 }}>
               Tổng tiền:{' '}
             </Typography>
@@ -950,7 +970,7 @@ export default function QuoteDetail(props) {
               {formatMoneyWithDot(parseInt(priceQuoteService * 1 + priceQuoteProduct * 1) || 0)}
             </Typography>
           </Box>
-          <Box style={{ display: 'flex', justifyContent: 'space-between', width: 330, marginLeft: 620 }}>
+          <Box style={{ display: 'flex', justifyContent: 'space-between', width: 330, marginLeft: 850 }}>
             <Typography textAlign={'right'} style={{ fontSize: 18, marginTop: 12 }}>
               (VAT 8%) :{' '}
             </Typography>
@@ -958,7 +978,7 @@ export default function QuoteDetail(props) {
               {formatMoneyWithDot(parseInt((priceQuoteService * 1 + priceQuoteProduct * 1) * 0.08) || 0)}
             </Typography>
           </Box>
-          <Box style={{ display: 'flex', justifyContent: 'space-between', width: 330, marginLeft: 620 }}>
+          <Box style={{ display: 'flex', justifyContent: 'space-between', width: 330, marginLeft: 850 }}>
             <Typography textAlign={'right'} style={{ fontSize: 18, marginTop: 12 }}>
               Tổng tiền(VAT 8%) :{' '}
             </Typography>

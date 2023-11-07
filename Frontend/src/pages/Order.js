@@ -30,6 +30,7 @@ import { getAllReceiptAPI, getAllStatusAPI, getUserInfoAPI } from '../components
 import EditReceipt from 'src/dialog/Receipt/EditReceipt';
 import ReceiptDetail from 'src/dialog/Receipt/ReceiptDetail';
 import CreateQuote from 'src/dialog/Receipt/CreateQuote';
+import RepairItemDialog from 'src/dialog/RepairItem/RepairItemDialog';
 
 // ----------------------------------------------------------------------
 
@@ -90,6 +91,7 @@ export default function Receipt() {
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [openDetailDialog, setOpenDetailDialog] = useState(false);
   const [openCreateQuoteDialog, setOpenCreateQuoteDialog] = useState(false);
+  const [openCreateRepairItemDialog, setOpenRepairItemDialog] = useState(false);
   const [receiptChoose, setReceiptChoose] = useState({});
 
   const getEmployeeInfo = async () => {
@@ -232,6 +234,8 @@ export default function Receipt() {
         setOpenDialog={setOpenDialog}
         listCart={listCart}
         getAllCart={getAllCart}
+        openCreateRepairItemDialog={openCreateRepairItemDialog}
+        setOpenRepairItemDialog={setOpenRepairItemDialog}
       />
       <EditReceipt
         openDialog={openEditDialog}
@@ -253,6 +257,8 @@ export default function Receipt() {
         receiptChoose={receiptChoose}
         listCart={listCart}
       />
+      <RepairItemDialog openDialog={openCreateRepairItemDialog} setOpenDialog={setOpenRepairItemDialog} />
+
       {/* <AssignStaff openDialog={openDialog} setOpenDialog={setOpenDialog} listCart={listCart} /> */}
     </Page>
   );

@@ -38,6 +38,7 @@ import ReceiptDetail from 'src/dialog/Receipt/ReceiptDetail';
 import QuoteDetail from 'src/dialog/Quote/QuoteDetail';
 import formatMoneyWithDot from 'src/utils/formatMoney';
 import moment from 'moment';
+import AssignService from 'src/dialog/Quote/AssignService';
 
 // ----------------------------------------------------------------------
 
@@ -245,6 +246,12 @@ export default function Quote() {
         getAllCart={getAllCart}
         receiptChoose={receiptChoose}
       />
+      <AssignService
+        openDialog={openDetailDialog}
+        setOpenDialog={setOpenDetailDialog}
+        getAllCart={getAllCart}
+        receiptChoose={receiptChoose}
+      />
 
       {/* <CreateQuote openDialog={openDialog} setOpenDialog={setOpenDialog} listCart={listCart} /> */}
       {/* <AssignStaff openDialog={openDialog} setOpenDialog={setOpenDialog} listCart={listCart} /> */}
@@ -372,10 +379,10 @@ const Row = ({ row, setReceiptChoose, setOpenEditDialog, setOpenDetailDialog, In
             id={ReceiptID}
             status={Status}
             entity={row}
-            handleEditCart={() => {
-              setOpenEditDialog(true);
-              setReceiptChoose(row);
-            }}
+            // handleEditCart={() => {
+            //   setOpenEditDialog(true);
+            //   setReceiptChoose(row);
+            // }}
           />
         </TableCell>
       </TableRow>

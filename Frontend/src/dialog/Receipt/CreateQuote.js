@@ -463,7 +463,7 @@ export default function CreateQuote(props) {
 
   const renderTitleServices = () => {
     return (
-      <Box style={{ width: 950 }}>
+      <Box style={{ width: 1200 }}>
         <Box
           style={{
             display: 'flex',
@@ -498,6 +498,10 @@ export default function CreateQuote(props) {
             <Typography style={{ width: 100, textAlign: 'center' }}></Typography>
             {/* <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} /> */}
           </Box>
+          <Box style={{ display: 'flex', padding: 4, width: 190 }}>
+            <Typography style={{ width: 190, textAlign: 'center' }}>Hạng mục sửa chửa</Typography>
+            <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+          </Box>
         </Box>
         <Box style={{ height: 1, backgroundColor: 'gray' }} />
       </Box>
@@ -506,7 +510,7 @@ export default function CreateQuote(props) {
 
   const renderTitleProduct = () => {
     return (
-      <Box style={{ width: 950 }}>
+      <Box style={{ width: 1200 }}>
         <Box
           style={{
             display: 'flex',
@@ -543,6 +547,10 @@ export default function CreateQuote(props) {
             <Typography style={{ width: 140, textAlign: 'center' }}>{Vi.totalPrice}</Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
+          <Box style={{ display: 'flex', padding: 4, width: 220 }}>
+            <Typography style={{ width: 190, textAlign: 'center' }}>Hạng mục sửa chửa</Typography>
+            <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+          </Box>
           <Box style={{ display: 'flex', padding: 4, width: 40 }}>
             <Typography style={{ width: 100, textAlign: 'center' }}></Typography>
             {/* <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} /> */}
@@ -571,7 +579,7 @@ export default function CreateQuote(props) {
 
           <Button onClick={() => setOpenDialog(false)}>X</Button>
         </Box>
-        <DialogContent sx={{ height: 650, width: 1000 }}>
+        <DialogContent sx={{ height: 650, width: 1300 }}>
           <Box style={{ borderWidth: 1, borderColor: 'grey' }}>
             <Typography style={{ fontSize: 14, marginTop: 8, marginBottom: 12 }}>{Vi.inforQuote}</Typography>
             <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -686,7 +694,21 @@ export default function CreateQuote(props) {
             />
           </Box>
           <Typography style={{ fontSize: 14, marginTop: 24, marginBottom: 12 }}>{Vi.addProductService}</Typography>
-          <Box style={{ display: 'flex' }}>
+
+          <Box style={{ display: 'flex', marginTop: 12 }}>
+            <Autocomplete
+              disablePortal
+              //   id="manufacturer"
+              options={ENUM_PRODUCT_TYPE}
+              getOptionLabel={(option) => option?.name}
+              sx={{ width: 300, mr: 2 }}
+              onChange={(e, newValue) => {
+                setType(newValue?.name);
+              }}
+              size="small"
+              // defaultValue={ENUM_PRODUCT_TYPE?.[0]}
+              renderInput={(params) => <TextField {...params} label={'chọn hạng mục sửa chửa'} />}
+            />
             <Autocomplete
               disablePortal
               //   id="manufacturer"
@@ -700,6 +722,7 @@ export default function CreateQuote(props) {
               defaultValue={ENUM_PRODUCT_TYPE?.[0]}
               renderInput={(params) => <TextField {...params} />}
             />
+
             {type === ENUM_PRODUCT_TYPE?.[0]?.name ? (
               <Autocomplete
                 disablePortal
@@ -794,9 +817,12 @@ export default function CreateQuote(props) {
         </DialogContent>
 
         <DialogActions>
-          {/* <Button variant="outlined" onClick={handleClose}>
-            {Vi.Cancel}
-          </Button> */}
+          <Button variant="outlined" onClick={handleClose}>
+            {'Xem phiếu tiếp nhận'}
+          </Button>
+          <Button variant="outlined" onClick={handleClose}>
+            {'Xem lệnh sửa chửa'}
+          </Button>
           <Button variant="outlined" onClick={() => handleAddProduct(0)} type="submit">
             {Vi.save}
           </Button>

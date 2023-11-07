@@ -47,17 +47,8 @@ export default function RepairDetail(props) {
 
   /// services/product
 
-  const [listServcies, setListServices] = useState([]);
-
-  const [staffChoose, setStaffChoose] = useState({
-    staffName: '',
-  });
-  const [listStaff, setListStaff] = useState([]);
   const [type, setType] = useState(ENUM_PRODUCT_TYPE?.[0]?.name);
-  const [listProduct, setListProduct] = useState([]);
 
-  const [isClear, setIsClear] = useState(true);
-  const [isClearService, setIsClearService] = useState(true);
   ///
   const [createAt, setCreateAt] = useState();
 
@@ -87,25 +78,8 @@ export default function RepairDetail(props) {
   const [listProductAdd, setListProductAdd] = useState([]);
   const [isDoneAll, setIsDoneAll] = useState(false);
 
-  const [productChoose, setProductChoose] = useState({
-    quantity: 0,
-  });
-  const [serviceChoose, setServiceChoose] = useState({
-    staff: {},
-  });
-
-  const InfoAdmin = JSON.parse(localStorage.getItem('profileAdmin'));
-
   //// useEffect
 
-  useEffect(() => {
-    getAllProduct();
-    getAllService();
-  }, []);
-  React.useEffect(() => {
-    // setCreateAt(moment().format('DD-MM-yyyy hh:mm'));
-    getAllStaff();
-  }, []);
   React.useEffect(() => {
     // getAllUser();
     getVehicleByNumber(inforVehicle?.vehicleNumber);
@@ -168,33 +142,33 @@ export default function RepairDetail(props) {
 
   /// function
 
-  const getAllService = async () => {
-    try {
-      const res = await getAllServiceAPI();
-      const temp = res?.data;
-      setListServices(temp);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  // const getAllService = async () => {
+  //   try {
+  //     const res = await getAllServiceAPI();
+  //     const temp = res?.data;
+  //     setListServices(temp);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
-  const getAllStaff = async () => {
-    try {
-      const res = await getAllStaffAPI();
-      setListStaff(res?.data);
-    } catch (error) {}
-  };
+  // const getAllStaff = async () => {
+  //   try {
+  //     const res = await getAllStaffAPI();
+  //     setListStaff(res?.data);
+  //   } catch (error) {}
+  // };
 
-  const getAllProduct = async () => {
-    try {
-      const res = await getAllProductDetailAPI();
-      if (res?.data) {
-        setListProduct(res?.data);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  // const getAllProduct = async () => {
+  //   try {
+  //     const res = await getAllProductDetailAPI();
+  //     if (res?.data) {
+  //       setListProduct(res?.data);
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
   const handleClose = () => {
     setCartId(null);
@@ -428,15 +402,14 @@ export default function RepairDetail(props) {
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
 
-          <Box style={{ display: 'flex', padding: 4, width: 240, justifyContent: 'space-between' }}>
-            <Typography style={{ width: 240, textAlign: 'center' }}>{Vi.price}</Typography>
-            <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
-          </Box>
           <Box style={{ display: 'flex', padding: 4, width: 200 }}>
             <Typography style={{ width: 200, textAlign: 'center' }}>Nhân viên kỉ thuật</Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
-
+          <Box style={{ display: 'flex', padding: 4, width: 240, justifyContent: 'space-between' }}>
+            <Typography style={{ width: 240, textAlign: 'center' }}>Hạng mục sửa chửa</Typography>
+            <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+          </Box>
           <Box
             onClick={isDoneAll ? handleAllNotDone : handleAllDone}
             style={{ display: 'flex', padding: 4, width: 40 }}
@@ -479,18 +452,66 @@ export default function RepairDetail(props) {
             <Typography style={{ width: 100, textAlign: 'center' }}>{Vi.brand}</Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
-          <Box style={{ display: 'flex', padding: 4, width: 140, justifyContent: 'space-between' }}>
+          {/* <Box style={{ display: 'flex', padding: 4, width: 140, justifyContent: 'space-between' }}>
             <Typography style={{ width: 100, textAlign: 'center' }}>{Vi.price}</Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
-          </Box>
+          </Box> */}
           <Box style={{ display: 'flex', padding: 4, width: 100 }}>
             <Typography style={{ width: 100, textAlign: 'center' }}>{Vi.quantity}</Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
-          <Box style={{ display: 'flex', padding: 4, width: 180 }}>
-            <Typography style={{ width: 140, textAlign: 'center' }}>{Vi.totalPrice}</Typography>
+          <Box style={{ display: 'flex', padding: 4, width: 320 }}>
+            <Typography style={{ width: 280, textAlign: 'center' }}>Hạng mục sửa chửa</Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
+          <Box style={{ display: 'flex', padding: 4, width: 40 }}>
+            <Typography style={{ width: 100, textAlign: 'center' }}></Typography>
+            {/* <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} /> */}
+          </Box>
+        </Box>
+        <Box style={{ height: 1, backgroundColor: 'gray' }} />
+      </Box>
+    );
+  };
+  const renderTitleProduct1 = () => {
+    return (
+      <Box style={{ width: 950 }}>
+        <Box
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            //   justifyContent: 'space-between',
+            backgroundColor: 'cyan',
+          }}
+        >
+          <Box style={{ display: 'flex', padding: 4, width: 60 }}>
+            <Typography style={{ width: 50 }}>STT</Typography>
+            <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+          </Box>
+          <Box style={{ display: 'flex', width: 300 }}>
+            <Typography style={{ width: 260, textAlign: 'center' }}>Danh mục sửa chửa</Typography>
+            <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+          </Box>
+          <Box style={{ display: 'flex', padding: 4, width: 260 }}>
+            <Typography style={{ width: 220, textAlign: 'start' }}>{Vi.nameProduct}/ tên dịch vụ</Typography>
+            <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+          </Box>
+          <Box style={{ display: 'flex', padding: 4, width: 240, justifyContent: 'space-between' }}>
+            <Typography style={{ width: 220, textAlign: 'center' }}>{Vi.brand} / người sửa</Typography>
+            <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+          </Box>
+          {/* <Box style={{ display: 'flex', padding: 4, width: 140, justifyContent: 'space-between' }}>
+            <Typography style={{ width: 100, textAlign: 'center' }}>{Vi.price}</Typography>
+            <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+          </Box> */}
+          <Box style={{ display: 'flex', padding: 4, width: 100 }}>
+            <Typography style={{ width: 100, textAlign: 'center' }}>{Vi.quantity}</Typography>
+            <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+          </Box>
+          {/* <Box style={{ display: 'flex', padding: 4, width: 320 }}>
+            <Typography style={{ width: 280, textAlign: 'center' }}>Hạng mục sửa chửa</Typography>
+            <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+          </Box> */}
           <Box style={{ display: 'flex', padding: 4, width: 40 }}>
             <Typography style={{ width: 100, textAlign: 'center' }}></Typography>
             {/* <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} /> */}
@@ -733,16 +754,16 @@ export default function RepairDetail(props) {
             </Button>
           </Box>
          */}
-          <Box mt={2}>
+          {/* <Box mt={2}>
             <Typography style={{ fontSize: 18, marginBottom: 12, fontWeight: 600 }}> {Vi.product}:</Typography>
-          </Box>
-          {renderTitleProduct()}
+          </Box> */}
+          {renderTitleProduct1()}
           {listProductAdd?.map((e, index) => renderItemProduct(e, index))}
-          <Box mt={2}>
+          {/* <Box mt={2}>
             <Typography style={{ fontSize: 18, marginBottom: 12, fontWeight: 600 }}> {Vi.service}:</Typography>
           </Box>
           {renderTitleServices()}
-          {listServiceAdd?.map((e, index) => renderItemService(e, index))}
+          {listServiceAdd?.map((e, index) => renderItemService(e, index))} */}
         </DialogContent>
 
         <DialogActions>
