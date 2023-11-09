@@ -1,14 +1,20 @@
-import { Button } from '@mui/material';
+import * as React from 'react';
+import { Button, Box } from '@mui/material';
+import TextField from '@mui/material/TextField';
+import Autocomplete from '@mui/material/Autocomplete';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import TextField from '@mui/material/TextField';
-import * as React from 'react';
 
-import { addNewBrandAPI, addNewVehicleStatusAPI } from 'src/components/services';
+import {
+  getAllAccessoryTypeAPI,
+  addNewProductAPI,
+  getAllManufacturerAPI,
+  addNewBrandAPI,
+} from 'src/components/services';
 
-export default function RepairItemDialog(props) {
+export default function BrandDialog(props) {
   const { openDialog, setOpenDialog, getAllProduct, setContentToast, setSeverity, setOpenToast } = props;
   const [name, setName] = React.useState();
 
@@ -16,9 +22,9 @@ export default function RepairItemDialog(props) {
 
   const addNewProduct = async (data) => {
     try {
-      const res = await addNewVehicleStatusAPI(data);
-      let errorMessage = res.message || 'Thêm danh mục sửa chửa thất bại';
-      let successMessage = res.message || 'Thêm danh mục sửa chửa thành công';
+      const res = await addNewBrandAPI(data);
+      let errorMessage = res.message || 'Thêm Hãng thất bại';
+      let successMessage = res.message || 'Thêm Hãng thành công';
 
       if (res.status === 201) {
         setName(null);
@@ -34,7 +40,7 @@ export default function RepairItemDialog(props) {
       }
     } catch (error) {
       console.log(error);
-      setContentToast('Thêm danh mục sửa chửa thất bại');
+      setContentToast('Thêm product thất bại');
       setOpenToast(true);
       setSeverity('error');
     }
@@ -51,7 +57,7 @@ export default function RepairItemDialog(props) {
     } else {
       setIsError(false);
       const data = {
-        name: name,
+        BrandName: name,
       };
       addNewProduct(data);
     }
@@ -60,12 +66,12 @@ export default function RepairItemDialog(props) {
   return (
     <div>
       <Dialog open={openDialog} onClose={handleClose}>
-        <DialogTitle>Tạo Hạng mục sửa chửa mới</DialogTitle>
+        <DialogTitle>Tạo hãng mới</DialogTitle>
         <DialogContent sx={{ height: 150, width: 500 }}>
           <TextField
             margin="dense"
             id="name"
-            label="Tên hạng mục sửa chửa"
+            label="Tên hãng"
             type="text"
             fullWidth
             variant="outlined"
@@ -75,9 +81,9 @@ export default function RepairItemDialog(props) {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>huỷ</Button>
+          <Button onClick={handleClose}>Cancel</Button>
           <Button onClick={handleAddProduct} type="submit">
-            Tạo Hạng mục sửa chửa
+            Tạo hãng
           </Button>
         </DialogActions>
       </Dialog>

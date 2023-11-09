@@ -53,6 +53,7 @@ export default function ReceiptDetail(props) {
   const [vehicleCondition, setVehicleCondition] = useState('');
   const [noteVehicle, setNoteVehicle] = useState('');
 
+  const [repairItem, setRepairItem] = useState([]);
   //
   const InfoAdmin = JSON.parse(localStorage.getItem('profileAdmin'));
   ///
@@ -109,6 +110,17 @@ export default function ReceiptDetail(props) {
       handleDataVehicle('vehicleNumber', receiptChoose?.vehicle?.NumberPlate);
       setVehicleCondition(receiptChoose?.VehicleStatus);
       setNoteVehicle(receiptChoose?.Note);
+      const tempVehicleStatusReceipts = [];
+
+      receiptChoose?.vehicleStatusReceipts.forEach((e) => {
+        const temp = {
+          ID: e?.vehicleStatus?.ID,
+          Name: e?.vehicleStatus?.Name,
+          condition: e?.Condition,
+        };
+        tempVehicleStatusReceipts?.push(temp);
+      });
+      setRepairItem(tempVehicleStatusReceipts);
     }
   }, [receiptChoose, openDialog]);
 
@@ -179,6 +191,11 @@ export default function ReceiptDetail(props) {
     setErrorMsg('');
     // addProduct();
     // }
+  };
+
+  const removeRepairItem = (ID) => {
+    const flat = repairItem?.filter((e) => e?.ID !== ID);
+    setRepairItem(flat);
   };
 
   const handleDataVehicle = (field, value) => {
@@ -402,7 +419,7 @@ export default function ReceiptDetail(props) {
               size="small"
             />
           </Box>
-          <TextField
+          {/* <TextField
             id="vehicleCondition"
             label={Vi.vehicleCondition}
             //   type="Number"
@@ -419,7 +436,63 @@ export default function ReceiptDetail(props) {
             minRows={3}
             size="small"
             disabled={true}
-          />
+          /> */}
+          <Box style={{ width: 740, marginTop: 24 }}>
+            <Box
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                //   justifyContent: 'space-between',
+                backgroundColor: 'cyan',
+              }}
+            >
+              <Box style={{ display: 'flex', padding: 4, width: 60 }}>
+                <Typography style={{ width: 30 }}>STT</Typography>
+                <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+              </Box>
+              <Box style={{ display: 'flex', padding: 4, width: 300 }}>
+                <Typography style={{ width: 200 }}>Hạng mục sửa chửa</Typography>
+                <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+              </Box>
+              <Box style={{ display: 'flex', width: 500 }}>
+                <Typography style={{ width: 400, textAlign: 'center' }}>Tình trạng xe</Typography>
+              </Box>
+              <Box style={{ display: 'flex', width: 40 }}>
+                <Typography style={{ width: 40, textAlign: 'center' }}></Typography>
+              </Box>
+            </Box>
+          </Box>
+          {repairItem?.map((e, index) => {
+            return (
+              <Box style={{ width: 740 }}>
+                <Box
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    //   justifyContent: 'space-between',
+                    // backgroundColor: 'cyan',
+                  }}
+                >
+                  <Box style={{ display: 'flex', padding: 4, width: 60 }}>
+                    <Typography style={{ width: 30 }}>{index + 1}</Typography>
+                    <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+                  </Box>
+                  <Box style={{ display: 'flex', padding: 4, width: 300 }}>
+                    <Typography style={{ width: 200 }}>{e?.Name}</Typography>
+                    <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+                  </Box>
+                  <Box style={{ display: 'flex', width: 500 }}>
+                    <Typography style={{ width: 400, textAlign: 'center' }}>{e?.condition}</Typography>
+                    <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+                  </Box>
+                  <Box style={{ display: 'flex', width: 40 }}>
+                    <Typography style={{ width: 40, textAlign: 'center' }}>X</Typography>
+                  </Box>
+                </Box>
+                <Box style={{ height: 1, backgroundColor: 'gray' }} />
+              </Box>
+            );
+          })}
           <TextField
             id="noteVehicle"
             label={Vi.noteVehicle}

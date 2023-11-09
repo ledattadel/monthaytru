@@ -87,6 +87,11 @@ export default function CreateQuote(props) {
     staff: {},
   });
 
+  ///
+  const [repairItem, setRepairItem] = useState([]);
+
+  const [repairItemChoose, setRepairItemChoose] = useState({});
+
   const InfoAdmin = JSON.parse(localStorage.getItem('profileAdmin'));
 
   //// useEffect
@@ -109,6 +114,18 @@ export default function CreateQuote(props) {
       handleDataCustomer('phoneNumber', receiptChoose?.customer?.phoneNumber);
       handleDataCustomer('name', receiptChoose?.customer?.name);
       handleDataVehicle('vehicleNumber', receiptChoose?.vehicle?.NumberPlate);
+
+      const tempVehicleStatusReceipts = [];
+
+      receiptChoose?.vehicleStatusReceipts.forEach((e) => {
+        const temp = {
+          ID: e?.vehicleStatus?.ID,
+          Name: e?.vehicleStatus?.Name,
+          condition: e?.Condition,
+        };
+        tempVehicleStatusReceipts?.push(temp);
+      });
+      setRepairItem(tempVehicleStatusReceipts);
     }
   }, [receiptChoose, openDialog]);
 
@@ -206,7 +223,8 @@ export default function CreateQuote(props) {
       const temp = {
         ServiceID: e?.ServiceID,
         Price: e?.Price,
-        Technician: e?.staff?.id,
+        // Technician: e?.staff?.id,
+        repairItem: e?.repairItemChoose,
       };
       dataService?.push(temp);
     });
@@ -219,23 +237,36 @@ export default function CreateQuote(props) {
         PurchasePrice: e?.PurchasePrice,
         Quantity: e?.quantity,
         productDetailID: e?.ProductDetailID,
+        repairItem: e?.repairItemChoose,
       };
       dataProduct?.push(temp);
     });
+
+    const listVehicleStatus = [];
+    repairItem?.forEach((item) => {
+      const dataServiceTemp = dataService?.filter((e) => e?.repairItem?.ID === item?.ID);
+      const dataProductTemp = dataProduct?.filter((e) => e?.repairItem?.ID === item?.ID);
+      const temp = { ...item, pqProduct: [...dataProductTemp], prService: [...dataServiceTemp] };
+      listVehicleStatus?.push(temp);
+    });
+
+    // const supperData
     const data = {
       Status: status,
       Time: moment().format('DD-MM-yyyy hh:mm'),
       StaffID: InfoAdmin?.userId,
       ReceiptID: receiptChoose?.ReceiptID,
-      priceQuoteServiceDetails: dataService,
-      priceQuoteProductDetails: dataProduct,
+      // priceQuoteServiceDetails: dataService,
+      // priceQuoteProd ataProduct,
+      vehicleStatus: listVehicleStatus,
       TimeCreateRepair: status === 1 ? moment().format('DD-MM-yyyy hh:mm') : undefined,
     };
-    // console.log('pon console ne ', data);
-    addNewQuote(data);
+    console.log('pon console ne ', data);
+    // addNewQuote(data);
   };
   const handleAddProductToList = () => {
-    const flat = listProductAdd?.filter((e) => e?.ProductDetailID === productChoose?.ProductDetailID);
+    const listChoose = listServiceAdd?.filter((e) => e?.repairItemChoose?.ID === repairItemChoose?.ID);
+    const flat = listChoose?.filter((e) => e?.ProductDetailID === productChoose?.ProductDetailID);
     if (!productChoose?.quantity) {
       setContentToastHere('số luợng phải lớn hơn 0');
       setOpenToastHere(true);
@@ -247,9 +278,7 @@ export default function CreateQuote(props) {
     } else if (flat?.length > 0) {
       const tempData = listProductAdd?.filter((e) => e?.ProductDetailID !== productChoose?.ProductDetailID);
       const data = { ...flat?.[0], quantity: flat?.[0]?.quantity * 1 + productChoose?.quantity * 1 };
-
       const product = [...tempData, data]?.sort((a, b) => a.index - b.index);
-
       setListProductAdd(product);
       setIsClear(true);
       setProductChoose({
@@ -260,6 +289,7 @@ export default function CreateQuote(props) {
       product.push({
         ...productChoose,
         index: listProductAdd?.length > 0 ? listProductAdd?.[listProductAdd?.length - 1]?.index + 1 : 1,
+        repairItemChoose: repairItemChoose,
       });
       setListProductAdd(product);
       setIsClear(true);
@@ -277,12 +307,9 @@ export default function CreateQuote(props) {
   };
 
   const handleAddServiceToList = () => {
-    const flat = listServiceAdd?.filter((e) => e?.ServiceID === serviceChoose?.ServiceID);
-    if (!serviceChoose?.staff?.id) {
-      setContentToastHere('Vui lòng chọn nhân viên sửa chửa');
-      setOpenToastHere(true);
-      setSeverityHere('error');
-    } else if (!serviceChoose?.ServiceID) {
+    const listChoose = listServiceAdd?.filter((e) => e?.repairItemChoose?.ID === repairItemChoose?.ID);
+    const flat = listChoose?.filter((e) => e?.ServiceID === serviceChoose?.ServiceID);
+    if (!serviceChoose?.ServiceID) {
       setContentToastHere('Vui lòng chọn dịch vụ sửa chửa');
       setOpenToastHere(true);
       setSeverityHere('error');
@@ -295,6 +322,7 @@ export default function CreateQuote(props) {
       service.push({
         ...serviceChoose,
         index: listServiceAdd?.length > 0 ? listServiceAdd?.[listServiceAdd?.length - 1]?.index + 1 : 1,
+        repairItemChoose: repairItemChoose,
       });
       setListServiceAdd(service);
       setIsClearService(true);
@@ -366,7 +394,7 @@ export default function CreateQuote(props) {
             alignItems: 'center',
             //   justifyContent: 'space-between',
             // backgroundColor: 'cyan',
-            width: 950,
+            width: 1200,
           }}
         >
           <Box style={{ display: 'flex', padding: 4, width: 60, justifyContent: 'space-between' }}>
@@ -401,6 +429,10 @@ export default function CreateQuote(props) {
             </Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
+          <Box style={{ display: 'flex', padding: 4, width: 240 }}>
+            <Typography style={{ width: 215, textAlign: 'center' }}>{item?.repairItemChoose?.Name}</Typography>
+            <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+          </Box>
           <Button
             onClick={() => removeProductAdd(item?.ProductDetailID)}
             style={{ display: 'flex', padding: 4, width: 40, justifyContent: 'space-between' }}
@@ -409,11 +441,12 @@ export default function CreateQuote(props) {
             {/* <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} /> */}
           </Button>
         </Box>
-        <Box style={{ height: 1, backgroundColor: 'gray', width: 950 }} />
+        <Box style={{ height: 1, backgroundColor: 'gray', width: 1200 }} />
       </Box>
     );
   };
   const renderItemService = (item, index) => {
+    console.log('pon console', item);
     return (
       <Box>
         <Box
@@ -422,7 +455,7 @@ export default function CreateQuote(props) {
             alignItems: 'center',
             //   justifyContent: 'space-between',
             // backgroundColor: 'cyan',
-            width: 950,
+            width: 1000,
           }}
         >
           <Box style={{ display: 'flex', padding: 4, width: 60, justifyContent: 'space-between' }}>
@@ -434,18 +467,22 @@ export default function CreateQuote(props) {
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
           <Box style={{ display: 'flex', padding: 4, width: 268, justifyContent: 'space-between' }}>
-            <Typography style={{ width: 230, textAlign: 'center' }}>{item?.ServiceName}</Typography>
+            <Typography style={{ width: 250, textAlign: 'center' }}>{item?.ServiceName}</Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
 
-          <Box style={{ display: 'flex', padding: 4, width: 248, justifyContent: 'space-between' }}>
-            <Typography style={{ width: 210, textAlign: 'center' }}>
+          <Box style={{ display: 'flex', padding: 4, width: 250, justifyContent: 'space-between' }}>
+            <Typography style={{ width: 300, textAlign: 'center' }}>
               {formatMoneyWithDot(parseInt(item?.Price || '0.00'))}
             </Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
           <Box style={{ display: 'flex', padding: 4, width: 200, justifyContent: 'space-between' }}>
-            <Typography style={{ width: 100, textAlign: 'center' }}>{item?.staff?.name}</Typography>
+            <Typography style={{ width: 190, textAlign: 'center' }}>{item?.staff?.name || ''}</Typography>
+            <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+          </Box>
+          <Box style={{ display: 'flex', padding: 4, width: 220, justifyContent: 'space-between' }}>
+            <Typography style={{ width: 220, textAlign: 'center' }}>{item?.repairItemChoose?.Name}</Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
 
@@ -456,7 +493,7 @@ export default function CreateQuote(props) {
             <Typography style={{ width: 100, textAlign: 'center' }}>X</Typography>
           </Button>
         </Box>
-        <Box style={{ height: 1, backgroundColor: 'gray', width: 950 }} />
+        <Box style={{ height: 1, backgroundColor: 'gray', width: 1200 }} />
       </Box>
     );
   };
@@ -699,11 +736,11 @@ export default function CreateQuote(props) {
             <Autocomplete
               disablePortal
               //   id="manufacturer"
-              options={ENUM_PRODUCT_TYPE}
-              getOptionLabel={(option) => option?.name}
+              options={repairItem}
+              getOptionLabel={(option) => option?.Name}
               sx={{ width: 300, mr: 2 }}
               onChange={(e, newValue) => {
-                setType(newValue?.name);
+                setRepairItemChoose(newValue);
               }}
               size="small"
               // defaultValue={ENUM_PRODUCT_TYPE?.[0]}
@@ -759,7 +796,7 @@ export default function CreateQuote(props) {
               />
             )}
 
-            {type === ENUM_PRODUCT_TYPE?.[0]?.name ? (
+            {/* {type === ENUM_PRODUCT_TYPE?.[0]?.name ? (
               <Autocomplete
                 disablePortal
                 id="staff"
@@ -776,7 +813,7 @@ export default function CreateQuote(props) {
                 value={isClear ? null : serviceChoose?.staff}
                 renderInput={(params) => <TextField {...params} label={Vi.staffWork} />}
               />
-            ) : null}
+            ) : null} */}
 
             {type === ENUM_PRODUCT_TYPE?.[1]?.name ? (
               <TextField

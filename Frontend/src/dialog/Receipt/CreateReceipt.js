@@ -4,10 +4,16 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import TextField from '@mui/material/TextField';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import moment from 'moment';
-import { addCarDesAPI, addNewReceiptAPI, getUserByPhoneAPI, getVehicleByNumberAPI } from 'src/components/services';
+import {
+  addCarDesAPI,
+  addNewReceiptAPI,
+  getAllVehicleStatusAPI,
+  getUserByPhoneAPI,
+  getVehicleByNumberAPI,
+} from 'src/components/services';
 import AppToast from 'src/myTool/AppToast';
 import { Vi } from 'src/_mock/Vi';
 
@@ -29,7 +35,7 @@ function formatDate(str) {
 }
 
 export default function CreateReceipt(props) {
-  const { openDialog, setOpenDialog, openCreateRepairItemDialog, getAllCart, setOpenRepairItemDialog } = props;
+  const { openDialog, setOpenDialog, listVehicleStatus, getAllCart, setOpenRepairItemDialog } = props;
 
   const [additionPrice, setAdditionPrice] = useState(0);
   const [productAdd, setProductAdd] = useState([]);
@@ -40,6 +46,7 @@ export default function CreateReceipt(props) {
   const [errorMsg, setErrorMsg] = useState('');
   const [cartId, setCartId] = useState(0);
   const [errors, setErrors] = useState('');
+
   ///
   const [createAt, setCreateAt] = useState();
   const [inforCustomerApi, setInforCustomerApi] = useState({});
@@ -73,6 +80,15 @@ export default function CreateReceipt(props) {
     //   productAdd,
     //   ...(additionPrice ? { additionPrice } : null),
     // };
+    const vehicleStatusList = [];
+
+    repairItem?.forEach((e) => {
+      const temp = {
+        id: e?.ID,
+        condition: e?.condition,
+      };
+      vehicleStatusList?.push(temp);
+    });
 
     const data = {
       timeCreate: moment().format('DD-MM-yyyy hh:mm'),
@@ -86,34 +102,32 @@ export default function CreateReceipt(props) {
       EngineNumberVehicle: inforVehicleApi?.EngineNumber ?? inforVehicle?.engineNumber,
       ChassisNumberVehicle: inforVehicleApi?.ChassisNumber ?? inforVehicle?.chassisNumber,
       BrandNameVehicle: inforVehicleApi?.brand?.BrandID ?? inforVehicle?.brand,
-      VehicleStatus: repairItem,
+      vehicleStatus: vehicleStatusList,
       Note: noteVehicle,
     };
 
-    console.log('pon console', data);
-
-    // try {
-    //   const res = await addNewReceiptAPI(data);
-    //   let errorMessage = res.message || 'Tạo phiếu tiếp nhận thất bại';
-    //   let successMessage = res.message || 'Tạo phiếu tiếp nhận thành công';
-    //   if (res.status === 201) {
-    //     setContentToastHere(successMessage);
-    //     setSeverityHere('success');
-    //     setProductAdd([]);
-    //     setAdditionPrice(0);
-    //     setOpenToastHere(true);
-    //     setOpenDialog(false);
-    //     getAllCart();
-    //   } else {
-    //     setContentToastHere(errorMessage);
-    //     setOpenToastHere(true);
-    //     setSeverityHere('error');
-    //   }
-    // } catch (error) {
-    //   setContentToastHere('Tạo phiếu tiếp nhận thất bại');
-    //   setOpenToastHere(true);
-    //   setSeverityHere('error');
-    // }
+    try {
+      const res = await addNewReceiptAPI(data);
+      let errorMessage = res.message || 'Tạo phiếu tiếp nhận thất bại';
+      let successMessage = res.message || 'Tạo phiếu tiếp nhận thành công';
+      if (res.status === 201) {
+        setContentToastHere(successMessage);
+        setSeverityHere('success');
+        setProductAdd([]);
+        setAdditionPrice(0);
+        setOpenToastHere(true);
+        setOpenDialog(false);
+        getAllCart();
+      } else {
+        setContentToastHere(errorMessage);
+        setOpenToastHere(true);
+        setSeverityHere('error');
+      }
+    } catch (error) {
+      setContentToastHere('Tạo phiếu tiếp nhận thất bại');
+      setOpenToastHere(true);
+      setSeverityHere('error');
+    }
   };
 
   const getVehicleByNumber = async (number) => {
@@ -176,12 +190,12 @@ export default function CreateReceipt(props) {
   };
 
   const handleAddRepairtItem = () => {
-    const flat = repairItem?.filter((e) => e?.id === repairItemChoose?.id);
-    if (!repairItemChoose?.name || vehicleCondition === '') {
+    const flat = repairItem?.filter((e) => e?.ID === repairItemChoose?.ID);
+    if (!repairItemChoose?.Name || vehicleCondition === '') {
       setContentToastHere('Vui lòng nhập đủ thông tin danh mục sửa chửa và tình trạng xe');
       setOpenToastHere(true);
       setSeverityHere('error');
-    } else if (flat?.length > 1) {
+    } else if (flat?.length > 0) {
       setContentToastHere('Danh mục sửa chửa này đã tồn tại');
       setOpenToastHere(true);
       setSeverityHere('error');
@@ -191,6 +205,11 @@ export default function CreateReceipt(props) {
       setRepairItem(temp);
       setVehicleCondition('');
     }
+  };
+
+  const removeRepairItem = (ID) => {
+    const flat = repairItem?.filter((e) => e?.ID !== ID);
+    setRepairItem(flat);
   };
 
   const handleAddProduct = () => {
@@ -495,8 +514,8 @@ export default function CreateReceipt(props) {
             <Autocomplete
               disablePortal
               //   id="manufacturer"
-              options={ENUM_PRODUCT_TYPE}
-              getOptionLabel={(option) => option?.name}
+              options={listVehicleStatus}
+              getOptionLabel={(option) => option?.Name}
               sx={{ width: 300, mr: 2 }}
               onChange={(e, newValue) => {
                 // setType(newValue?.name);
@@ -542,8 +561,11 @@ export default function CreateReceipt(props) {
                 <Typography style={{ width: 200 }}>Hạng mục sửa chửa</Typography>
                 <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
               </Box>
-              <Box style={{ display: 'flex', width: 540 }}>
+              <Box style={{ display: 'flex', width: 500 }}>
                 <Typography style={{ width: 400, textAlign: 'center' }}>Tình trạng xe</Typography>
+              </Box>
+              <Box style={{ display: 'flex', width: 40 }}>
+                <Typography style={{ width: 40, textAlign: 'center' }}></Typography>
               </Box>
             </Box>
           </Box>
@@ -563,12 +585,15 @@ export default function CreateReceipt(props) {
                     <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
                   </Box>
                   <Box style={{ display: 'flex', padding: 4, width: 300 }}>
-                    <Typography style={{ width: 200 }}>{e?.name}</Typography>
+                    <Typography style={{ width: 200 }}>{e?.Name}</Typography>
                     <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
                   </Box>
-                  <Box style={{ display: 'flex', width: 540 }}>
-                    <Typography style={{ width: 450, textAlign: 'center' }}>{e?.condition}</Typography>
+                  <Box style={{ display: 'flex', width: 500 }}>
+                    <Typography style={{ width: 400, textAlign: 'center' }}>{e?.condition}</Typography>
                     <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+                  </Box>
+                  <Box onClick={() => removeRepairItem(e?.ID)} style={{ display: 'flex', width: 40 }}>
+                    <Typography style={{ width: 40, textAlign: 'center' }}>X</Typography>
                   </Box>
                 </Box>
                 <Box style={{ height: 1, backgroundColor: 'gray' }} />

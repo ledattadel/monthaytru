@@ -26,7 +26,12 @@ import { UserBillMoreMenu, UserListHead, UserListToolbar } from '../sections/@da
 
 import CreateReceipt from 'src/dialog/Receipt/CreateReceipt';
 import { Vi } from 'src/_mock/Vi';
-import { getAllReceiptAPI, getAllStatusAPI, getUserInfoAPI } from '../components/services/index';
+import {
+  getAllReceiptAPI,
+  getAllStatusAPI,
+  getAllVehicleStatusAPI,
+  getUserInfoAPI,
+} from '../components/services/index';
 import EditReceipt from 'src/dialog/Receipt/EditReceipt';
 import ReceiptDetail from 'src/dialog/Receipt/ReceiptDetail';
 import CreateQuote from 'src/dialog/Receipt/CreateQuote';
@@ -93,6 +98,27 @@ export default function Receipt() {
   const [openCreateQuoteDialog, setOpenCreateQuoteDialog] = useState(false);
   const [openCreateRepairItemDialog, setOpenRepairItemDialog] = useState(false);
   const [receiptChoose, setReceiptChoose] = useState({});
+
+  ///
+  const [openToast, setOpenToast] = useState(false);
+  const [contentToast, setContentToast] = useState('');
+  const [severity, setSeverity] = useState('');
+
+  ///
+  const [listVehicleStatus, setListVehicleStatus] = useState([]);
+
+  const getAllVehicleStatus = async () => {
+    try {
+      const res = await getAllVehicleStatusAPI();
+      setListVehicleStatus(res?.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    getAllVehicleStatus();
+  }, []);
 
   const getEmployeeInfo = async () => {
     try {
@@ -236,6 +262,7 @@ export default function Receipt() {
         getAllCart={getAllCart}
         openCreateRepairItemDialog={openCreateRepairItemDialog}
         setOpenRepairItemDialog={setOpenRepairItemDialog}
+        listVehicleStatus={listVehicleStatus}
       />
       <EditReceipt
         openDialog={openEditDialog}
@@ -249,6 +276,7 @@ export default function Receipt() {
         getAllCart={getAllCart}
         receiptChoose={receiptChoose}
         setOpenCreateQuoteDialog={setOpenCreateQuoteDialog}
+        listVehicleStatus={listVehicleStatus}
       />
 
       <CreateQuote
@@ -257,8 +285,24 @@ export default function Receipt() {
         receiptChoose={receiptChoose}
         listCart={listCart}
       />
-      <RepairItemDialog openDialog={openCreateRepairItemDialog} setOpenDialog={setOpenRepairItemDialog} />
+      <RepairItemDialog
+        getAllProduct={getAllVehicleStatus}
+        openDialog={openCreateRepairItemDialog}
+        setOpenDialog={setOpenRepairItemDialog}
+        setContentToast={setContentToast}
+        setSeverity={setSeverity}
+        setOpenToast={setOpenToast}
+      />
 
+      <AppToast
+        content={contentToast}
+        type={0}
+        isOpen={openToast}
+        severity={severity}
+        callback={() => {
+          setOpenToast(false);
+        }}
+      />
       {/* <AssignStaff openDialog={openDialog} setOpenDialog={setOpenDialog} listCart={listCart} /> */}
     </Page>
   );

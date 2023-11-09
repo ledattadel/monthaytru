@@ -55,6 +55,7 @@ import {
   API_GET_ALL_QUOTE,
   API_GET_ALL_REPAIR,
   API_GET_ALL_INVOICE,
+  API_GET_ALL_VEHICLE_STATUS,
 } from './configs';
 const token = JSON.parse(localStorage.getItem('adminInfo'));
 
@@ -249,6 +250,52 @@ export const deleteStaffAPI = async (id) => {
     return error?.response?.data || error;
   }
 };
+//// vehicleStatus API_GET_ALL_VEHICLE_STATUS
+
+export const getAllVehicleStatusAPI = async () => {
+  try {
+    const response = await axios.get(API_GET_ALL_VEHICLE_STATUS, {
+      headers: { authorization: `Bearer ${token}` },
+    });
+    return response;
+  } catch (error) {
+    return error?.response?.data || error;
+  }
+};
+
+export const addNewVehicleStatusAPI = async (body) => {
+  try {
+    const response = await axios.post(API_GET_ALL_VEHICLE_STATUS, body, {
+      headers: { authorization: `Bearer ${token}` },
+    });
+    return response;
+  } catch (error) {
+    return error?.response?.data || error;
+  }
+};
+
+export const editVehicleStatusAPI = async (body, id) => {
+  try {
+    const response = await axios.patch(`${API_GET_ALL_VEHICLE_STATUS}/${id}`, body, {
+      headers: { authorization: `Bearer ${token}` },
+    });
+    return response;
+  } catch (error) {
+    return error?.response?.data || error;
+  }
+};
+
+export const deleteVehicleStatusAPI = async (id) => {
+  try {
+    const response = await axios.delete(`${API_GET_ALL_VEHICLE_STATUS}/${id}`, {
+      headers: { authorization: `Bearer ${token}` },
+    });
+    return response;
+  } catch (error) {
+    return error?.response?.data || error;
+  }
+};
+
 /// BRAND
 export const getAllBrandAPI = async () => {
   try {

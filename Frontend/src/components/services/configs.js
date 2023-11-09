@@ -116,6 +116,8 @@ export const API_GET_ALL_INVOICE = `${BASE_URL}/invoice`;
 export const API_GET_ALL_REPAIR = `${BASE_URL}/repair`;
 //vehicle
 export const API_GET_ALL_VEHICLE = `${BASE_URL}/vehicle`;
+//vehiclestatus' \
+export const API_GET_ALL_VEHICLE_STATUS = `${BASE_URL}/vehiclestatus`;
 //productdetail
 export const API_GET_ALL_PRODUCT_DETAIL = `${BASE_URL}/productdetail`;
 //import product

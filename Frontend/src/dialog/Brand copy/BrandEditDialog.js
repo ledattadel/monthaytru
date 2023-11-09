@@ -6,9 +6,9 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import { editBrandAPI, editVehicleStatusAPI } from 'src/components/services';
+import { editBrandAPI } from 'src/components/services';
 
-export default function RepairItemEditDialog(props) {
+export default function BrandEditDialog(props) {
   const { openDialog, setOpenDialog, getAllProduct, setContentToast, setSeverity, setOpenToast, product } = props;
   const [name, setName] = useState();
   // const [quantity, setQuantity] = useState();
@@ -20,7 +20,7 @@ export default function RepairItemEditDialog(props) {
   // const [listAccessoryType, setListAccessoryType] = useState();
 
   React.useEffect(() => {
-    setName(product?.Name);
+    setName(product?.BrandName);
     // setPrice(product?.price);
     // setQuantity(product?.quantity);
     // setManufacturer(product?.manufacturer);
@@ -29,9 +29,9 @@ export default function RepairItemEditDialog(props) {
 
   const editProduct = async (data, productId) => {
     try {
-      const res = await editVehicleStatusAPI(data, productId);
-      let errorMessage = res.message || 'Cập nhật hạng mục sửa chửa thất bại';
-      let successMessage = res.message || 'Cập nhật hạng mục sửa chửa thành công';
+      const res = await editBrandAPI(data, productId);
+      let errorMessage = res.message || 'Cập nhật Hãng thất bại';
+      let successMessage = res.message || 'Cập nhật Hãng thành công';
 
       if (res.status === 200) {
         setContentToast(successMessage);
@@ -45,7 +45,7 @@ export default function RepairItemEditDialog(props) {
         setSeverity('error');
       }
     } catch (error) {
-      setContentToast('Sửa hạng mục sửa chửa phẩm thất bại');
+      setContentToast('Sửa sản phẩm thất bại');
       setOpenToast(true);
       setSeverity('error');
     }
@@ -61,10 +61,10 @@ export default function RepairItemEditDialog(props) {
     } else {
       setIsError(false);
       const data = {
-        name: name,
+        BrandName: name,
       };
 
-      editProduct(data, product?.ID);
+      editProduct(data, product?.BrandID);
     }
   };
 
@@ -73,7 +73,7 @@ export default function RepairItemEditDialog(props) {
       <Dialog open={openDialog} onClose={handleClose}>
         {/* <DialogTitle>Chỉnh sửa hãng</DialogTitle> */}
         <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <DialogTitle>Hạng mục sửa chửa</DialogTitle>
+          <DialogTitle>Chỉnh sửa hãng</DialogTitle>
 
           <Button onClick={() => setOpenDialog(false)}>X</Button>
         </Box>

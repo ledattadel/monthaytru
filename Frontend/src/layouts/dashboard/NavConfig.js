@@ -52,6 +52,11 @@ const navConfig = [
     path: '/dashboard/service',
     icon: getIcon('eva:lock-fill'),
   },
+  {
+    title: 'Danh mục sửa chửa',
+    path: '/dashboard/RepairItem',
+    icon: getIcon('eva:lock-fill'),
+  },
   // {
   //   title: 'Sale',
   //   path: '/dashboard/sale',

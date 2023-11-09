@@ -22,6 +22,7 @@ import ImportProducts from './pages/ImportProducts';
 import Quote from './pages/Quote';
 import RepairOrder from './pages/RepairOrder';
 import DashboardApp from './pages/DashboardApp';
+import RepairItem from './pages/RepairItem';
 
 // ----------------------------------------------------------------------
 
@@ -40,6 +41,7 @@ export default function Router() {
         { path: 'brand', element: <Brand /> },
         { path: 'supplier', element: <Supplier /> },
         { path: 'service', element: <Service /> },
+        { path: 'RepairItem', element: <RepairItem /> },
         { path: 'sale', element: <Sale /> },
         { path: 'order', element: <Blog /> },
         { path: 'Quote', element: <Quote /> },
