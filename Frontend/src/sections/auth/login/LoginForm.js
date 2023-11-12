@@ -62,6 +62,8 @@ export default function LoginForm() {
   };
   return (
     <FormikProvider value={formik}>
+      <div style={{textAlign:'center',width:'100%'}}><h1>ENMASYS</h1></div><br/>
+      <div  style={{textAlign:'center',width:'100%'}}><h2>QUẢN LÝ GARAGE SỬA CHỮA Ô TÔ</h2></div><br/><br/>
       <Form autoComplete="off" noValidate>
         <Stack spacing={3}>
           <TextField
