@@ -9,6 +9,9 @@ export class Customer {
   @Column()
   name: string;
 
+  @Column()
+  TimeCreate: String;
+
   @Column({ nullable: true })
   email: string;
 

@@ -1,5 +1,9 @@
 const messages = {
   // STAFF
+  wrongLengthPasswordWhenSignIn: 'Mật khẩu có độ dài từ 6 đến 32 kí tự', 
+  userNotInputUsername:'Vui lòng nhập tài khoản',
+  userNotInputPassword:'Vui lòng nhập mật khẩu',
+  userNotInputUsernamePassword:'Vui lòng nhập tài khoản và mật khẩu',
   accountExists: 'Tài khoản này đã tồn tại, vui lòng chọn tên đăng nhập khác.',
   idCardExists: 'Số chứng minh nhân dân này đã được sử dụng, vui lòng nhập một số khác.',
   emailExists: 'Địa chỉ email này đã được sử dụng, vui lòng nhập một địa chỉ email khác.',
@@ -11,7 +15,7 @@ const messages = {
   created: 'Đã tạo thành công',
   internalServerError: 'Lỗi máy chủ nội bộ: Đã xảy ra lỗi trên máy chủ.',
   missingRoleName: 'Thiếu các trường dữ liệu: tên vai trò',
-  accountNotFoundWhenSignIn: 'Không tìm thấy tài khoản với tên đăng nhập này',
+  accountNotFoundWhenSignIn: 'Không tìm thấy tài khoản này',
   wrongPasswordWhenSignIn: 'Mật khẩu không chính xác, vui lòng thử lại',
   missingToken: 'Truy cập bị từ chối: Token bị thiếu',
   invalidToken: 'Truy cập bị từ chối: Token không hợp lệ',
@@ -65,8 +69,30 @@ const messages = {
      createProductSuccessful: 'sản phẩm đã được tạo thành công',
      updateProductSuccessful: 'sản phẩm đã được cập nhật thành công',
      deleteProductSuccessful: 'sản phẩm đã được xóa thành công', 
+
+
+
+     // RECEPIT
+     missingReceiptFields: 'Thiếu các trường dữ liệu bắt buộc',
+     createReceiptSuccessful: 'Phiếu tiếp nhận đã được tạo thành công',
+     updateReceiptSuccessful: 'Phiếu tiếp nhận đã được cập nhật thành công',
+     deleteReceiptSuccessful: 'Phiếu tiếp nhận đã được xóa thành công', 
+
+
+
+    //  PRODUCT DETAIL
+    missingProductDetailFields:"Thiếu các trường dữ liệu bắt buộc",
+    updateProductDetailSuccessful:"Cập nhật thành công",
+
+
+    createInvoiceSuccessful:"tạo hoá đơn thành công",
+    updateInvoiceSuccessful:"Cập nhật hoá đơn thành công",
+    missingInvoiceFields:"Thiếu các trường dữ liệu bắt buộc",
+    priceQuoteStillHaveInvoice:"Phiếu báo giá này đã tạo hoá đơn"
+
 };
 
 
 
 export default messages;
+

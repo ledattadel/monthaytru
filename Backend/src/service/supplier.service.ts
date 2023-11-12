@@ -7,7 +7,7 @@ class SupplierService {
     async getAll(_, res) {
       try {
         const suppliers = await AppDataSource.getRepository(Supplier).find({ where: { isActive: true } });
-        return res.json(suppliers);
+        return res.json(suppliers.reverse());
       } catch (error) {
         return res.status(500).json({ error: messages.internalServerError });
       }

@@ -41,7 +41,7 @@ router.get('/get-all-technicians',StaffService.getAllTechnicians);
 
 router.get('/get-role-name/:username',StaffService.getRoleNameByUsername);
 
-router.get('/user-info',  StaffService.getUserInfor)
+router.get('/user-info/:username',  StaffService.getUserInfor)
 
 // //POST
 router.post('/', StaffService.createStaff)	// createStaff

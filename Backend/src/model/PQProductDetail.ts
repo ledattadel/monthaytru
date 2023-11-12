@@ -7,25 +7,29 @@ export class PQProductDetail {
   @PrimaryGeneratedColumn()
   PDID: number;
   
-  @Column()
+  @Column({ nullable: true })
   QuoteID: number;
 
-  
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  @Column()
   SellingPrice: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  @Column()
   PurchasePrice: number;
+
+
+  @Column({ nullable: true })
+  isAcceptedRepair: boolean;
+
 
   @Column()
   Quantity: number;
 
   @ManyToOne(() => PriceQuote, (pq) => pq.priceQuoteProductDetails)
-  @JoinColumn({ name: 'QuoteID' })
+  // @JoinColumn({ name: 'QuoteID' })
   priceQuote: PriceQuote;
 
   @ManyToOne(() => ProductDetail, (pd) => pd.priceQuoteProductDetail)
-  @JoinColumn({ name: 'PDID' })
+  // @JoinColumn({ name: 'PDID' })
   productDetail: ProductDetail;
 }

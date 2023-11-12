@@ -1,14 +1,39 @@
 import { getRepository } from 'typeorm';
 import { AppDataSource } from '../data-source';
+import {parseDateStringToDate, spitDateFromString, compareDateStrings, compare2DateBetweenStrings} from '../utils/support'
 import { Customer } from '../model/index';
 import messages from '../messageResponse.js'
 
 class CustomerService {
+
+
+
+  async getTotalCustomersByTimeRange(req, res) {
+    try {
+      const { startDate, endDate } = req.query; 
+    
+
+    const receipts = await AppDataSource.getRepository(Customer).find({ 
+      where: { isActive: true } 
+    });
+    
+    const filteredData = receipts.filter(item => {    
+      return compare2DateBetweenStrings(startDate,spitDateFromString(item.TimeCreate),endDate)
+    });
+
+
+      return res.json({total: filteredData.length, filteredData});
+    } catch (error) {
+      return res.status(500).json({ error: messages.internalServerError + error});
+    }
+  }
+  
+
   // GET_ALL
   async getAll(_, res) {
     try {
       const customers = await AppDataSource.getRepository(Customer).find({ where: { isActive: true } });
-      return res.json(customers);
+      return res.json(customers.reverse());
     } catch (error) {
       return res.status(500).json({ error: messages.internalServerError });
     }
@@ -18,8 +43,8 @@ class CustomerService {
   // CREATE
   async create(req, res) {
     const customerRepo = AppDataSource.getRepository(Customer);
-    const { name, email, phoneNumber } = req.body;
-    if (!name || !phoneNumber) {
+    const { name, email, phoneNumber, TimeCreate } = req.body;
+    if (!name || !phoneNumber || !TimeCreate) {
       return res.status(400).json({
         code: 400,
         message: messages.customerMissingNameAndPhoneNumber,
@@ -39,6 +64,7 @@ class CustomerService {
       }
 
       const customer = new Customer();
+      customer.TimeCreate = TimeCreate;
       customer.name = name;
       customer.email = email || null;
       customer.phoneNumber = phoneNumber;

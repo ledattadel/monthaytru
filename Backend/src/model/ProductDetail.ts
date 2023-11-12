@@ -1,12 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne ,JoinColumn} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne ,JoinColumn, OneToMany} from 'typeorm';
 import { Product } from './index';
 import { Supplier } from './index';
-import { PQProductDetail } from './index';
+import { PQProductDetail , PurchaseOrderDetail} from './index';
 
 @Entity()
 export class ProductDetail {
   @PrimaryGeneratedColumn()
-  PDID: number;
+  ProductDetailID: number;
 
   @Column()
   ProductID: number;
@@ -14,11 +14,19 @@ export class ProductDetail {
   @Column()
   SupplierID: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  @Column()
   SellingPrice: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  @Column()
   PurchasePrice: number;
+
+    
+  @Column({ nullable: false })
+  isActive: boolean | null;
+
+  // @Column({ nullable: false })
+  // isPending: boolean | null;
+
 
   @Column()
   Quantity: number;
@@ -30,6 +38,10 @@ export class ProductDetail {
   @ManyToOne(() => Supplier, (supplier) => supplier.productDetails)
   @JoinColumn({ name: 'SupplierID' })
   supplier: Supplier;
+
+
+  @OneToMany(() => PurchaseOrderDetail, (pod) => pod.purchaseOrder)
+  purchaseOrderDetails: PurchaseOrderDetail[];
 
   @ManyToOne(() => PQProductDetail, (pqpd) => pqpd.productDetail)
   priceQuoteProductDetail: PQProductDetail;

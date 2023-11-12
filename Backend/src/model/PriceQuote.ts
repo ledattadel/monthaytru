@@ -15,20 +15,36 @@ export class PriceQuote {
   Status: string;
 
   @Column()
-  Time: Date;
+  Time: String;
 
   @Column()
   StaffID: number;
 
+  @Column({ nullable: true })
+  Editor: number | null;
+
+  @ManyToOne(() => Staff, (staff) => staff.editPriceQuotes)
+  @JoinColumn({ name: 'Editor' })
+  editor: Staff | null;
+  
+
+  @Column({ nullable: true })
+  TimeUpdate: string;
+
+
   @Column()
   ReceiptID: number;
+
+  @Column({ nullable: false })
+  isActive: boolean | null;
+
 
   @ManyToOne(() => Staff, (staff: any) => staff.priceQuotes)
   @JoinColumn({ name: 'StaffID' })
   staff: Staff;
 
   @ManyToOne(() => Receipt, (receipt: any) => receipt.priceQuotes)
-  @JoinColumn({ name: 'ReceiptID' })
+  // @JoinColumn({ name: 'ReceiptID' })
   receipt: Receipt;
 
   @OneToMany(() => PQServiceDetail, (pqsd) => pqsd.priceQuote)

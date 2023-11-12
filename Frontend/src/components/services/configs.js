@@ -69,7 +69,7 @@
 // export const API_GET_SALE_DESCRIPTION = `${BASE_URL}/sale-description/get-sale-description-by-id`;
 // export const API_CREATE_SALE_DESCRIPTION = `${BASE_URL}/sale-description/create`;
 
-const BASE_URL = 'http://172.16.3.249:8888/api';
+const BASE_URL = 'http://localhost:8888/api';
 // https://bf4a-27-78-35-127.ngrok-free.app/api/staff/sign-in
 // Sign in
 export const SIGN_IN_ADMIN = `${BASE_URL}/staff/sign-in`;

@@ -1,13 +1,41 @@
 import { AppDataSource } from '../data-source';
 import { Brand, Vehicle } from '../model/index';
 import messages from '../messageResponse.js'
+import {parseDateStringToDate, spitDateFromString, compareDateStrings, compare2DateBetweenStrings} from '../utils/support'
+
 
 class VehicleService {
   
+
+  async getTotalVehiclesByTimeRange(req, res) {
+    try {
+      const { startDate, endDate } = req.query; 
+    
+
+    const receipts = await AppDataSource.getRepository(Vehicle).find({ 
+      where: { isActive: true } 
+    });
+    
+    const filteredData = receipts.filter(item => {    
+      return compare2DateBetweenStrings(startDate,spitDateFromString(item.TimeCreate),endDate)
+    });
+
+
+      return res.json({total: filteredData.length, filteredData});
+    } catch (error) {
+      return res.status(500).json({ error: messages.internalServerError + error});
+    }
+  }
+
     async getAll(_, res) {
       try {
-        const Vehicles = await AppDataSource.getRepository(Vehicle).find({ where: { isActive: true } });
-        return res.json(Vehicles);
+        const Vehicles = await AppDataSource.getRepository(Vehicle).find({ 
+          where: { isActive: true },
+          relations:[
+            'brand'
+          ]
+        });
+        return res.json(Vehicles.reverse());
       } catch (error) {
         return res.status(500).json({ error: messages.internalServerError });
       }
@@ -16,7 +44,28 @@ class VehicleService {
     async getById(req, res) {
       try {
         const vehicleId = req.params.id;
-        const vehicle = await AppDataSource.getRepository(Vehicle).findOne({ where: { VehicleID: vehicleId, isActive: true } });
+        const vehicle = await AppDataSource.getRepository(Vehicle).findOne({ where: { VehicleID: vehicleId, isActive: true } ,
+          relations:[
+            'brand'
+          ]});
+  
+        if (!vehicle) {
+          return res.status(404).json({ message: messages.notFound });
+        }
+  
+        return res.json(vehicle);
+      } catch (error) {
+        return res.status(500).json({ error: messages.internalServerError });
+      }
+    }
+
+    async getByNumberPlate(req, res) {
+      try {
+        const NumberPlate = req.params.id;
+        const vehicle = await AppDataSource.getRepository(Vehicle).findOne({ where: { NumberPlate: NumberPlate, isActive: true } ,
+          relations:[
+            'brand'
+          ]});
   
         if (!vehicle) {
           return res.status(404).json({ message: messages.notFound });
@@ -31,12 +80,12 @@ class VehicleService {
     async create(req, res) {
       try {
         const { 
-            NumberPlate, Type, Color, EngineNumber, ChassisNumber, BrandName } = req.body;
+            NumberPlate, Type, Color, EngineNumber, ChassisNumber, BrandName , TimeCreate} = req.body;
   
             const vehicleRepo = AppDataSource.getRepository(Vehicle);
             const brandRepo =  AppDataSource.getRepository(Brand);
             
-        if (!NumberPlate) {
+        if (!NumberPlate || !TimeCreate) {
           return res.status(400).json({
             code: 400,
             message: messages.missingVehicleFields,
@@ -77,6 +126,7 @@ class VehicleService {
         vehicle.EngineNumber = EngineNumber || vehicle.EngineNumber;
         vehicle.ChassisNumber = ChassisNumber || vehicle.ChassisNumber;
         vehicle.BrandId=brandId;
+        vehicle.TimeCreate = TimeCreate;
         vehicle.isActive = true;
   
         await vehicleRepo.save(vehicle);

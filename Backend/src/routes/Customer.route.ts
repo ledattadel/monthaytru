@@ -18,6 +18,6 @@ router.patch('/:id', CustomerService.updateCustomer);
 router.delete('/:id', CustomerService.deleteCustomer); 
 router.get('/:id', CustomerService.getById);
 router.get('/phone/:phoneNumber', CustomerService.getByPhoneNumber); 
-
+router.get('/statistics/total-by-time', CustomerService.getTotalCustomersByTimeRange);
 
 export default router;

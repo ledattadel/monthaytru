@@ -7,7 +7,9 @@ class BrandService {
  async getAll(_, res) {
     try {
       const services = await AppDataSource.getRepository(Brand).find({ where: { isActive: true } });
-      return res.json(services);
+      return res.json(services.reverse());
+
+
     } catch (error) {
       return res.status(500).json({ error: messages.internalServerError });
     }

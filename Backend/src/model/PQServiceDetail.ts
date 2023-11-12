@@ -1,5 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne , JoinColumn} from 'typeorm';
-import { PriceQuote } from './index';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne , JoinColumn,OneToMany} from 'typeorm';
+import { PriceQuote , RepairOrderDetail} from './index';
 import { Service } from './index';
 
 @Entity()
@@ -7,18 +7,26 @@ export class PQServiceDetail {
   @PrimaryGeneratedColumn()
   PQSDID: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  @Column()
   Price: number;
 
-  @Column()
+  @Column({ nullable: true })
+  isAcceptedRepair: boolean;
+
+
+  @Column({ nullable: true })
   QuoteID: number;
 
   @Column()
   ServiceID: number;
 
   @ManyToOne(() => PriceQuote, (pq) => pq.priceQuoteServiceDetails)
-  @JoinColumn({ name: 'QuoteID' })
+  // @JoinColumn({ name: 'QuoteID' })
   priceQuote: PriceQuote;
+
+
+  @OneToMany(() => RepairOrderDetail, (rod) => rod.pqServiceDetail)
+  repairOrderDetails: RepairOrderDetail[];
 
   @ManyToOne(() => Service, (service) => service.priceQuoteServiceDetails)
   @JoinColumn({ name: 'ServiceID' })

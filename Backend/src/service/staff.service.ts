@@ -72,6 +72,33 @@ class StaffService {
     }
 
     const { username, password } = req.body;
+
+    if (!password && !username) {
+      return error({
+        res,
+        message: messages.userNotInputUsernamePassword,
+      });
+    }
+    if (!username) {
+      return error({
+        res,
+        message: messages.userNotInputUsername,
+      });
+    }
+    if (!password) {
+      return error({
+        res,
+        message: messages.userNotInputPassword,
+      });
+    }
+    if (password.length <6 || password.length >32) {
+      return error({
+        res,
+        message: messages.wrongLengthPasswordWhenSignIn,
+      });
+    }
+    
+
     const account = await AppDataSource.getRepository(Staff).findOne({
       where: {
         username,
@@ -343,21 +370,24 @@ class StaffService {
   }
   async getUserInfor(req, res){
     const staffRepo = AppDataSource.getRepository(Staff);
-  
+    const roleRepo = AppDataSource.getRepository(Role)
 
   
     const staff = await staffRepo.findOne({
-      where: { username: req.username },
+      where: { username: req.params.username },
     });
   
+    let role = await roleRepo.findOne({where:{roleId: Number(staff.RoleId)}});
+
     return res.status(200).json({
+      userId:staff.id ,
       username:staff.username ,
       address:staff.address, 
       idCardNumber:staff.idCardNumber, 
       name:staff.name, 
       email:staff.email, 
       phoneNumber:staff.phoneNumber, 
-      role:staff.role 
+      role:role.roleName 
     });
   }
 

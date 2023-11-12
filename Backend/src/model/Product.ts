@@ -12,7 +12,7 @@ export class Product {
   @Column({ nullable: true, type: 'text' })
   ProductDescription: string;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  @Column()
   Price: number;
   
   @Column({ nullable: false })

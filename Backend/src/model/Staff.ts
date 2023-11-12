@@ -9,7 +9,7 @@ import {
 	JoinColumn,
 } from 'typeorm';
 
-import { Receipt } from './index';
+import { PriceQuote, Receipt } from './index';
 import { RepairOrderDetail } from './index';
 import { Role } from  './index';
 var jwt = require('jsonwebtoken');
@@ -64,7 +64,20 @@ export class Staff {
   @OneToMany(() => RepairOrderDetail, (rod) => rod.staff)
   repairOrderDetails: RepairOrderDetail[];
   
+
   
+  @OneToMany(() => PriceQuote, (priceQuote) => priceQuote.staff)
+  priceQuotes: PriceQuote[];
+
+
+
+  @OneToMany(() => Receipt, (receipt) => receipt.editor)
+  editedReceipts: Receipt[];
+
+  @OneToMany(() => PriceQuote, (priceQuote) => priceQuote.editor)
+  editPriceQuotes: PriceQuote[];
+
+
 
   
 	comparePassword = (password: string) => {

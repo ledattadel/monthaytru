@@ -9,6 +9,10 @@ export class Vehicle {
   @Column({ nullable: true })
   NumberPlate: string;
 
+
+  @Column()
+  TimeCreate: String;
+  
   @Column({ nullable: true })
   Type: string;
 
@@ -20,6 +24,7 @@ export class Vehicle {
 
   @Column({ nullable: true })
   ChassisNumber: string;
+
 
 
   @Column({ nullable: false })

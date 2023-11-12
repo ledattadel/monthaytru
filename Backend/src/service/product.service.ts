@@ -12,7 +12,7 @@ class ProductService {
       .where("product.isActive = :isActive", { isActive: true })
       .getMany();
       
-      return res.json(products);
+      return res.json(products.reverse());
     } catch (error) {
       return res.status(500).json({ error: messages.internalServerError });
     }
@@ -35,9 +35,9 @@ class ProductService {
 
   async create(req, res) {
     try {
-      const { ProductName, ProductDescription, BrandName, Unit, Price } = req.body;
+      const { ProductName, ProductDescription, BrandName,  Price } = req.body;
 
-      if (!ProductName || !BrandName || !Unit || !Price) {
+      if (!ProductName || !BrandName  || !Price) {
         return res.status(400).json({
           code: 400,
           message: messages.missingProductFields,
@@ -67,7 +67,7 @@ class ProductService {
       product.ProductDescription = ProductDescription;
       product.BrandId = brandId;
       product.Price = Price;
-      product.Unit = Unit;
+      // product.Unit = Unit;
       product.isActive = true;
 
       await productRepo.save(product);
@@ -85,9 +85,9 @@ class ProductService {
   async update(req, res) {
     try {
       const productId = req.params.id;
-      const { ProductName, ProductDescription, BrandName, Unit } = req.body;
+      const { ProductName, ProductDescription, BrandName } = req.body;
 
-      if (!ProductName || !BrandName || !Unit) {
+      if (!ProductName || !BrandName ) {
         return res.status(400).json({
           code: 400,
           message: messages.missingProductFields,
@@ -124,7 +124,7 @@ class ProductService {
       product.ProductName = ProductName || product.ProductName;
       product.ProductDescription = ProductDescription || product.ProductDescription;
       product.BrandId = brandId || product.BrandId;
-      product.Unit = Unit || product.Unit;
+      // product.Unit = Unit || product.Unit;
 
       await productRepo.save(product);
 

@@ -11,7 +11,12 @@ export class Receipt {
   ReceiptID: number;
 
   @Column()
-  Time: Date;
+  TimeCreate: string;
+
+
+  @Column({ nullable: true })
+  TimeUpdate: string;
+
 
   @Column()
   VehicleStatus: string;
@@ -21,6 +26,11 @@ export class Receipt {
 
   @Column()
   StaffID: number;
+
+
+  @Column({ nullable: true })
+  Editor: number | null;
+
 
   @Column()
   CustomerID: number;
@@ -35,6 +45,11 @@ export class Receipt {
   @ManyToOne(() => Staff, (staff) => staff.receipts)
   @JoinColumn({ name: 'StaffID' })
   staff: Staff;
+
+  @ManyToOne(() => Staff, (staff) => staff.editedReceipts)
+  @JoinColumn({ name: 'Editor' })
+  editor: Staff | null;
+  
 
   @ManyToOne(() => Customer, (customer) => customer.receipts)
   @JoinColumn({ name: 'CustomerID' })

@@ -1,5 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
-import { Staff } from './index';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, JoinColumn , ManyToMany, JoinTable} from 'typeorm';
+import { Staff, ProductDetail } from './index';
 import { PurchaseOrderDetail } from './index';
 
 @Entity()
@@ -8,10 +8,16 @@ export class PurchaseOrder {
   OrderID: number;
 
   @Column()
-  OrderDate: Date;
+  OrderDate: string;
 
   @Column()
   StaffID: number;
+    
+  @Column({ nullable: false })
+  isActive: boolean | null;
+
+  // @Column({ type: 'decimal', precision: 10, scale: 2 })
+  // totalPurchasePrice: number;
 
   @ManyToOne(() => Staff, (staff: any) => staff.purchaseOrders)
   @JoinColumn({ name: 'StaffID' })

@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, ManyToOne ,JoinColumn} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne, ManyToOne ,JoinColumn, OneToMany} from 'typeorm';
 import { RepairOrder } from './index';
 import { PQServiceDetail } from './index';
 import { Staff } from './index';
@@ -11,25 +11,22 @@ export class RepairOrderDetail {
   @Column()
   IsDone: boolean;
 
-  @Column()
-  TimeWhenDone: Date;
+  @Column({ nullable: true})
+  TimeWhenDone: string;
 
   @Column()
   RepairOrderID: number;
 
   @Column()
-  PQSDID: number;
-
-  @Column()
   StaffID: number;
 
-  @OneToOne(() => RepairOrder, (ro: any) => ro.repairOrderDetail)
+  @ManyToOne(() => RepairOrder, (ro: any) => ro.repairOrderDetail)
   @JoinColumn({ name: 'RepairOrderID' })
   repairOrder: RepairOrder;
 
-  @ManyToOne(() => PQServiceDetail, (pqsd: any) => pqsd.repairOrderDetails)
-  @JoinColumn({ name: 'PQSDID' })
+  @ManyToOne(() => PQServiceDetail, (pqsd) => pqsd.repairOrderDetails)
   pqServiceDetail: PQServiceDetail;
+
 
   @ManyToOne(() => Staff, (staff) => staff.repairOrderDetails)
   @JoinColumn({ name: 'StaffID' })

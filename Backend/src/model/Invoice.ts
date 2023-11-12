@@ -8,10 +8,14 @@ export class Invoice {
   InvoiceID: number;
 
   @Column()
-  Time: Date;
+  Time: String;
 
   @Column()
   StaffID: number;
+
+
+  @Column({ nullable: false})
+  isActive: boolean | null;
 
   @Column()
   QuoteID: number;
