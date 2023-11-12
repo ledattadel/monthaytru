@@ -246,12 +246,12 @@ export default function Quote() {
         getAllCart={getAllCart}
         receiptChoose={receiptChoose}
       />
-      <AssignService
+      {/* <AssignService
         openDialog={openDetailDialog}
         setOpenDialog={setOpenDetailDialog}
         getAllCart={getAllCart}
         receiptChoose={receiptChoose}
-      />
+      /> */}
 
       {/* <CreateQuote openDialog={openDialog} setOpenDialog={setOpenDialog} listCart={listCart} /> */}
       {/* <AssignStaff openDialog={openDialog} setOpenDialog={setOpenDialog} listCart={listCart} /> */}

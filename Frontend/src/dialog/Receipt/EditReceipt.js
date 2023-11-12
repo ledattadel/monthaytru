@@ -1,4 +1,4 @@
-import { Box, Button, Typography } from '@mui/material';
+import { Autocomplete, Box, Button, Typography } from '@mui/material';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -29,7 +29,7 @@ function formatDate(str) {
 }
 
 export default function EditReceipt(props) {
-  const { openDialog, setOpenDialog, receiptChoose, getAllCart } = props;
+  const { openDialog, setOpenDialog, receiptChoose, getAllCart, listVehicleStatus, setOpenRepairItemDialog } = props;
 
   const [additionPrice, setAdditionPrice] = useState(0);
   const [productAdd, setProductAdd] = useState([]);
@@ -62,6 +62,12 @@ export default function EditReceipt(props) {
   //
   const InfoAdmin = JSON.parse(localStorage.getItem('profileAdmin'));
   ///
+
+  ///
+  /// repairItem
+
+  const [repairItem, setRepairItem] = useState([]);
+  const [repairItemChoose, setRepairItemChoose] = useState({});
   const addProduct = async (id) => {
     // const data = {
     //   idCartDes: cartId,
@@ -85,10 +91,20 @@ export default function EditReceipt(props) {
     //   Note: noteVehicle,
     // };
 
+    const vehicleStatusList = [];
+
+    repairItem?.forEach((e) => {
+      const temp = {
+        id: e?.ID,
+        condition: e?.condition,
+      };
+      vehicleStatusList?.push(temp);
+    });
+
     const data = {
       TimeUpdate: moment().format('DD-MM-yyyy hh:mm'),
       Editor: InfoAdmin?.userId,
-      VehicleStatus: vehicleCondition,
+      VehicleStatus: vehicleStatusList,
       Note: noteVehicle,
     };
 
@@ -202,6 +218,29 @@ export default function EditReceipt(props) {
   const handleDataCustomer = (field, value) => {
     const tempDate = { ...inforCustomer, [field]: value };
     setInforCustomer(tempDate);
+  };
+
+  const handleAddRepairtItem = () => {
+    const flat = repairItem?.filter((e) => e?.ID === repairItemChoose?.ID);
+    if (!repairItemChoose?.Name || vehicleCondition === '') {
+      setContentToastHere('Vui lòng nhập đủ thông tin danh mục sửa chửa và tình trạng xe');
+      setOpenToastHere(true);
+      setSeverityHere('error');
+    } else if (flat?.length > 0) {
+      setContentToastHere('Danh mục sửa chửa này đã tồn tại');
+      setOpenToastHere(true);
+      setSeverityHere('error');
+    } else {
+      const temp = [...repairItem];
+      temp?.push({ ...repairItemChoose, condition: vehicleCondition });
+      setRepairItem(temp);
+      setVehicleCondition('');
+    }
+  };
+
+  const removeRepairItem = (ID) => {
+    const flat = repairItem?.filter((e) => e?.ID !== ID);
+    setRepairItem(flat);
   };
 
   return (
@@ -409,7 +448,7 @@ export default function EditReceipt(props) {
               size="small"
             />
           </Box>
-          <TextField
+          {/* <TextField
             id="vehicleCondition"
             label={Vi.vehicleCondition}
             //   type="Number"
@@ -425,7 +464,97 @@ export default function EditReceipt(props) {
             multiline
             minRows={3}
             size="small"
-          />
+          /> */}
+          <Box style={{ display: 'flex', justifyContent: 'space-between', marginTop: 24 }}>
+            <Autocomplete
+              disablePortal
+              //   id="manufacturer"
+              options={listVehicleStatus}
+              getOptionLabel={(option) => option?.Name}
+              sx={{ width: 300, mr: 2 }}
+              onChange={(e, newValue) => {
+                // setType(newValue?.name);
+                setRepairItemChoose(newValue);
+              }}
+              size="small"
+              renderInput={(params) => <TextField {...params} label={'chọn hạng mục sửa chửa'} />}
+            />
+            <TextField
+              id="vehicleCondition"
+              label={Vi.vehicleCondition}
+              //   type="Number"
+              sx={{ mr: 2, width: 300 }}
+              InputLabelProps={{
+                shrink: true,
+              }}
+              // fullWidth
+              // disabled={inforCustomer?.email ? true : false}
+              value={vehicleCondition}
+              onChange={(e) => setVehicleCondition(e.target.value)}
+              required
+              multiline
+              minRows={2}
+              size="small"
+            />
+            <Button onClick={() => handleAddRepairtItem()}>Thêm</Button>
+            <Button onClick={() => setOpenRepairItemDialog(true)}>Thêm mới </Button>
+          </Box>
+          <Box style={{ width: 740, marginTop: 24 }}>
+            <Box
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                //   justifyContent: 'space-between',
+                backgroundColor: 'cyan',
+              }}
+            >
+              <Box style={{ display: 'flex', padding: 4, width: 60 }}>
+                <Typography style={{ width: 30 }}>STT</Typography>
+                <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+              </Box>
+              <Box style={{ display: 'flex', padding: 4, width: 300 }}>
+                <Typography style={{ width: 200 }}>Hạng mục sửa chửa</Typography>
+                <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+              </Box>
+              <Box style={{ display: 'flex', width: 500 }}>
+                <Typography style={{ width: 400, textAlign: 'center' }}>Tình trạng xe</Typography>
+              </Box>
+              <Box style={{ display: 'flex', width: 40 }}>
+                <Typography style={{ width: 40, textAlign: 'center' }}></Typography>
+              </Box>
+            </Box>
+          </Box>
+          {repairItem?.map((e, index) => {
+            return (
+              <Box style={{ width: 740 }}>
+                <Box
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    //   justifyContent: 'space-between',
+                    // backgroundColor: 'cyan',
+                  }}
+                >
+                  <Box style={{ display: 'flex', padding: 4, width: 60 }}>
+                    <Typography style={{ width: 30 }}>{index + 1}</Typography>
+                    <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+                  </Box>
+                  <Box style={{ display: 'flex', padding: 4, width: 300 }}>
+                    <Typography style={{ width: 200 }}>{e?.Name}</Typography>
+                    <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+                  </Box>
+                  <Box style={{ display: 'flex', width: 500 }}>
+                    <Typography style={{ width: 400, textAlign: 'center' }}>{e?.condition}</Typography>
+                    <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+                  </Box>
+                  <Box onClick={() => removeRepairItem(e?.ID)} style={{ display: 'flex', width: 40 }}>
+                    <Typography style={{ width: 40, textAlign: 'center' }}>X</Typography>
+                  </Box>
+                </Box>
+                <Box style={{ height: 1, backgroundColor: 'gray' }} />
+              </Box>
+            );
+          })}
           <TextField
             id="noteVehicle"
             label={Vi.noteVehicle}

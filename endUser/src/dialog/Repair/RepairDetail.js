@@ -1,27 +1,16 @@
-import { Box, Button, Typography } from '@mui/material';
+import { Autocomplete, Box, Button, Typography } from '@mui/material';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import TextField from '@mui/material/TextField';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
-import Autocomplete from '@mui/material/Autocomplete';
-import moment from 'moment';
-import {
-  addCarDesAPI,
-  addNewQuoteAPI,
-  addUpdateQuoteAPI,
-  getAllProductDetailAPI,
-  getAllServiceAPI,
-  getAllStaffAPI,
-  getVehicleByNumberAPI,
-  updateRepairAPI,
-} from 'src/components/services';
-import AppToast from 'src/myTool/AppToast';
-import { Vi } from 'src/_mock/Vi';
-import formatMoneyWithDot from 'src/utils/formatMoney';
 import { useNavigate } from 'react-router-dom';
+import { getVehicleByNumberAPI, updateRepairAPI } from 'src/components/services';
+import AppToast from 'src/myTool/AppToast';
+import formatMoneyWithDot from 'src/utils/formatMoney';
+import { Vi } from 'src/_mock/Vi';
 
 const ENUM_PRODUCT_TYPE = [
   {
@@ -75,9 +64,31 @@ export default function RepairDetail(props) {
   const [listProductAddDefault, setListProductAddDefault] = useState([]);
   ///
   const [listServiceAdd, setListServiceAdd] = useState([]);
-  const [listProductAdd, setListProductAdd] = useState([]);
+  const [listProductAdd, setListProductAdd] = useState([{}]);
   const [isDoneAll, setIsDoneAll] = useState(false);
+  ////
+  const [repairItem, setRepairItem] = useState([]);
 
+  const [repairItemChoose, setRepairItemChoose] = useState({});
+
+  const [listServcies, setListServices] = useState([]);
+
+  const [staffChoose, setStaffChoose] = useState({
+    staffName: '',
+  });
+  const [listStaff, setListStaff] = useState([]);
+
+  const [listProduct, setListProduct] = useState([]);
+
+  const [isClear, setIsClear] = useState(true);
+  const [isClearService, setIsClearService] = useState(true);
+
+  const [productChoose, setProductChoose] = useState({
+    quantity: 0,
+  });
+  const [serviceChoose, setServiceChoose] = useState({
+    staff: {},
+  });
   //// useEffect
 
   React.useEffect(() => {
@@ -271,47 +282,169 @@ export default function RepairDetail(props) {
     }
   };
 
+  const onlyNumber = (value) => {
+    const pattern = /^\d+$/;
+    let flat = false;
+    if (pattern.test(value)) {
+      flat = true;
+    }
+    return flat;
+  };
+
+  const handleChooseProduct = (field, value) => {
+    if (field === 'quantity') {
+      if (!onlyNumber(value)) {
+        if (value === '') {
+          const temp = { ...productChoose, [field]: value };
+          setProductChoose(temp);
+        }
+      } else if (value > 100 || value === 0 || value === '') {
+        const temp = { ...productChoose, [field]: value };
+        setProductChoose(temp);
+      } else {
+        const temp = { ...productChoose, [field]: value };
+        setProductChoose(temp);
+      }
+    } else {
+      const temp = { ...productChoose, [field]: value };
+      setProductChoose(temp);
+    }
+  };
+  const handleChooseNameProduct = (value) => {
+    const temp = { ...productChoose, ...value };
+    setProductChoose(temp);
+  };
+
+  const handleChooseServce = (value) => {
+    const temp = { ...serviceChoose, ...value };
+    setServiceChoose(temp);
+  };
+
   const renderItemProduct = (item, index) => {
     return (
       <Box>
+        {!item?.type ? (
+          <>
+            <Box
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                //   justifyContent: 'space-between',
+                // backgroundColor: 'cyan',
+                width: 1200,
+              }}
+            >
+              <Box style={{ display: 'flex', padding: 4, width: 60, justifyContent: 'space-between' }}>
+                <Typography style={{ width: 50, textAlign: 'center' }}>{index + 1}</Typography>
+                <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+              </Box>
+              <Box style={{ display: 'flex', width: 200, justifyContent: 'space-between' }}>
+                <Typography style={{ width: 200, textAlign: 'center' }}>
+                  {item?.ProductDetailID || 'Hư kính xe'}
+                </Typography>
+                <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+              </Box>
+              <Box style={{ display: 'flex', width: 900, justifyContent: 'space-between', marginLeft: 12 }}>
+                <Typography style={{ width: 900 }}>
+                  {item?.ProductDetailID || 'Kính xe trái bị vỡ khó nhìn được cần phải thay'}
+                </Typography>
+              </Box>
+            </Box>
+            <Box style={{ height: 1, backgroundColor: 'gray', width: 1200 }} />
+          </>
+        ) : (
+          <Box
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              //   justifyContent: 'space-between',
+              // backgroundColor: 'cyan',
+              width: 1200,
+            }}
+          >
+            <Box style={{ display: 'flex', padding: 4, width: 60, justifyContent: 'space-between' }}>
+              <Typography style={{ width: 50, textAlign: 'center' }}></Typography>
+              <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+            </Box>
+            <Box style={{ display: 'flex', width: 106, justifyContent: 'space-between' }}>
+              <Typography style={{ width: 100, textAlign: 'center' }}>{item?.ProductDetailID}</Typography>
+              <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+            </Box>
+            <Box style={{ display: 'flex', padding: 4, width: 168, justifyContent: 'space-between' }}>
+              <Typography style={{ width: 130, textAlign: 'center' }}>{item?.product?.ProductName}</Typography>
+              <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+            </Box>
+            <Box style={{ display: 'flex', padding: 4, width: 146, justifyContent: 'space-between' }}>
+              <Typography style={{ width: 100, textAlign: 'center' }}>{item?.product?.brand?.BrandName}</Typography>
+              <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+            </Box>
+            <Box style={{ display: 'flex', padding: 4, width: 140, justifyContent: 'space-between' }}>
+              <Typography style={{ width: 100, textAlign: 'center' }}>
+                {formatMoneyWithDot(parseInt(item.SellingPrice || '0.0'))}
+              </Typography>
+              <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+            </Box>
+            <Box style={{ display: 'flex', padding: 4, width: 100, justifyContent: 'space-between' }}>
+              <Typography style={{ width: 100, textAlign: 'center' }}>{item.quantity}</Typography>
+              <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+            </Box>
+            <Box style={{ display: 'flex', padding: 4, width: 156, justifyContent: 'space-between' }}>
+              <Typography style={{ width: 140, textAlign: 'center' }}>
+                {formatMoneyWithDot(parseInt(item.SellingPrice || '0.0') * item.quantity)}
+              </Typography>
+              <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+            </Box>
+            {/* <Button
+            onClick={() => removeProductAdd(item?.ProductDetailID)}
+            disabled={item?.isRemove}
+            style={{ display: 'flex', padding: 4, width: 40, justifyContent: 'space-between' }}
+          >
+            <Typography style={{ width: 100, textAlign: 'center' }}>X</Typography>
+          </Button> */}
+          </Box>
+        )}
         <Box
           style={{
             display: 'flex',
             alignItems: 'center',
             //   justifyContent: 'space-between',
             // backgroundColor: 'cyan',
-            width: 950,
+            width: 1200,
           }}
         >
           <Box style={{ display: 'flex', padding: 4, width: 60, justifyContent: 'space-between' }}>
-            <Typography style={{ width: 50, textAlign: 'center' }}>{index + 1}</Typography>
+            <Typography style={{ width: 50, textAlign: 'center' }}></Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
-          <Box style={{ display: 'flex', width: 106, justifyContent: 'space-between' }}>
-            <Typography style={{ width: 100, textAlign: 'center' }}>{item?.ProductDetailID}</Typography>
+          <Box style={{ display: 'flex', width: 200, justifyContent: 'space-between' }}>
+            <Typography style={{ width: 198, textAlign: 'center' }}>{item?.ProductDetailID}</Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
-          <Box style={{ display: 'flex', padding: 4, width: 168, justifyContent: 'space-between' }}>
-            <Typography style={{ width: 130, textAlign: 'center' }}>{item?.product?.ProductName}</Typography>
+          <Box style={{ display: 'flex', padding: 4, width: 230, justifyContent: 'space-between' }}>
+            <Typography style={{ width: 230, textAlign: 'center' }}>
+              {item?.product?.ProductName || 'Kính xe'}
+            </Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
           <Box style={{ display: 'flex', padding: 4, width: 146, justifyContent: 'space-between' }}>
-            <Typography style={{ width: 100, textAlign: 'center' }}>{item?.product?.brand?.BrandName}</Typography>
+            <Typography style={{ width: 100, textAlign: 'center' }}>
+              {item?.product?.brand?.BrandName || 'Toyota'}
+            </Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
-          <Box style={{ display: 'flex', padding: 4, width: 140, justifyContent: 'space-between' }}>
+          <Box style={{ display: 'flex', padding: 4, width: 130, justifyContent: 'space-between' }}>
             <Typography style={{ width: 100, textAlign: 'center' }}>
-              {formatMoneyWithDot(parseInt(item.SellingPrice || '0.0'))}
+              {formatMoneyWithDot(parseInt(item.SellingPrice || '1000000.0'))}
             </Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
           <Box style={{ display: 'flex', padding: 4, width: 100, justifyContent: 'space-between' }}>
-            <Typography style={{ width: 100, textAlign: 'center' }}>{item.quantity}</Typography>
+            <Typography style={{ width: 100, textAlign: 'center' }}>{item.quantity || 2}</Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
-          <Box style={{ display: 'flex', padding: 4, width: 156, justifyContent: 'space-between' }}>
-            <Typography style={{ width: 140, textAlign: 'center' }}>
-              {formatMoneyWithDot(parseInt(item.SellingPrice || '0.0') * item.quantity)}
+          <Box style={{ display: 'flex', padding: 4, width: 200, justifyContent: 'space-between' }}>
+            <Typography style={{ width: 198, textAlign: 'center' }}>
+              {formatMoneyWithDot(parseInt(item.SellingPrice || '1000000.0') * 2)}
             </Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
@@ -323,7 +456,59 @@ export default function RepairDetail(props) {
             <Typography style={{ width: 100, textAlign: 'center' }}>X</Typography>
           </Button> */}
         </Box>
-        <Box style={{ height: 1, backgroundColor: 'gray', width: 950 }} />
+        <Box style={{ height: 1, backgroundColor: 'gray', width: 1200 }} />
+        <Box
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            //   justifyContent: 'space-between',
+            // backgroundColor: 'cyan',
+            width: 1200,
+          }}
+        >
+          <Box style={{ display: 'flex', padding: 4, width: 60, justifyContent: 'space-between' }}>
+            <Typography style={{ width: 50, textAlign: 'center' }}></Typography>
+            <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+          </Box>
+          <Box style={{ display: 'flex', width: 200, justifyContent: 'space-between' }}>
+            <Typography style={{ width: 198, textAlign: 'center' }}>{item?.ProductDetailID}</Typography>
+            <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+          </Box>
+          <Box style={{ display: 'flex', padding: 4, width: 230, justifyContent: 'space-between' }}>
+            <Typography style={{ width: 230, textAlign: 'center' }}>
+              {item?.product?.ProductName || 'Thay kính xe'}
+            </Typography>
+            <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+          </Box>
+          <Box style={{ display: 'flex', padding: 4, width: 146, justifyContent: 'space-between' }}>
+            <Typography style={{ width: 100, textAlign: 'center' }}>{item?.product?.brand?.BrandName}</Typography>
+            <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+          </Box>
+          <Box style={{ display: 'flex', padding: 4, width: 130, justifyContent: 'space-between' }}>
+            <Typography style={{ width: 100, textAlign: 'center' }}>
+              {formatMoneyWithDot(parseInt(item.SellingPrice || '150000.0'))}
+            </Typography>
+            <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+          </Box>
+          <Box style={{ display: 'flex', padding: 4, width: 100, justifyContent: 'space-between' }}>
+            <Typography style={{ width: 100, textAlign: 'center' }}>{item.quantity || 1}</Typography>
+            <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+          </Box>
+          <Box style={{ display: 'flex', padding: 4, width: 200, justifyContent: 'space-between' }}>
+            <Typography style={{ width: 198, textAlign: 'center' }}>
+              {formatMoneyWithDot(parseInt(item.SellingPrice || '150000.0') * 1)}
+            </Typography>
+            <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+          </Box>
+          {/* <Button
+            onClick={() => removeProductAdd(item?.ProductDetailID)}
+            disabled={item?.isRemove}
+            style={{ display: 'flex', padding: 4, width: 40, justifyContent: 'space-between' }}
+          >
+            <Typography style={{ width: 100, textAlign: 'center' }}>X</Typography>
+          </Button> */}
+        </Box>
+        <Box style={{ height: 1, backgroundColor: 'gray', width: 1200 }} />
       </Box>
     );
   };
@@ -475,7 +660,7 @@ export default function RepairDetail(props) {
   };
   const renderTitleProduct1 = () => {
     return (
-      <Box style={{ width: 950 }}>
+      <Box style={{ width: 1200 }}>
         <Box
           style={{
             display: 'flex',
@@ -488,32 +673,32 @@ export default function RepairDetail(props) {
             <Typography style={{ width: 50 }}>STT</Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
-          <Box style={{ display: 'flex', width: 300 }}>
-            <Typography style={{ width: 260, textAlign: 'center' }}>Danh mục sửa chửa</Typography>
+          <Box style={{ display: 'flex', width: 200 }}>
+            <Typography style={{ width: 190, textAlign: 'center' }}>Danh mục sửa chửa</Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
           <Box style={{ display: 'flex', padding: 4, width: 260 }}>
             <Typography style={{ width: 220, textAlign: 'start' }}>{Vi.nameProduct}/ tên dịch vụ</Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
-          <Box style={{ display: 'flex', padding: 4, width: 240, justifyContent: 'space-between' }}>
-            <Typography style={{ width: 220, textAlign: 'center' }}>{Vi.brand} / người sửa</Typography>
+          <Box style={{ display: 'flex', padding: 4, width: 150, justifyContent: 'space-between' }}>
+            <Typography style={{ width: 150, textAlign: 'center' }}>{Vi.brand} / người sửa</Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
-          {/* <Box style={{ display: 'flex', padding: 4, width: 140, justifyContent: 'space-between' }}>
+          <Box style={{ display: 'flex', padding: 4, width: 140, justifyContent: 'space-between' }}>
             <Typography style={{ width: 100, textAlign: 'center' }}>{Vi.price}</Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
-          </Box> */}
+          </Box>
           <Box style={{ display: 'flex', padding: 4, width: 100 }}>
             <Typography style={{ width: 100, textAlign: 'center' }}>{Vi.quantity}</Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
-          {/* <Box style={{ display: 'flex', padding: 4, width: 320 }}>
-            <Typography style={{ width: 280, textAlign: 'center' }}>Hạng mục sửa chửa</Typography>
+          <Box style={{ display: 'flex', padding: 4, width: 200 }}>
+            <Typography style={{ width: 180, textAlign: 'center' }}>Thành tiền</Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
-          </Box> */}
-          <Box style={{ display: 'flex', padding: 4, width: 40 }}>
-            <Typography style={{ width: 100, textAlign: 'center' }}></Typography>
+          </Box>
+          <Box style={{ display: 'flex', padding: 4, width: 140 }}>
+            <Typography style={{ width: 200, textAlign: 'center' }}>trạng thái dịch vụ</Typography>
             {/* <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} /> */}
           </Box>
         </Box>
@@ -527,13 +712,13 @@ export default function RepairDetail(props) {
       <Dialog open={openDialog} onClose={handleClose} maxWidth={'1500px'}>
         {/* <DialogTitle>{Vi.RepairOrder}</DialogTitle> */}
         <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <DialogTitle>{Vi.RepairOrder}</DialogTitle>
+          <DialogTitle>{Vi.quote}</DialogTitle>
 
           <Button onClick={() => setOpenDialog(false)}>X</Button>
         </Box>
-        <DialogContent sx={{ height: 650, width: 1000 }}>
+        <DialogContent sx={{ height: 650, width: 1300 }}>
           <Box style={{ borderWidth: 1, borderColor: 'grey' }}>
-            <Typography style={{ fontSize: 14, marginTop: 8, marginBottom: 12 }}>Thông tin lệnh sửa chửa</Typography>
+            <Typography style={{ fontSize: 14, marginTop: 8, marginBottom: 12 }}></Typography>
             <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
               <TextField
                 id="receiptId"
@@ -658,6 +843,114 @@ export default function RepairDetail(props) {
               size="small"
             />
           </Box>
+          <Box style={{ display: 'flex', marginTop: 20, marginBottom: 20 }}>
+            <Autocomplete
+              disablePortal
+              //   id="manufacturer"
+              options={repairItem}
+              getOptionLabel={(option) => option?.Name}
+              sx={{ width: 300, mr: 2 }}
+              onChange={(e, newValue) => {
+                setRepairItemChoose(newValue);
+              }}
+              size="small"
+              // defaultValue={ENUM_PRODUCT_TYPE?.[0]}
+              renderInput={(params) => <TextField {...params} label={'chọn hạng mục sửa chửa'} />}
+            />
+            <Autocomplete
+              disablePortal
+              //   id="manufacturer"
+              options={ENUM_PRODUCT_TYPE}
+              getOptionLabel={(option) => option?.name}
+              sx={{ width: 200, mr: 2 }}
+              onChange={(e, newValue) => {
+                setType(newValue?.name);
+              }}
+              size="small"
+              defaultValue={ENUM_PRODUCT_TYPE?.[0]}
+              renderInput={(params) => <TextField {...params} />}
+            />
+
+            {type === ENUM_PRODUCT_TYPE?.[0]?.name ? (
+              <Autocomplete
+                disablePortal
+                id="nameService"
+                options={listServcies}
+                getOptionLabel={(option) => option?.ServiceName}
+                sx={{ width: 400, mr: 2 }}
+                onChange={(e, newValue) => {
+                  handleChooseServce(newValue);
+                  setIsClearService(false);
+                }}
+                size="small"
+                key={serviceChoose?.ServiceName}
+                value={isClearService ? null : serviceChoose}
+                renderInput={(params) => <TextField {...params} label={Vi.nameService} />}
+              />
+            ) : (
+              <Autocomplete
+                disablePortal
+                id="option?.ServiceName"
+                options={listProduct}
+                getOptionLabel={(option) =>
+                  `${option?.product?.ProductName} - ${option?.product?.brand?.BrandName} - ${option?.supplier?.name}`
+                }
+                sx={{ width: 500, mr: 2 }}
+                onChange={(e, newValue) => {
+                  handleChooseNameProduct(newValue);
+                  setIsClear(false);
+                }}
+                size="small"
+                key={productChoose?.product?.ProductName}
+                value={isClear ? null : productChoose}
+                renderInput={(params) => <TextField {...params} label={Vi.nameProduct} />}
+              />
+            )}
+
+            {/* {type === ENUM_PRODUCT_TYPE?.[0]?.name ? (
+              <Autocomplete
+                disablePortal
+                id="staff"
+                options={listStaff}
+                getOptionLabel={(option) => option?.name}
+                sx={{ width: 200, mr: 2 }}
+                onChange={(e, newValue) => {
+                  handleChooseStaffToServce(newValue);
+
+                  setIsClear(false);
+                }}
+                key={serviceChoose?.staff}
+                size="small"
+                value={isClear ? null : serviceChoose?.staff}
+                renderInput={(params) => <TextField {...params} label={Vi.staffWork} />}
+              />
+            ) : null} */}
+
+            {type === ENUM_PRODUCT_TYPE?.[1]?.name ? (
+              <TextField
+                id="quantity"
+                label={Vi.quantity}
+                //   type="Number"
+                sx={{ mr: 2 }}
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                required
+                value={productChoose?.quantity}
+                size="small"
+                style={{ width: 100 }}
+                onChange={(e) => handleChooseProduct('quantity', e.target.value)}
+              />
+            ) : null}
+            <Button
+              variant="outlined"
+              // onClick={type === ENUM_PRODUCT_TYPE?.[0]?.name ? handleAddServiceToList : handleAddProductToList}
+              size="small"
+              type="submit"
+            >
+              {Vi.add}
+            </Button>
+          </Box>
           {/* <Typography style={{ fontSize: 14, marginTop: 24, marginBottom: 12 }}>{Vi.addProductService}</Typography>
           <Box style={{ display: 'flex' }}>
             <Autocomplete
@@ -767,14 +1060,14 @@ export default function RepairDetail(props) {
         </DialogContent>
 
         <DialogActions>
-          {!receiptChoose?.priceQuote?.invoice ? (
+          {/* {!receiptChoose?.priceQuote?.invoice ? (
             <Button variant="outlined" onClick={handleAdd}>
               Phát sinh
             </Button>
-          ) : null}
+          ) : null} */}
 
           <Button variant="outlined" onClick={() => handleAddProduct()} type="submit">
-            Lưu
+            Xác nhận báo giá
           </Button>
         </DialogActions>
       </Dialog>

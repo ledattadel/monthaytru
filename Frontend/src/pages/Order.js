@@ -269,6 +269,9 @@ export default function Receipt() {
         setOpenDialog={setOpenEditDialog}
         getAllCart={getAllCart}
         receiptChoose={receiptChoose}
+        openCreateRepairItemDialog={openCreateRepairItemDialog}
+        setOpenRepairItemDialog={setOpenRepairItemDialog}
+        listVehicleStatus={listVehicleStatus}
       />
       <ReceiptDetail
         openDialog={openDetailDialog}

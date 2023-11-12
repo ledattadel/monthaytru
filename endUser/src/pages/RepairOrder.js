@@ -226,7 +226,7 @@ export default function RepairOrder() {
         receiptChoose={receiptChoose}
       />
       <RepairDetail
-        openDialog={openDetailDialog}
+        openDialog={true}
         setOpenDialog={setOpenDetailDialog}
         getAllCart={getAllCart}
         receiptChoose={receiptChoose}

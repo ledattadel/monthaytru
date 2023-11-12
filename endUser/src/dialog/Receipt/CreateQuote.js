@@ -4,12 +4,11 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import TextField from '@mui/material/TextField';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import Autocomplete from '@mui/material/Autocomplete';
 import moment from 'moment';
 import {
-  addCarDesAPI,
   addNewQuoteAPI,
   getAllProductDetailAPI,
   getAllServiceAPI,
@@ -17,8 +16,8 @@ import {
   getVehicleByNumberAPI,
 } from 'src/components/services';
 import AppToast from 'src/myTool/AppToast';
-import { Vi } from 'src/_mock/Vi';
 import formatMoneyWithDot from 'src/utils/formatMoney';
+import { Vi } from 'src/_mock/Vi';
 
 const ENUM_PRODUCT_TYPE = [
   {
@@ -446,7 +445,6 @@ export default function CreateQuote(props) {
     );
   };
   const renderItemService = (item, index) => {
-    console.log('pon console', item);
     return (
       <Box>
         <Box

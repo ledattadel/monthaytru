@@ -119,30 +119,36 @@ export default function QuoteDetail(props) {
       handleDataVehicle('vehicleNumber', receiptChoose?.receipt?.vehicle?.NumberPlate);
 
       const dataProduct = [];
-      receiptChoose?.priceQuoteProductDetails?.forEach((e, index) => {
-        const temp = {
-          ...e?.productDetail,
-          quantity: e?.Quantity,
-          supplier: e?.supplier,
-          isRemove: e?.Status === 1 ? true : false,
-          index: index + 1,
-          isAcceptedRepair: e?.isAcceptedRepair,
-        };
-        dataProduct?.push(temp);
+      receiptChoose?.vehicleStatusReceipts?.forEach((item, index) => {
+        item?.pqProductDetails?.forEach((e, index) => {
+          const temp = {
+            ...e?.productDetail,
+            quantity: e?.Quantity,
+            supplier: e?.supplier,
+            isRemove: e?.Status === 1 ? true : false,
+            index: index + 1,
+            isAcceptedRepair: e?.isAcceptedRepair,
+            vehicleStatus: item?.vehicleStatus,
+          };
+          dataProduct?.push(temp);
+        });
       });
       setListProductAddDefault(dataProduct);
       setListProductAdd(dataProduct);
 
       const dataService = [];
-      receiptChoose?.priceQuoteServiceDetails?.forEach((e, index) => {
-        const temp = {
-          ...e?.service,
-          staff: e?.repairOrderDetails?.[0]?.staff,
-          isRemove: e?.Status === 1 ? true : false,
-          index: index + 1,
-          isAcceptedRepair: e?.isAcceptedRepair,
-        };
-        dataService?.push(temp);
+      receiptChoose?.vehicleStatusReceipts?.forEach((item, index) => {
+        item?.pqServiceDetails?.forEach((e, index) => {
+          const temp = {
+            ...e?.service,
+            staff: e?.repairOrderDetails?.[0]?.staff,
+            isRemove: e?.Status === 1 ? true : false,
+            index: index + 1,
+            isAcceptedRepair: e?.isAcceptedRepair,
+            vehicleStatus: item?.vehicleStatus,
+          };
+          dataService?.push(temp);
+        });
       });
       setListServiceAddDefault(dataService);
       setListServiceAdd(dataService);
@@ -497,7 +503,7 @@ export default function QuoteDetail(props) {
             alignItems: 'center',
             //   justifyContent: 'space-between',
             // backgroundColor: 'cyan',
-            width: 950,
+            width: 1200,
           }}
         >
           <Box style={{ display: 'flex', padding: 4, width: 60, justifyContent: 'space-between' }}>
@@ -532,6 +538,10 @@ export default function QuoteDetail(props) {
             </Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
+          <Box style={{ display: 'flex', padding: 4, width: 230, justifyContent: 'space-between' }}>
+            <Typography style={{ width: 220, textAlign: 'center' }}>{item.vehicleStatus?.Name}</Typography>
+            <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+          </Box>
           <Button
             onClick={() => removeProductAdd(item?.ProductDetailID)}
             disabled={item?.isAcceptedRepair}
@@ -541,7 +551,7 @@ export default function QuoteDetail(props) {
             {/* <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} /> */}
           </Button>
         </Box>
-        <Box style={{ height: 1, backgroundColor: 'gray', width: 950 }} />
+        <Box style={{ height: 1, backgroundColor: 'gray', width: 1200 }} />
       </Box>
     );
   };
@@ -554,7 +564,7 @@ export default function QuoteDetail(props) {
             alignItems: 'center',
             //   justifyContent: 'space-between',
             // backgroundColor: 'cyan',
-            width: 950,
+            width: 1000,
           }}
         >
           <Box style={{ display: 'flex', padding: 4, width: 60, justifyContent: 'space-between' }}>
@@ -576,8 +586,12 @@ export default function QuoteDetail(props) {
             </Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
-          <Box style={{ display: 'flex', padding: 4, width: 200, justifyContent: 'space-between' }}>
+          {/* <Box style={{ display: 'flex', padding: 4, width: 200, justifyContent: 'space-between' }}>
             <Typography style={{ width: 100, textAlign: 'center' }}>{item?.staff?.name}</Typography>
+            <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+          </Box> */}
+          <Box style={{ display: 'flex', padding: 4, width: 230, justifyContent: 'space-between' }}>
+            <Typography style={{ width: 200, textAlign: 'center' }}>{item?.vehicleStatus?.Name}</Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
 
@@ -589,14 +603,14 @@ export default function QuoteDetail(props) {
             <Typography style={{ width: 100, textAlign: 'center' }}>X</Typography>
           </Button>
         </Box>
-        <Box style={{ height: 1, backgroundColor: 'gray', width: 950 }} />
+        <Box style={{ height: 1, backgroundColor: 'gray', width: 1000 }} />
       </Box>
     );
   };
 
   const renderTitleServices = () => {
     return (
-      <Box style={{ width: 1200 }}>
+      <Box style={{ width: 1000 }}>
         <Box
           style={{
             display: 'flex',
@@ -622,10 +636,7 @@ export default function QuoteDetail(props) {
             <Typography style={{ width: 240, textAlign: 'center' }}>{Vi.price}</Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
-          <Box style={{ display: 'flex', padding: 4, width: 200 }}>
-            <Typography style={{ width: 200, textAlign: 'center' }}>Nhân viên kỉ thuật</Typography>
-            <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
-          </Box>
+
           <Box style={{ display: 'flex', padding: 4, width: 230 }}>
             <Typography style={{ width: 220, textAlign: 'center' }}>Hạng mục sửa chửa</Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />

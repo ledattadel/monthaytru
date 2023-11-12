@@ -246,7 +246,7 @@ export default function CreateQuote(props) {
     repairItem?.forEach((item) => {
       const dataServiceTemp = dataService?.filter((e) => e?.repairItem?.ID === item?.ID);
       const dataProductTemp = dataProduct?.filter((e) => e?.repairItem?.ID === item?.ID);
-      const temp = { ...item, pqProduct: [...dataProductTemp], prService: [...dataServiceTemp] };
+      const temp = { ...item, pqProduct: [...dataProductTemp], pqService: [...dataServiceTemp] };
       listVehicleStatus?.push(temp);
     });
 
@@ -262,7 +262,7 @@ export default function CreateQuote(props) {
       TimeCreateRepair: status === 1 ? moment().format('DD-MM-yyyy hh:mm') : undefined,
     };
     console.log('pon console ne ', data);
-    // addNewQuote(data);
+    addNewQuote(data);
   };
   const handleAddProductToList = () => {
     const listChoose = listServiceAdd?.filter((e) => e?.repairItemChoose?.ID === repairItemChoose?.ID);
@@ -333,10 +333,17 @@ export default function CreateQuote(props) {
     }
   };
 
-  const removeServiceAdd = (ServiceID) => {
+  const removeServiceAdd = (ServiceID, IDRepairItem) => {
     const listTemp = [...listServiceAdd];
-    const listNewProduct = listTemp?.filter((e) => e?.ServiceID !== ServiceID);
 
+    const listNewProduct = [];
+
+    // listTemp?.filter((e) => e?.ServiceID !== ServiceID);
+    listTemp?.forEach((e) => {
+      if (e?.serviceID !== ServiceID && e?.repairItemChoose?.ID !== IDRepairItem) {
+        listNewProduct?.push(e);
+      }
+    });
     setListServiceAdd(listNewProduct);
   };
 
@@ -487,7 +494,7 @@ export default function CreateQuote(props) {
           </Box>
 
           <Button
-            onClick={() => removeServiceAdd(item?.ServiceID)}
+            onClick={() => removeServiceAdd(item?.ServiceID, item?.repairItemChoose?.ID)}
             style={{ display: 'flex', padding: 4, width: 40, justifyContent: 'space-between' }}
           >
             <Typography style={{ width: 100, textAlign: 'center' }}>X</Typography>
@@ -663,7 +670,7 @@ export default function CreateQuote(props) {
                   shrink: true,
                 }}
                 disabled={true}
-                value={'Pôn'}
+                value={InfoAdmin?.name}
                 size="small"
                 required
               />

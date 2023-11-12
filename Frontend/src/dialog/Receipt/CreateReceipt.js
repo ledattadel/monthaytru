@@ -346,7 +346,7 @@ export default function CreateReceipt(props) {
                   shrink: true,
                 }}
                 disabled={true}
-                value={'Pôn'}
+                value={InfoAdmin?.name}
                 size="small"
                 //   onChange={(e) => handleDataCustomer(e.target.value)}
                 required
