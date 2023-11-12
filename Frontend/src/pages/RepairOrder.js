@@ -276,7 +276,7 @@ const Row = ({ row, setReceiptChoose, setOpenEditDialog, setOpenDetailDialog }) 
       (a, b) => a * 1 + parseInt(b?.SellingPrice || '0.0') * b?.Quantity || 1,
       0
     );
-    return priceQuoteService * 1 + priceQuoteProduct * 1;
+    return (priceQuoteService * 1 + priceQuoteProduct * 1) * 1.08;
   };
 
   const addNewInvoice = async () => {

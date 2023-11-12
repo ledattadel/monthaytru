@@ -479,7 +479,6 @@ export default function CreateReceipt(props) {
             minRows={3}
             size="small"
           />
-          <Button>Thêm hạng mục sửa chửa</Button>
           <TextField
             id="noteVehicle"
             label={Vi.noteVehicle}
