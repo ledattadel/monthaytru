@@ -325,7 +325,7 @@ const Row = ({ row, setReceiptChoose, setOpenEditDialog, setOpenDetailDialog, In
       (a, b) => a * 1 + parseInt(b?.SellingPrice || '0.0') * b?.Quantity || 1,
       0
     );
-    return (priceQuoteService * 1 + priceQuoteProduct * 1) * 1.08;
+    return ((priceQuoteService * 1 + priceQuoteProduct * 1) * 1.08).toFixed(0);
   };
 
   return (
