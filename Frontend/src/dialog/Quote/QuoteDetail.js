@@ -95,6 +95,11 @@ export default function QuoteDetail(props) {
     staff: {},
   });
 
+  ////
+  const [repairItem, setRepairItem] = useState([]);
+
+  const [repairItemChoose, setRepairItemChoose] = useState({});
+
   const InfoAdmin = JSON.parse(localStorage.getItem('profileAdmin'));
 
   //// useEffect
@@ -119,6 +124,7 @@ export default function QuoteDetail(props) {
       handleDataVehicle('vehicleNumber', receiptChoose?.receipt?.vehicle?.NumberPlate);
 
       const dataProduct = [];
+      const listRepairItem = [];
       receiptChoose?.vehicleStatusReceipts?.forEach((item, index) => {
         item?.pqProductDetails?.forEach((e, index) => {
           const temp = {
@@ -132,7 +138,9 @@ export default function QuoteDetail(props) {
           };
           dataProduct?.push(temp);
         });
+        listRepairItem?.push(item?.vehicleStatus);
       });
+      setRepairItem(listRepairItem);
       setListProductAddDefault(dataProduct);
       setListProductAdd(dataProduct);
 
@@ -319,7 +327,8 @@ export default function QuoteDetail(props) {
     addNewQuote(data, receiptChoose?.QuoteID);
   };
   const handleAddProductToList = () => {
-    const flat = listProductAdd?.filter((e) => e?.ProductDetailID === productChoose?.ProductDetailID);
+    const listChoose = listServiceAdd?.filter((e) => e?.vehicleStatus?.ID === repairItemChoose?.ID);
+    const flat = listChoose?.filter((e) => e?.ProductDetailID === productChoose?.ProductDetailID);
     if (!productChoose?.quantity) {
       setContentToastHere('số luợng phải lớn hơn 0');
       setOpenToastHere(true);
@@ -349,6 +358,7 @@ export default function QuoteDetail(props) {
       product.push({
         ...productChoose,
         index: listProductAdd?.length > 0 ? listProductAdd?.[listProductAdd?.length - 1]?.index + 1 : 1,
+        vehicleStatus: repairItemChoose,
       });
       setListProductAdd(product);
 
@@ -357,6 +367,7 @@ export default function QuoteDetail(props) {
       product1.push({
         ...productChoose,
         index: listProductAdd?.length > 0 ? listProductAdd?.[listProductAdd?.length - 1]?.index + 1 : 1,
+        vehicleStatus: repairItemChoose,
       });
       setListProductAdd1(product1);
       setIsClear(true);
@@ -374,12 +385,9 @@ export default function QuoteDetail(props) {
   };
 
   const handleAddServiceToList = () => {
-    const flat = listServiceAdd?.filter((e) => e?.ServiceID === serviceChoose?.ServiceID);
-    if (!serviceChoose?.staff?.id) {
-      setContentToastHere('Vui lòng chọn nhân viên sửa chửa');
-      setOpenToastHere(true);
-      setSeverityHere('error');
-    } else if (!serviceChoose?.ServiceID) {
+    const listChoose = listServiceAdd?.filter((e) => e?.vehicleStatus?.ID === repairItemChoose?.ID);
+    const flat = listChoose?.filter((e) => e?.ServiceID === serviceChoose?.ServiceID);
+    if (!serviceChoose?.ServiceID) {
       setContentToastHere('Vui lòng chọn dịch vụ sửa chửa');
       setOpenToastHere(true);
       setSeverityHere('error');
@@ -395,10 +403,12 @@ export default function QuoteDetail(props) {
       service.push({
         ...serviceChoose,
         index: listServiceAdd?.length > 0 ? listServiceAdd?.[listServiceAdd?.length - 1]?.index + 1 : 1,
+        vehicleStatus: repairItemChoose,
       });
       service1.push({
         ...serviceChoose,
         index: listServiceAdd?.length > 0 ? listServiceAdd?.[listServiceAdd?.length - 1]?.index + 1 : 1,
+        vehicleStatus: repairItemChoose,
       });
       setListServiceAdd(service);
       setListServiceAdd1(service1);
@@ -839,11 +849,11 @@ export default function QuoteDetail(props) {
               <Autocomplete
                 disablePortal
                 //   id="manufacturer"
-                options={ENUM_PRODUCT_TYPE}
-                getOptionLabel={(option) => option?.name}
+                options={repairItem}
+                getOptionLabel={(option) => option?.Name}
                 sx={{ width: 300, mr: 2 }}
                 onChange={(e, newValue) => {
-                  setType(newValue?.name);
+                  setRepairItemChoose(newValue);
                 }}
                 size="small"
                 // defaultValue={ENUM_PRODUCT_TYPE?.[0]}
@@ -898,7 +908,7 @@ export default function QuoteDetail(props) {
                 />
               )}
 
-              {type === ENUM_PRODUCT_TYPE?.[0]?.name ? (
+              {/* {type === ENUM_PRODUCT_TYPE?.[0]?.name ? (
                 <Autocomplete
                   disablePortal
                   id="staff"
@@ -915,7 +925,7 @@ export default function QuoteDetail(props) {
                   value={isClear ? null : serviceChoose?.staff}
                   renderInput={(params) => <TextField {...params} label={Vi.staffWork} />}
                 />
-              ) : null}
+              ) : null} */}
 
               {type === ENUM_PRODUCT_TYPE?.[1]?.name ? (
                 <TextField
