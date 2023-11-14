@@ -39,25 +39,31 @@ export default function LoginForm() {
   };
   const handleClick = async () => {
     const data = {
-      username: userName,
+      phoneNumber: userName,
       password,
     };
     const res = await loginAPI(data);
     if (res?.status === 200) {
-      localStorage.setItem('adminInfo', JSON.stringify(res.data?.accessToken));
-
-      const resData = await getInfoAdminAPI(userName);
-      if (resData?.status === 200) {
-        // console.log('pon console', resData?.data);
-        localStorage.setItem('profileAdmin', JSON.stringify(resData.data));
-        if (resData?.data?.role === 'admin' || resData?.data?.role === 'manage') {
-          navigate('/dashboard/user');
-        } else {
-          setErrorMsg('Chỉ có nhân viên quản lí và Quản trị viên mới được vào');
-        }
+      localStorage.setItem('adminInfo', JSON.stringify(res.data?.message?.info));
+      localStorage.setItem('profileAdmin', JSON.stringify(res.data?.message?.info));
+      // const resData = await getInfoAdminAPI(userName);
+      if (res?.data) {
+        navigate('/dashboard/Quote');
+      } else {
+        setErrorMsg('Chỉ có nhân viên quản lí và Quản trị viên mới được vào');
       }
-    } else {
-      setErrorMsg(res?.message || res);
+      //   if (resData?.status === 200) {
+      //     // console.log('pon console', resData?.data);
+      //     localStorage.setItem('profileAdmin', JSON.stringify(resData.data));
+      //     if (resData?.data?.role === 'admin' || resData?.data?.role === 'manage') {
+      //       navigate('/dashboard/user');
+      //     } else {
+      //       setErrorMsg('Chỉ có nhân viên quản lí và Quản trị viên mới được vào');
+      //     }
+      //   }
+      // } else {
+      //   setErrorMsg(res?.message || res);
+      // }
     }
   };
   return (

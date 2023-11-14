@@ -525,7 +525,7 @@ export default function ReceiptDetail(props) {
           Please enter full information {errorMsg}
         </p>
         <DialogActions>
-          {/* <Button onClick={handleClose}>Huỷ</Button> */}
+          <Button onClick={handleClose}>Huỷ</Button>
           <Button onClick={openCreateQuoteDialog} type="submit">
             Tạo báo giá
           </Button>

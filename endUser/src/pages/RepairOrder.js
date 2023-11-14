@@ -43,7 +43,7 @@ import moment from 'moment/moment';
 
 const TABLE_HEAD = [
   { id: 'quoteId', label: 'Mã phiếu báo giá', alignRight: false },
-  { id: 'cardId', label: 'Mã phiếu sửa chửa', alignRight: false },
+  // { id: 'cardId', label: 'Mã phiếu sửa chửa', alignRight: false },
   { id: 'owner', label: Vi.nameCustomer, alignRight: false },
   { id: 'carNumber', label: Vi.plateNumber, alignRight: false },
   { id: 'createTime', label: Vi.createAt, alignRight: false },
@@ -53,7 +53,7 @@ const TABLE_HEAD = [
   // { id: 'vehicleCondition', label: Vi.vehicleCondition, alignRight: false },
   { id: 'status', label: Vi.status, alignRight: false },
   { id: 'detail', label: Vi.detail, alignRight: false },
-  { id: 'bill', label: 'tạo hoá đơn', alignRight: false },
+  // { id: 'bill', label: 'tạo hoá đơn', alignRight: false },
 ];
 
 function descendingComparator(a, b, orderBy) {
@@ -99,12 +99,12 @@ export default function RepairOrder() {
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [openDetailDialog, setOpenDetailDialog] = useState(false);
   const [receiptChoose, setReceiptChoose] = useState({});
-
+  const InfoAdmin = JSON.parse(localStorage.getItem('profileAdmin'));
   const getAllCart = async () => {
     try {
-      const res = await getAllRepairAPI();
+      const res = await getAllRepairAPI(InfoAdmin?.CustomerID);
       if (res?.data) {
-        setListCart(res?.data);
+        setListCart(res?.data?.message?.priceQuote);
       }
     } catch (error) {}
   };
@@ -226,7 +226,7 @@ export default function RepairOrder() {
         receiptChoose={receiptChoose}
       />
       <RepairDetail
-        openDialog={true}
+        openDialog={openDetailDialog}
         setOpenDialog={setOpenDetailDialog}
         getAllCart={getAllCart}
         receiptChoose={receiptChoose}
@@ -241,7 +241,7 @@ export default function RepairOrder() {
 const Row = ({ row, setReceiptChoose, setOpenEditDialog, setOpenDetailDialog }) => {
   const {
     ReceiptID,
-    TimeCreate,
+    Time,
     Note,
     customer,
     staff,
@@ -257,14 +257,12 @@ const Row = ({ row, setReceiptChoose, setOpenEditDialog, setOpenDetailDialog }) 
     repairOrderDetails,
     // priceQuoteProductDetails,
     IsDone,
+    receipt,
   } = row;
 
   const [openToast, setOpenToast] = useState(false);
   const [severity, setSeverity] = useState(false);
   const [contentToast, setContentToast] = useState('');
-
-  const [openToastDatePicker, setOpenToastDatePicker] = useState(false);
-  const InfoAdmin = JSON.parse(localStorage.getItem('profileAdmin'));
 
   const countPrice = () => {
     const priceQuoteService = repairOrderDetails?.reduce(
@@ -276,34 +274,7 @@ const Row = ({ row, setReceiptChoose, setOpenEditDialog, setOpenDetailDialog }) 
       (a, b) => a * 1 + parseInt(b?.SellingPrice || '0.0') * b?.Quantity || 1,
       0
     );
-    return priceQuoteService * 1 + priceQuoteProduct * 1;
-  };
-
-  const addNewInvoice = async () => {
-    const data = {
-      Time: moment().format('DD-MM-yyyy hh:mm'),
-      StaffID: InfoAdmin?.userId,
-      QuoteID: QuoteID,
-    };
-    try {
-      const res = await addNewInvoiceAPI(data);
-      let errorMessage = res.message || 'Tạo hoá đơn thất bại';
-      let successMessage = res.message || 'Tạo hoá đơn thành công';
-      if (res.status === 201) {
-        setContentToast(successMessage);
-        setSeverity('success');
-
-        setOpenToast(true);
-      } else {
-        setContentToast(errorMessage);
-        setSeverity('error');
-        setOpenToast(true);
-      }
-    } catch (error) {
-      setContentToast('Tạo hoá đơn thất bại');
-      setSeverity('error');
-      setOpenToast(true);
-    }
+    return priceQuoteService * 1 + priceQuoteProduct * 1 || 0;
   };
 
   return (
@@ -311,12 +282,11 @@ const Row = ({ row, setReceiptChoose, setOpenEditDialog, setOpenDetailDialog }) 
       <TableRow hover key={RepairOrderID} tabIndex={-1} role="checkbox">
         <TableCell></TableCell>
         <TableCell align="center">{QuoteID}</TableCell>
-        <TableCell align="center">{RepairOrderID}</TableCell>
         {/* <TableCell align="center">{staff?.name}</TableCell> */}
-        <TableCell align="center">{priceQuote?.receipt?.customer?.name}</TableCell>
-        <TableCell align="center">{priceQuote?.receipt?.vehicle?.NumberPlate}</TableCell>
+        <TableCell align="center">{receipt?.customer?.name}</TableCell>
+        <TableCell align="center">{receipt?.vehicle?.NumberPlate}</TableCell>
 
-        <TableCell align="center">{TimeCreate}</TableCell>
+        <TableCell align="center">{Time}</TableCell>
         {/* <TableCell align="center">{staff?.name}</TableCell> */}
         {/* <TableCell align="center">{updateTime ? formatDateTime(updateTime) : ''}</TableCell> */}
         {/* <TableCell align="center">{timeToDone ? formatDate(timeToDone) : ''}</TableCell> */}
@@ -335,19 +305,6 @@ const Row = ({ row, setReceiptChoose, setOpenEditDialog, setOpenDetailDialog }) 
             }}
           >
             {Vi.detail}
-          </Button>
-        </TableCell>
-        <TableCell align="center">
-          {' '}
-          <Button
-            onClick={() => {
-              // setReceiptChoose(row);
-              // setOpenDetailDialog(true);
-              addNewInvoice();
-            }}
-            disabled={priceQuote?.Status === '1' && IsDone && !priceQuote?.invoice ? false : true}
-          >
-            Tạo hoá đơn
           </Button>
         </TableCell>
 

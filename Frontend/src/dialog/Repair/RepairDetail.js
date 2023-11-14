@@ -75,7 +75,7 @@ export default function RepairDetail(props) {
   const [listProductAddDefault, setListProductAddDefault] = useState([]);
   ///
   const [listServiceAdd, setListServiceAdd] = useState([]);
-  const [listProductAdd, setListProductAdd] = useState([]);
+  const [listProductAdd, setListProductAdd] = useState([{}]);
   const [isDoneAll, setIsDoneAll] = useState(false);
 
   //// useEffect
@@ -271,62 +271,62 @@ export default function RepairDetail(props) {
     }
   };
 
-  const renderItemProduct = (item, index) => {
-    return (
-      <Box>
-        <Box
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            //   justifyContent: 'space-between',
-            // backgroundColor: 'cyan',
-            width: 950,
-          }}
-        >
-          <Box style={{ display: 'flex', padding: 4, width: 60, justifyContent: 'space-between' }}>
-            <Typography style={{ width: 50, textAlign: 'center' }}>{index + 1}</Typography>
-            <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
-          </Box>
-          <Box style={{ display: 'flex', width: 106, justifyContent: 'space-between' }}>
-            <Typography style={{ width: 100, textAlign: 'center' }}>{item?.ProductDetailID}</Typography>
-            <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
-          </Box>
-          <Box style={{ display: 'flex', padding: 4, width: 168, justifyContent: 'space-between' }}>
-            <Typography style={{ width: 130, textAlign: 'center' }}>{item?.product?.ProductName}</Typography>
-            <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
-          </Box>
-          <Box style={{ display: 'flex', padding: 4, width: 146, justifyContent: 'space-between' }}>
-            <Typography style={{ width: 100, textAlign: 'center' }}>{item?.product?.brand?.BrandName}</Typography>
-            <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
-          </Box>
-          <Box style={{ display: 'flex', padding: 4, width: 140, justifyContent: 'space-between' }}>
-            <Typography style={{ width: 100, textAlign: 'center' }}>
-              {formatMoneyWithDot(parseInt(item.SellingPrice || '0.0'))}
-            </Typography>
-            <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
-          </Box>
-          <Box style={{ display: 'flex', padding: 4, width: 100, justifyContent: 'space-between' }}>
-            <Typography style={{ width: 100, textAlign: 'center' }}>{item.quantity}</Typography>
-            <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
-          </Box>
-          <Box style={{ display: 'flex', padding: 4, width: 156, justifyContent: 'space-between' }}>
-            <Typography style={{ width: 140, textAlign: 'center' }}>
-              {formatMoneyWithDot(parseInt(item.SellingPrice || '0.0') * item.quantity)}
-            </Typography>
-            <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
-          </Box>
-          {/* <Button
-            onClick={() => removeProductAdd(item?.ProductDetailID)}
-            disabled={item?.isRemove}
-            style={{ display: 'flex', padding: 4, width: 40, justifyContent: 'space-between' }}
-          >
-            <Typography style={{ width: 100, textAlign: 'center' }}>X</Typography>
-          </Button> */}
-        </Box>
-        <Box style={{ height: 1, backgroundColor: 'gray', width: 950 }} />
-      </Box>
-    );
-  };
+  // const renderItemProduct = (item, index) => {
+  //   return (
+  //     <Box>
+  //       <Box
+  //         style={{
+  //           display: 'flex',
+  //           alignItems: 'center',
+  //           //   justifyContent: 'space-between',
+  //           // backgroundColor: 'cyan',
+  //           width: 950,
+  //         }}
+  //       >
+  //         <Box style={{ display: 'flex', padding: 4, width: 60, justifyContent: 'space-between' }}>
+  //           <Typography style={{ width: 50, textAlign: 'center' }}>{index + 1}</Typography>
+  //           <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+  //         </Box>
+  //         <Box style={{ display: 'flex', width: 270, justifyContent: 'space-between' }}>
+  //           <Typography style={{ width: 240, textAlign: 'center' }}>{item?.ProductDetailID}</Typography>
+  //           <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+  //         </Box>
+  //         <Box style={{ display: 'flex', padding: 4, width: 240, justifyContent: 'space-between' }}>
+  //           <Typography style={{ width: 230, textAlign: 'center' }}>{item?.product?.ProductName}</Typography>
+  //           <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+  //         </Box>
+  //         <Box style={{ display: 'flex', padding: 4, width: 240, justifyContent: 'space-between' }}>
+  //           <Typography style={{ width: 230, textAlign: 'center' }}>{item?.product?.brand?.BrandName}</Typography>
+  //           <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+  //         </Box>
+  //         {/* <Box style={{ display: 'flex', padding: 4, width: 140, justifyContent: 'space-between' }}>
+  //           <Typography style={{ width: 100, textAlign: 'center' }}>
+  //             {formatMoneyWithDot(parseInt(item.SellingPrice || '0.0'))}
+  //           </Typography>
+  //           <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+  //         </Box> */}
+  //         <Box style={{ display: 'flex', padding: 4, width: 100, justifyContent: 'space-between' }}>
+  //           <Typography style={{ width: 100, textAlign: 'center' }}>{item.quantity}</Typography>
+  //           <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+  //         </Box>
+  //         {/* <Box style={{ display: 'flex', padding: 4, width: 156, justifyContent: 'space-between' }}>
+  //           <Typography style={{ width: 140, textAlign: 'center' }}>
+  //             {formatMoneyWithDot(parseInt(item.SellingPrice || '0.0') * item.quantity)}
+  //           </Typography>
+  //           <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+  //         </Box> */}
+  //         {/* <Button
+  //           onClick={() => removeProductAdd(item?.ProductDetailID)}
+  //           disabled={item?.isRemove}
+  //           style={{ display: 'flex', padding: 4, width: 40, justifyContent: 'space-between' }}
+  //         >
+  //           <Typography style={{ width: 100, textAlign: 'center' }}>X</Typography>
+  //         </Button> */}
+  //       </Box>
+  //       <Box style={{ height: 1, backgroundColor: 'gray', width: 950 }} />
+  //     </Box>
+  //   );
+  // };
   const renderItemService = (item, index) => {
     return (
       <Box>
@@ -518,6 +518,190 @@ export default function RepairDetail(props) {
           </Box>
         </Box>
         <Box style={{ height: 1, backgroundColor: 'gray' }} />
+      </Box>
+    );
+  };
+
+  const renderItemProduct = (item, index) => {
+    return (
+      <Box>
+        {!item?.type ? (
+          <>
+            <Box
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                //   justifyContent: 'space-between',
+                // backgroundColor: 'cyan',
+                width: 950,
+              }}
+            >
+              <Box style={{ display: 'flex', padding: 4, width: 60, justifyContent: 'space-between' }}>
+                <Typography style={{ width: 50, textAlign: 'center' }}>{index + 1}</Typography>
+                <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+              </Box>
+              <Box style={{ display: 'flex', width: 270, justifyContent: 'space-between' }}>
+                <Typography style={{ width: 260, textAlign: 'center' }}>
+                  {item?.ProductDetailID || 'Hư kính xe'}
+                </Typography>
+                <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+              </Box>
+              <Box style={{ display: 'flex', width: 590, justifyContent: 'space-between', marginLeft: 12 }}>
+                <Typography style={{ width: 570 }}>
+                  {item?.ProductDetailID || 'Kính xe trái bị vỡ khó nhìn được cần phải thay'}
+                </Typography>
+              </Box>
+              <Button
+                onClick={() => handleDone(item?.IsDone, item?.ServiceID)}
+                disabled={item?.isRemove}
+                style={{ display: 'flex', padding: 4, width: 30, height: 30, justifyContent: 'space-between' }}
+              >
+                <Typography style={{ width: 30, height: 30, textAlign: 'center', border: '1px solid red' }}>
+                  {item?.IsDone ? 'V' : ''}
+                </Typography>
+              </Button>
+            </Box>
+            <Box style={{ height: 1, backgroundColor: 'gray', width: 950 }} />
+          </>
+        ) : (
+          <Box
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              //   justifyContent: 'space-between',
+              // backgroundColor: 'cyan',
+              width: 1200,
+            }}
+          >
+            <Box style={{ display: 'flex', padding: 4, width: 60, justifyContent: 'space-between' }}>
+              <Typography style={{ width: 50, textAlign: 'center' }}></Typography>
+              <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+            </Box>
+            <Box style={{ display: 'flex', width: 106, justifyContent: 'space-between' }}>
+              <Typography style={{ width: 100, textAlign: 'center' }}>{item?.ProductDetailID}</Typography>
+              <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+            </Box>
+            <Box style={{ display: 'flex', padding: 4, width: 168, justifyContent: 'space-between' }}>
+              <Typography style={{ width: 130, textAlign: 'center' }}>{item?.product?.ProductName}</Typography>
+              <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+            </Box>
+            <Box style={{ display: 'flex', padding: 4, width: 146, justifyContent: 'space-between' }}>
+              <Typography style={{ width: 100, textAlign: 'center' }}>{item?.product?.brand?.BrandName}</Typography>
+              <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+            </Box>
+            <Box style={{ display: 'flex', padding: 4, width: 140, justifyContent: 'space-between' }}>
+              <Typography style={{ width: 100, textAlign: 'center' }}>
+                {formatMoneyWithDot(parseInt(item.SellingPrice || '0.0'))}
+              </Typography>
+              <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+            </Box>
+            <Box style={{ display: 'flex', padding: 4, width: 100, justifyContent: 'space-between' }}>
+              <Typography style={{ width: 100, textAlign: 'center' }}>{item.quantity}</Typography>
+              <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+            </Box>
+            <Box style={{ display: 'flex', padding: 4, width: 156, justifyContent: 'space-between' }}>
+              <Typography style={{ width: 140, textAlign: 'center' }}>
+                {formatMoneyWithDot(parseInt(item.SellingPrice || '0.0') * item.quantity)}
+              </Typography>
+              <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+            </Box>
+            {/* <Button
+            onClick={() => removeProductAdd(item?.ProductDetailID)}
+            disabled={item?.isRemove}
+            style={{ display: 'flex', padding: 4, width: 40, justifyContent: 'space-between' }}
+          >
+            <Typography style={{ width: 100, textAlign: 'center' }}>X</Typography>
+          </Button> */}
+          </Box>
+        )}
+        <Box
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            //   justifyContent: 'space-between',
+            // backgroundColor: 'cyan',
+            width: 950,
+          }}
+        >
+          <Box style={{ display: 'flex', padding: 4, width: 60, justifyContent: 'space-between' }}>
+            <Typography style={{ width: 50, textAlign: 'center' }}></Typography>
+            <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+          </Box>
+          <Box style={{ display: 'flex', width: 270, justifyContent: 'space-between' }}>
+            <Typography style={{ width: 230, textAlign: 'center' }}>{item?.ProductDetailID}</Typography>
+            <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+          </Box>
+          <Box style={{ display: 'flex', padding: 4, width: 230, justifyContent: 'space-between' }}>
+            <Typography style={{ width: 230, textAlign: 'center' }}>
+              {item?.product?.ProductName || 'Kính xe'}
+            </Typography>
+            <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+          </Box>
+          <Box style={{ display: 'flex', padding: 4, width: 250, justifyContent: 'space-between' }}>
+            <Typography style={{ width: 230, textAlign: 'center' }}>
+              {item?.product?.brand?.BrandName || 'Toyota'}
+            </Typography>
+            <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+          </Box>
+
+          <Box style={{ display: 'flex', padding: 4, width: 100, justifyContent: 'space-between' }}>
+            <Typography style={{ width: 100, textAlign: 'center' }}>{item.quantity || 2}</Typography>
+            <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+          </Box>
+
+          {/* <Button
+            onClick={() => removeProductAdd(item?.ProductDetailID)}
+            disabled={item?.isRemove}
+            style={{ display: 'flex', padding: 4, width: 40, justifyContent: 'space-between' }}
+          >
+            <Typography style={{ width: 100, textAlign: 'center' }}>X</Typography>
+          </Button> */}
+        </Box>
+        <Box style={{ height: 1, backgroundColor: 'gray', width: 1200 }} />
+        <Box
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            //   justifyContent: 'space-between',
+            // backgroundColor: 'cyan',
+            width: 1200,
+          }}
+        >
+          <Box style={{ display: 'flex', padding: 4, width: 60, justifyContent: 'space-between' }}>
+            <Typography style={{ width: 50, textAlign: 'center' }}></Typography>
+            <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+          </Box>
+          <Box style={{ display: 'flex', width: 270, justifyContent: 'space-between' }}>
+            <Typography style={{ width: 230, textAlign: 'center' }}>{item?.ProductDetailID}</Typography>
+            <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+          </Box>
+          <Box style={{ display: 'flex', padding: 4, width: 230, justifyContent: 'space-between' }}>
+            <Typography style={{ width: 230, textAlign: 'center' }}>
+              {item?.product?.ProductName || 'Thay kính xe'}
+            </Typography>
+            <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+          </Box>
+          <Box style={{ display: 'flex', padding: 4, width: 250, justifyContent: 'space-between' }}>
+            <Typography style={{ width: 230, textAlign: 'center' }}>
+              {item?.product?.brand?.BrandName || 'Trong Hieu'}
+            </Typography>
+            <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+          </Box>
+
+          <Box style={{ display: 'flex', padding: 4, width: 100, justifyContent: 'space-between' }}>
+            <Typography style={{ width: 100, textAlign: 'center' }}>{item.quantity || 1}</Typography>
+            <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+          </Box>
+
+          {/* <Button
+            onClick={() => removeProductAdd(item?.ProductDetailID)}
+            disabled={item?.isRemove}
+            style={{ display: 'flex', padding: 4, width: 40, justifyContent: 'space-between' }}
+          >
+            <Typography style={{ width: 100, textAlign: 'center' }}>X</Typography>
+          </Button> */}
+        </Box>
+        <Box style={{ height: 1, backgroundColor: 'gray', width: 950 }} />
       </Box>
     );
   };

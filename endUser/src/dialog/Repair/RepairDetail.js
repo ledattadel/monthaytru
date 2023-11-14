@@ -97,38 +97,45 @@ export default function RepairDetail(props) {
   }, [inforVehicle?.vehicleNumber]);
 
   useEffect(() => {
-    if (receiptChoose?.RepairOrderID) {
-      handleDataCustomer('phoneNumber', receiptChoose?.priceQuote?.receipt?.customer?.phoneNumber);
-      handleDataCustomer('name', receiptChoose?.priceQuote?.receipt?.customer?.name);
-      handleDataVehicle('vehicleNumber', receiptChoose?.priceQuote?.receipt?.vehicle?.NumberPlate);
-
+    if (receiptChoose?.QuoteID) {
+      handleDataCustomer('phoneNumber', receiptChoose?.receipt?.customer?.phoneNumber);
+      handleDataCustomer('name', receiptChoose?.receipt?.customer?.name);
+      handleDataVehicle('vehicleNumber', receiptChoose?.receipt?.vehicle?.NumberPlate);
+      setCreateAt(receiptChoose?.Time);
+      console.log('pon console', receiptChoose?.Time);
       const dataProduct = [];
-      receiptChoose?.priceQuote?.priceQuoteProductDetails?.forEach((e, index) => {
-        const temp = {
-          ...e?.productDetail,
-          quantity: e?.Quantity,
-          supplier: e?.supplier,
-          isRemove: e?.Status === 1 ? true : false,
-          index: index + 1,
-          isAcceptedRepair: e?.isAcceptedRepair,
-        };
-        dataProduct?.push(temp);
+      const listRepairItem = [];
+      receiptChoose?.vehicleStatusReceipts?.forEach((item, index) => {
+        item?.pqProductDetails?.forEach((e, index) => {
+          const temp = {
+            ...e?.productDetail,
+            quantity: e?.Quantity,
+            supplier: e?.supplier,
+            isRemove: e?.Status === 1 ? true : false,
+            index: index + 1,
+            isAcceptedRepair: e?.isAcceptedRepair,
+            vehicleStatus: item?.vehicleStatus,
+          };
+          dataProduct?.push(temp);
+        });
+        listRepairItem?.push(item?.vehicleStatus);
       });
       setListProductAddDefault(dataProduct);
       setListProductAdd(dataProduct);
 
       const dataService = [];
-      receiptChoose?.repairOrderDetails?.forEach((e, index) => {
-        const temp = {
-          ...e?.pqServiceDetail?.service,
-          staff: e?.staff,
-          isRemove: e?.Status === 1 ? true : false,
-          index: index + 1,
-          isAcceptedRepair: e?.isAcceptedRepair,
-          IsDone: e?.IsDone,
-          RODID: e?.RODID,
-        };
-        dataService?.push(temp);
+      receiptChoose?.vehicleStatusReceipts?.forEach((item, index) => {
+        item?.pqServiceDetails?.forEach((e, index) => {
+          const temp = {
+            ...e?.service,
+            staff: e?.repairOrderDetails?.[0]?.staff,
+            isRemove: e?.Status === 1 ? true : false,
+            index: index + 1,
+            isAcceptedRepair: e?.isAcceptedRepair,
+            vehicleStatus: item?.vehicleStatus,
+          };
+          dataService?.push(temp);
+        });
       });
       setListServiceAddDefault(dataService);
       setListServiceAdd(dataService);
@@ -728,7 +735,7 @@ export default function RepairDetail(props) {
                   shrink: true,
                 }}
                 disabled={true}
-                value={receiptChoose?.priceQuote?.ReceiptID}
+                value={receiptChoose?.ReceiptID}
                 size="small"
                 required
               />
@@ -744,7 +751,7 @@ export default function RepairDetail(props) {
                 size="small"
                 required
               />
-              <TextField
+              {/* <TextField
                 id="quoteId"
                 label={'Mã phiếu lệnh sửa chửa'}
                 sx={{ mr: 2 }}
@@ -756,7 +763,7 @@ export default function RepairDetail(props) {
                 size="small"
                 required
                 value={receiptChoose?.RepairOrderID}
-              />
+              /> */}
               <TextField
                 id="createAt"
                 label={Vi.createAt}
@@ -1066,6 +1073,9 @@ export default function RepairDetail(props) {
             </Button>
           ) : null} */}
 
+          <Button variant="outlined" onClick={() => handleAddProduct()} type="submit">
+            Huỷ
+          </Button>
           <Button variant="outlined" onClick={() => handleAddProduct()} type="submit">
             Xác nhận báo giá
           </Button>

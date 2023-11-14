@@ -33,7 +33,7 @@ export default function AssignService(props) {
   /// state list services / product
 
   ///
-  const [listServiceAdd, setListServiceAdd] = useState([]);
+  const [listServiceAdd, setListServiceAdd] = useState([{ ServiceName: 'Hư kính xe' }, { ServiceName: 'Hư bánh xe' }]);
   const [listProductAdd, setListProductAdd] = useState([]);
 
   //
@@ -181,7 +181,7 @@ export default function AssignService(props) {
             alignItems: 'center',
             //   justifyContent: 'space-between',
             // backgroundColor: 'cyan',
-            width: 950,
+            width: 470,
           }}
         >
           <Box style={{ display: 'flex', padding: 4, width: 60, justifyContent: 'space-between' }}>
@@ -189,12 +189,12 @@ export default function AssignService(props) {
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
 
-          <Box style={{ display: 'flex', padding: 4, width: 268, justifyContent: 'space-between' }}>
-            <Typography style={{ width: 230, textAlign: 'center' }}>{item?.ServiceName}</Typography>
+          <Box style={{ display: 'flex', padding: 4, width: 230, justifyContent: 'space-between' }}>
+            <Typography style={{ width: 220, textAlign: 'center' }}>{item?.ServiceName}</Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
 
-          <Box style={{ display: 'flex', padding: 4, width: 200, justifyContent: 'space-between' }}>
+          <Box style={{ display: 'flex', padding: 4, width: 250, justifyContent: 'space-between' }}>
             {/* <Typography style={{ width: 100, textAlign: 'center' }}>{item?.staff?.name}</Typography> */}
             <Autocomplete
               disablePortal
@@ -209,17 +209,17 @@ export default function AssignService(props) {
               // defaultValue={ENUM_PRODUCT_TYPE?.[0]}
               renderInput={(params) => <TextField {...params} label={'chọn nhân viên sửa chửa'} />}
             />
-            <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+            {/* <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} /> */}
           </Box>
         </Box>
-        <Box style={{ height: 1, backgroundColor: 'gray', width: 950 }} />
+        <Box style={{ height: 1, backgroundColor: 'gray', width: 530 }} />
       </Box>
     );
   };
 
   const renderTitleServices = () => {
     return (
-      <Box style={{ width: 730 }}>
+      <Box style={{ width: 530 }}>
         <Box
           style={{
             display: 'flex',
@@ -233,18 +233,18 @@ export default function AssignService(props) {
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
 
-          <Box style={{ display: 'flex', width: 240 }}>
+          {/* <Box style={{ display: 'flex', width: 240 }}>
             <Typography style={{ width: 220, textAlign: 'center' }}>{Vi.nameService}</Typography>
+            <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+          </Box> */}
+          <Box style={{ display: 'flex', padding: 4, width: 230 }}>
+            <Typography style={{ width: 220, textAlign: 'center' }}>Hạng mục sửa chửa</Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
 
           <Box style={{ display: 'flex', padding: 4, width: 200 }}>
             <Typography style={{ width: 200, textAlign: 'center' }}>Nhân viên kỉ thuật</Typography>
-            <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
-          </Box>
-          <Box style={{ display: 'flex', padding: 4, width: 230 }}>
-            <Typography style={{ width: 220, textAlign: 'center' }}>Hạng mục sửa chửa</Typography>
-            <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+            {/* <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} /> */}
           </Box>
         </Box>
         <Box style={{ height: 1, backgroundColor: 'gray' }} />
@@ -261,7 +261,7 @@ export default function AssignService(props) {
 
           <Button onClick={() => setOpenDialog(false)}>X</Button>
         </Box>
-        <DialogContent sx={{ height: 650, width: 800 }}>
+        <DialogContent sx={{ height: 650, width: 600 }}>
           {renderTitleServices()}
           {listServiceAdd?.map((e, index) => renderItemService(e, index))}
         </DialogContent>

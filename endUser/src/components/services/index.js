@@ -474,9 +474,9 @@ export const addUpdateQuoteAPI = async (body, id) => {
 
 //// REPAIR
 
-export const getAllRepairAPI = async () => {
+export const getAllRepairAPI = async (id) => {
   try {
-    const response = await axios.get(API_GET_ALL_REPAIR, {
+    const response = await axios.get(`${API_GET_ALL_REPAIR}/${id}`, {
       headers: { authorization: `Bearer ${token}` },
     });
     return response;

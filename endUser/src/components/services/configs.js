@@ -72,7 +72,7 @@
 const BASE_URL = 'http://ec2-13-212-78-52.ap-southeast-1.compute.amazonaws.com:8888/api';
 // https://bf4a-27-78-35-127.ngrok-free.app/api/staff/sign-in
 // Sign in
-export const SIGN_IN_ADMIN = `${BASE_URL}/staff/sign-in`;
+export const SIGN_IN_ADMIN = `${BASE_URL}/customer/sign-in`;
 export const GET_USER_INFO = `${BASE_URL}/staff/user-info`;
 
 //Accesory Type
@@ -113,7 +113,7 @@ export const API_GET_ALL_QUOTE = `${BASE_URL}/pricequote`;
 //quote
 export const API_GET_ALL_INVOICE = `${BASE_URL}/invoice`;
 //repair
-export const API_GET_ALL_REPAIR = `${BASE_URL}/repair`;
+export const API_GET_ALL_REPAIR = `${BASE_URL}/customer/pricequote`;
 //vehicle
 export const API_GET_ALL_VEHICLE = `${BASE_URL}/vehicle`;
 //vehiclestatus' \
