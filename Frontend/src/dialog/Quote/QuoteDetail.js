@@ -40,7 +40,7 @@ export default function QuoteDetail(props) {
   const [openToastHere, setOpenToastHere] = useState(false);
   const [contentToastHere, setContentToastHere] = useState('');
   const [severityHere, setSeverityHere] = useState('');
-
+  const [listDetailProductToCompare, setListDetailProductToCompare] = useState([]);
   const [cartId, setCartId] = useState(0);
 
   /// services/product
@@ -57,7 +57,7 @@ export default function QuoteDetail(props) {
   const [isClear, setIsClear] = useState(true);
   const [isClearService, setIsClearService] = useState(true);
   const [errorMsg, setErrorMsg] = useState('');
-  ///
+  ///   
   const [createAt, setCreateAt] = useState();
 
   const [inforCustomer, setInforCustomer] = useState({
@@ -130,12 +130,13 @@ export default function QuoteDetail(props) {
           const temp = {
             ...e?.productDetail,
             quantity: e?.Quantity,
-            supplier: e?.supplier,
+            supplier: e?.productDetail?.supplier,
             isRemove: e?.Status === 1 ? true : false,
             index: index + 1,
             isAcceptedRepair: e?.isAcceptedRepair,
             vehicleStatus: item?.vehicleStatus,
           };
+
           dataProduct?.push(temp);
         });
         listRepairItem?.push(item?.vehicleStatus);
@@ -204,6 +205,8 @@ export default function QuoteDetail(props) {
       setListStaff(res?.data);
     } catch (error) {}
   };
+
+
 
   const getAllProduct = async () => {
     try {
@@ -296,6 +299,7 @@ export default function QuoteDetail(props) {
         PurchasePrice: e?.PurchasePrice,
         Quantity: e?.quantity,
         productDetailID: e?.ProductDetailID,
+        vehicleStatus: e?.vehicleStatus?.ID,
         isAcceptedRepair:
           status === 1 ? true : status === 0 ? false : status === 2 && e?.isAcceptedRepair ? true : false,
       };
@@ -306,6 +310,7 @@ export default function QuoteDetail(props) {
           ServiceID: e?.ServiceID,
           Price: e?.Price,
           Technician: e?.staff?.id,
+          vehicleStatus: e?.vehicleStatus?.ID,
           isAcceptedRepair:
             status === 1 ? true : status === 0 ? false : status === 2 && e?.isAcceptedRepair ? true : false,
         };
@@ -319,16 +324,58 @@ export default function QuoteDetail(props) {
       TimeUpdate: moment().format('DD-MM-yyyy hh:mm'),
       EditorID: InfoAdmin?.userId,
       // ReceiptID: receiptChoose?.ReceiptID,
-      priceQuoteServiceDetails: dataService,
-      priceQuoteProductDetails: dataProduct,
+      dataService: dataService,
+      dataProduct: dataProduct,
       TimeCreateRepair: receiptChoose?.repairOrder?.TimeCreate ?? moment().format('DD-MM-yyyy hh:mm'),
     };
-    // console.log('pon console', receiptChoose);
-    addNewQuote(data, receiptChoose?.QuoteID);
+    // console.log("zzz",mergeDataPriceQuoteUpdate(data));
+    addNewQuote(mergeDataPriceQuoteUpdate(data), receiptChoose?.QuoteID);
   };
+
+  function mergeDataPriceQuoteUpdate(inputData) {
+    const result = {
+      Status: inputData.Status,
+      TimeUpdate: inputData.TimeUpdate,
+      EditorID: inputData.EditorID,
+      vehicleStatus: [],
+      TimeCreateRepair: inputData.TimeCreateRepair,
+    };
+  
+    inputData.dataService.forEach((value) => {
+      const existingStatus = result.vehicleStatus.find((status) => status.ID === value.vehicleStatus);
+  
+      if (existingStatus) {
+        existingStatus.pqService = existingStatus.pqService || [];
+        if (!existingStatus?.pqService?.find((service) => service.ServiceID === value.ServiceID)) {
+          existingStatus.pqService.push(value);
+        }
+      } else {
+        result.vehicleStatus.push({ ID: value.vehicleStatus, pqService: [value] });
+      }
+    });
+  
+    inputData.dataProduct.forEach((value) => {
+      const vehicleStatusID = value.vehicleStatus;
+      const existingStatus = result.vehicleStatus.find((status) => status.ID === vehicleStatusID);
+  
+      if (existingStatus) {
+        existingStatus.pqProduct = existingStatus.pqProduct || [];  
+        if (!existingStatus.pqProduct.find((product) => product.productDetailID === value.productDetailID)) {
+          existingStatus.pqProduct.push(value);
+        }
+      } else {
+        result.vehicleStatus.push({ ID: vehicleStatusID, pqProduct: [value] });
+      }
+    });
+  
+    return result;
+  }
+  
+
   const handleAddProductToList = () => {
     const listChoose = listServiceAdd?.filter((e) => e?.vehicleStatus?.ID === repairItemChoose?.ID);
     const flat = listChoose?.filter((e) => e?.ProductDetailID === productChoose?.ProductDetailID);
+    
     if (!productChoose?.quantity) {
       setContentToastHere('số luợng phải lớn hơn 0');
       setOpenToastHere(true);
@@ -342,7 +389,7 @@ export default function QuoteDetail(props) {
       const data = { ...flat?.[0], quantity: flat?.[0]?.quantity * 1 + productChoose?.quantity * 1 };
 
       const product = [...tempData, data]?.sort((a, b) => a.index - b.index);
-
+      console.log("data add", product);
       setListProductAdd(product);
 
       const tempData1 = listProductAdd1?.filter((e) => e?.ProductDetailID !== productChoose?.ProductDetailID);
@@ -419,6 +466,8 @@ export default function QuoteDetail(props) {
       });
     }
   };
+
+
 
   const removeServiceAdd = (ServiceID) => {
     const listTemp = [...listServiceAdd];
@@ -505,6 +554,7 @@ export default function QuoteDetail(props) {
     0
   );
   const renderItemProduct = (item, index) => {
+    // console.log('item', item);
     return (
       <Box>
         <Box
@@ -525,15 +575,19 @@ export default function QuoteDetail(props) {
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
           <Box style={{ display: 'flex', padding: 4, width: 168, justifyContent: 'space-between' }}>
-            <Typography style={{ width: 130, textAlign: 'center' }}>{item?.product?.ProductName}</Typography>
+            <Typography style={{ width: 138, textAlign: 'center' }}>{item?.product?.ProductName} </Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
           <Box style={{ display: 'flex', padding: 4, width: 146, justifyContent: 'space-between' }}>
-            <Typography style={{ width: 100, textAlign: 'center' }}>{item?.product?.brand?.BrandName}</Typography>
+            <Typography style={{ width: 110, textAlign: 'center' }}>{item?.product?.brand?.BrandName}</Typography>
+            <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+          </Box>
+          <Box style={{ display: 'flex', padding: 4, width: 146, justifyContent: 'space-between' }}>
+            <Typography style={{ width: 110, textAlign: 'center' }}>{item?.supplier?.name}</Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
           <Box style={{ display: 'flex', padding: 4, width: 140, justifyContent: 'space-between' }}>
-            <Typography style={{ width: 100, textAlign: 'center' }}>
+            <Typography style={{ width: 110, textAlign: 'center' }}>
               {formatMoneyWithDot(parseInt(item.SellingPrice || '0.0'))}
             </Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
@@ -688,6 +742,11 @@ export default function QuoteDetail(props) {
             <Typography style={{ width: 100, textAlign: 'center' }}>{Vi.brand}</Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
+          <Box style={{ display: 'flex', padding: 4, width: 140, justifyContent: 'space-between' }}>
+            <Typography style={{ width: 100, textAlign: 'center' }}>Nhà phân phối</Typography>
+            <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
+          </Box>
+
           <Box style={{ display: 'flex', padding: 4, width: 140, justifyContent: 'space-between' }}>
             <Typography style={{ width: 100, textAlign: 'center' }}>{Vi.price}</Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />

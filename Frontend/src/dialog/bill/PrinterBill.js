@@ -278,7 +278,7 @@ export default function PrinterBill(props) {
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
           <Box style={{ display: 'flex', padding: 4, width: 200 }}>
-            <Typography style={{ width: 200, textAlign: 'center' }}>Nhân viên kỉ thuật</Typography>
+            <Typography style={{ width: 200, textAlign: 'center' }}>Nhân viên kĩ thuật</Typography>
             <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
           </Box>
 

@@ -601,7 +601,7 @@ export default function ImportProductDialog(props) {
               disablePortal
               id="nameService"
               options={listProduct}
-              getOptionLabel={(option) => `${option?.ProductName} - ${option?.brand?.BrandName}`}
+              getOptionLabel={(option) => `${option?.ProductName} - ${option?.brand?.BrandName} -${option?.Price}đ`}
               sx={{ width: 350, mr: 2 }}
               onChange={(e, newValue) => {
                 setErrorMsg('');

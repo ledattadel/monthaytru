@@ -7,7 +7,7 @@ import TextField from '@mui/material/TextField';
 import React, { useEffect, useState } from 'react';
 
 import moment from 'moment';
-import { addCarDesAPI, addNewReceiptAPI, getUserByPhoneAPI, getVehicleByNumberAPI } from 'src/components/services';
+import { addCarDesAPI, addNewReceiptAPI, getUserByPhoneAPI, getVehicleByNumberAPI, checkExistPriceQuoteAPI } from 'src/components/services';
 import AppToast from 'src/myTool/AppToast';
 import { Vi } from 'src/_mock/Vi';
 
@@ -34,6 +34,7 @@ export default function ReceiptDetail(props) {
   const [errorMsg, setErrorMsg] = useState('');
   const [cartId, setCartId] = useState(0);
   ///
+  const [isExistPriceQuote, setIsExistPriceQuote] = useState(false);
   const [createAt, setCreateAt] = useState();
   const [inforCustomerApi, setInforCustomerApi] = useState({});
   const [inforCustomer, setInforCustomer] = useState({
@@ -103,9 +104,18 @@ export default function ReceiptDetail(props) {
       setSeverityHere('error');
     }
   };
-
+  const checkExistPriceQuote = async (id) => {
+    try {
+      const res = await checkExistPriceQuoteAPI(id);
+      const temp = res?.data?.existPriceQuote;
+      setIsExistPriceQuote(temp);
+    } catch (error) {
+      console.log(error);
+    }
+  }
   useEffect(() => {
     if (receiptChoose?.ReceiptID) {
+      checkExistPriceQuote(receiptChoose?.ReceiptID);
       handleDataCustomer('phoneNumber', receiptChoose?.customer?.phoneNumber);
       handleDataVehicle('vehicleNumber', receiptChoose?.vehicle?.NumberPlate);
       setVehicleCondition(receiptChoose?.VehicleStatus);
@@ -159,6 +169,7 @@ export default function ReceiptDetail(props) {
       console.log(error);
     }
   };
+
 
   React.useEffect(() => {
     // getAllUser();
@@ -526,9 +537,10 @@ export default function ReceiptDetail(props) {
         </p>
         <DialogActions>
           <Button onClick={handleClose}>Huỷ</Button>
-          <Button onClick={openCreateQuoteDialog} type="submit">
+          {!isExistPriceQuote && <Button onClick={openCreateQuoteDialog} type="submit">
             Tạo báo giá
-          </Button>
+          </Button>}
+          
         </DialogActions>
       </Dialog>
       <AppToast

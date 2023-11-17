@@ -69,45 +69,25 @@ export default function EditReceipt(props) {
   const [repairItem, setRepairItem] = useState([]);
   const [repairItemChoose, setRepairItemChoose] = useState({});
   const addProduct = async (id) => {
-    // const data = {
-    //   idCartDes: cartId,
-    //   productAdd,
-    //   ...(additionPrice ? { additionPrice } : null),
-    // };
-
-    // const data = {
-    //   timeCreate: moment().format('DD-MM-yyyy hh:mm'),
-    //   staffId: InfoAdmin?.userId,
-    //   customerPhoneNumber: inforCustomerApi?.phoneNumber ?? inforCustomer?.phoneNumber,
-    //   customerName: inforCustomerApi?.name ?? inforCustomer?.name,
-    //   email: inforCustomerApi?.email ?? inforCustomer?.email,
-    //   NumberPlateVehicle: inforVehicleApi.NumberPlate ?? inforVehicle?.vehicleNumber,
-    //   TypeVehicle: inforVehicleApi?.Type ?? inforVehicle?.vehicleType,
-    //   ColorVehicle: inforVehicleApi?.Color ?? inforVehicle?.vehicleColor,
-    //   EngineNumberVehicle: inforVehicleApi?.EngineNumber ?? inforVehicle?.engineNumber,
-    //   ChassisNumberVehicle: inforVehicleApi?.ChassisNumber ?? inforVehicle?.chassisNumber,
-    //   BrandNameVehicle: inforVehicleApi?.brand?.BrandID ?? inforVehicle?.brand,
-    //   VehicleStatus: vehicleCondition,
-    //   Note: noteVehicle,
-    // };
-
     const vehicleStatusList = [];
-
     repairItem?.forEach((e) => {
-      const temp = {
-        id: e?.ID,
-        condition: e?.condition,
-      };
-      vehicleStatusList?.push(temp);
+      if (e.QuoteID=== undefined) {
+        const temp = {
+          id: e?.ID,
+          Condition: e?.Condition,
+    
+        };
+          vehicleStatusList?.push(temp);
+      }
+   
+   
     });
-
     const data = {
       TimeUpdate: moment().format('DD-MM-yyyy hh:mm'),
       Editor: InfoAdmin?.userId,
       VehicleStatus: vehicleStatusList,
       Note: noteVehicle,
     };
-
     try {
       const res = await editReceiptlAPI(data, id);
       let errorMessage = res.message || 'Sửa phiếu tiếp nhận thất bại';
@@ -132,12 +112,25 @@ export default function EditReceipt(props) {
     }
   };
 
+  function transformData(inputData) {
+    return inputData.map((item) => {
+      const { vehicleStatus, TimeCreate, ...rest } = item;
+      return {
+        ID: vehicleStatus.ID,
+        Name: vehicleStatus.Name,
+        TimeCreate,
+        ...rest,
+      };
+    });
+  }
+  
   useEffect(() => {
     console.log('pon console', receiptChoose);
     if (receiptChoose?.ReceiptID) {
       handleDataCustomer('phoneNumber', receiptChoose?.customer?.phoneNumber);
       handleDataVehicle('vehicleNumber', receiptChoose?.vehicle?.NumberPlate);
       setVehicleCondition(receiptChoose?.VehicleStatus);
+      setRepairItem(transformData(receiptChoose?.vehicleStatusReceipts));
       setNoteVehicle(receiptChoose?.Note);
     }
   }, [receiptChoose, openDialog]);
@@ -232,7 +225,7 @@ export default function EditReceipt(props) {
       setSeverityHere('error');
     } else {
       const temp = [...repairItem];
-      temp?.push({ ...repairItemChoose, condition: vehicleCondition });
+      temp?.push({ ...repairItemChoose, Condition: vehicleCondition });
       setRepairItem(temp);
       setVehicleCondition('');
     }
@@ -264,7 +257,7 @@ export default function EditReceipt(props) {
                   shrink: true,
                 }}
                 disabled={true}
-                //   value={price}
+                  value={receiptChoose?.ReceiptID}
                 //   onChange={(e) => setPrice(e.target.value)}
                 size="small"
                 required
@@ -544,12 +537,13 @@ export default function EditReceipt(props) {
                     <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
                   </Box>
                   <Box style={{ display: 'flex', width: 500 }}>
-                    <Typography style={{ width: 400, textAlign: 'center' }}>{e?.condition}</Typography>
+                    <Typography style={{ width: 400, textAlign: 'center' }}>{e?.Condition}</Typography>
                     <Box style={{ height: 25, width: 1, backgroundColor: 'grey', marginLeft: 6 }} />
                   </Box>
-                  <Box onClick={() => removeRepairItem(e?.ID)} style={{ display: 'flex', width: 40 }}>
+                  {!e?.isTranferToPriceQuote &&  <Box onClick={() => removeRepairItem(e?.ID)} style={{ display: 'flex', width: 40 }}>
                     <Typography style={{ width: 40, textAlign: 'center' }}>X</Typography>
-                  </Box>
+                  </Box>}
+                 
                 </Box>
                 <Box style={{ height: 1, backgroundColor: 'gray' }} />
               </Box>
